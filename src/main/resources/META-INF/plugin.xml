@@ -1,0 +1,31 @@
+<idea-plugin>
+    <id>it.achdjian.plugin.ESP322</id>
+    <name>ESP32</name>
+    <vendor email="pachdjian@gmail.com"></vendor>
+
+    <description><![CDATA[
+    This plugin allow to develop a ESP32 firmware inside CLion, enabling CLion to detect all the references of the ESP32 SDK
+
+    Features:
+    <ul>
+    </ul>
+    ]]></description>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <depends>com.intellij.modules.clion</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <directoryProjectGenerator implementation="it.achdjian.plugin.esp32.generator.CProjectGenerator"/>
+        <applicationConfigurable order="last" id="ESP32.plugin.achdjian.it" displayName="ESP32 config" groupId="build" instance="it.achdjian.plugin.esp32.setting.ESP32Setting"/>
+    </extensions>
+
+    <actions>
+        <!-- Add your actions here -->
+    </actions>
+
+</idea-plugin>
