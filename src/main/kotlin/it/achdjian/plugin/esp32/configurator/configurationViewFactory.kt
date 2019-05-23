@@ -143,7 +143,7 @@ private fun menuPanel(configurationEntry: ConfigurationEntry, menuEntry: MenuEnt
 }
 
 
-class IntInputVerifier(private val min: Int, private val max: Int) : InputVerifier() {
+class IntInputVerifier(private val min: Long, private val max: Long) : InputVerifier() {
     companion object {
         val ERROR_BACKGROUND = Color(255, 215, 215)
     }
@@ -184,7 +184,7 @@ class IntegerTextField(private val intConfigEntry: IntConfigEntry) : JFormattedT
         background = NORMAL_BACKGROUND
         text = intConfigEntry.value.toString()
         document.addDocumentListener(this)
-//        inputVerifier = IntInputVerifier(intConfigEntry.min, intConfigEntry.max)
+        inputVerifier = IntInputVerifier(intConfigEntry.min, intConfigEntry.max)
     }
 
     override fun processKeyBinding(ks: KeyStroke, e: KeyEvent, condition: Int, pressed: Boolean): Boolean {
