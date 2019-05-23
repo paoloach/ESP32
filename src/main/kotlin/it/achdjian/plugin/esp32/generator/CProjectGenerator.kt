@@ -27,7 +27,6 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
     }
 
     override fun getSettingsPanel(): JComponent? {
-        wizardData.updateEntries()
         val settingPanel = ESP32WizardPanel(createSettingsPanel(), wizardData.entries)
         return settingPanel
     }
