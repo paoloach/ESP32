@@ -6,7 +6,6 @@ import io.mockk.impl.annotations.MockK
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.instanceOf
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.io.File
@@ -41,7 +40,12 @@ internal class EspressifMenuTest {
         )
 
 
-        val menu = EspressifMenu(EspressifMenuNullElement(),"menu \"Component config\"", mapOf("COMPONENT_KCONFIGS" to listOf(file)), readFile)
+        val menu = EspressifMenu(
+            EspressifMenuNullElement(),
+            "menu \"Component config\"",
+            mapOf("COMPONENT_KCONFIGS" to listOf(file)),
+            readFile
+        )
 
 
         menu.addLine("source \"\$COMPONENT_KCONFIGS\"")
@@ -51,6 +55,50 @@ internal class EspressifMenuTest {
 
         assertThat(menuConfig.elements.map { it.name }, contains("AWS_IOT_MQTT_HOST"))
     }
+
+
+    @Test
+    fun configWithHelpwithALine() {
+        val lines = listOf(
+            "",
+            "    config MB_MASTER_TIMEOUT_MS_RESPOND",
+            "        int \"Slave respond timeout (Milliseconds)\"",
+            "        default 150",
+            "        range 50 400",
+            "",
+            "        help",
+            "                If master sends a frame which is not broadcast, it has to wait sometime for slave response.",
+            "                if slave is not respond in this time, the master will process timeout error.",
+            "",
+            "    config MB_MASTER_DELAY_MS_CONVERT",
+            "        int \"Slave conversion delay (Milliseconds)\"",
+            "        default 200",
+            "        range 50 400",
+            "",
+            "        help",
+            "                If master sends a broadcast frame, it has to wait conversion time to delay,",
+            "                then master can send next frame.",
+            "endmenu"
+        )
+
+
+        val menu = EspressifMenu(EspressifFakeParent(), "menu \"Modbus configuration\"", mapOf(), readFile)
+        var parser: EspressifMenuParser = menu
+        lines.forEach {
+            parser = parser.addLine(it)
+        }
+
+        val configs = menu.elements.map { it as EspressifConfig }
+        assertThat(configs.map { it.name }, contains("MB_MASTER_TIMEOUT_MS_RESPOND", "MB_MASTER_DELAY_MS_CONVERT"))
+        assertThat(
+            configs.map { it.help }, contains(
+                "If master sends a frame which is not broadcast, it has to wait sometime for slave response.if slave is not respond in this time, the master will process timeout error.",
+                "If master sends a broadcast frame, it has to wait conversion time to delay,then master can send next frame."
+            )
+        )
+
+    }
+
 
     @Test
     fun subMenu() {
@@ -105,7 +153,7 @@ internal class EspressifMenuTest {
             "    endmenu"
         )
 
-        val menu = EspressifMenu(EspressifMenuNullElement(),"menu Bluetooth", mapOf(), readFile)
+        val menu = EspressifMenu(EspressifMenuNullElement(), "menu Bluetooth", mapOf(), readFile)
         var parser: EspressifMenuParser = menu
         lines.forEach {
             parser = parser.addLine(it)
@@ -116,7 +164,7 @@ internal class EspressifMenuTest {
         assertThat(subMenu.subMenus.map { it.name }, contains("HCI UART(H4) Options"))
         val subSubMenu = subMenu.subMenus[0]
         assertThat(subSubMenu.visibleIf, Is(SimpleExpression("BTDM_CONTROLLER_HCI_MODE_UART_H4") as Expression))
-        assertThat(subSubMenu.elements.map { it.name }, contains("BT_HCI_UART_NO","BT_HCI_UART_BAUDRATE"))
+        assertThat(subSubMenu.elements.map { it.name }, contains("BT_HCI_UART_NO", "BT_HCI_UART_BAUDRATE"))
 
 
     }

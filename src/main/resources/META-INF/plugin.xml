@@ -25,7 +25,15 @@
     </extensions>
 
     <actions>
-        <!-- Add your actions here -->
+        <group id="esp32.actions"  description="ESP32 setting" text="ESP32 setting">
+            <action id="esp32.plugin.achdjian.settings" class="it.achdjian.plugin.esp32.actions.Settings" text="ESP32 Settings"/>
+        </group>
+
+
+        <group id="esp32.Menu"  popup="true" text="_ESP32" icon="/images/icon.png">
+            <reference ref="esp32.actions"/>
+            <add-to-group group-id="ToolsMenu"/>
+        </group>
     </actions>
 
 </idea-plugin>

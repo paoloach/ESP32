@@ -1,5 +1,7 @@
 package it.achdjian.plugin.esp32.configurator
 
+import com.intellij.openapi.diagnostic.Logger
+import it.achdjian.plugin.esp32.actions.Settings
 import it.achdjian.plugin.esp32.entry_type.*
 import it.achdjian.plugin.esp32.entry_type.ConfigElements.configElements
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
@@ -9,6 +11,11 @@ import java.io.File
 class WizardData() {
     lateinit var entries: List<ConfigurationEntry>
     lateinit private var configList: List<EspressifConfig>
+    var error = ""
+
+    companion object {
+        private val LOG = Logger.getInstance(Settings::class.java)
+    }
 
     init {
         updateEntries()
@@ -25,9 +32,15 @@ class WizardData() {
             "COMPONENT_KCONFIGS_PROJBUILD" to componentKConfigProjbuild.toList()
         )
 
-        val mainMenu = MainMenu(kConfig.readLines(), sourcesList, ReadFile())
-        configList = createConfigList(mainMenu)
-        entries = createMenuEntries(mainMenu, configList)
+        try {
+            val mainMenu = MainMenu(kConfig.readLines(), sourcesList, ReadFile())
+            configList = createConfigList(mainMenu)
+            entries = createMenuEntries(mainMenu, configList)
+
+        } catch (e: Exception){
+            error = e.message?:"an exception of type ${e.javaClass.name}"
+            LOG.error(e)
+        }
 
     }
 }

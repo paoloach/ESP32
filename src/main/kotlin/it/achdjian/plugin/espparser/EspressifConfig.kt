@@ -195,6 +195,7 @@ open class EspressifConfig(
                     }
                 }
             }
+            trimmedLine.isEmpty() -> return this
             else -> {
                 if (parent is EspressifOwningConfig)
                     parent.addConfig(this)
