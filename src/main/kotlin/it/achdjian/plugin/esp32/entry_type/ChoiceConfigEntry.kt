@@ -12,6 +12,9 @@ class ChoiceConfigEntry(
     default: List<Value>,
     dependsOn: Expression
 ) : SdkConfigEntry(text, description, configEntry, default) {
+    override fun set(newValue: String) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     var choiced: BoolConfigEntry? = null
 
@@ -52,14 +55,6 @@ class ChoiceConfigEntry(
         return configEntry == configKey || choices.any { it.isConfig(configKey) }
     }
 
-
-    override fun set(key: String, value: String) {
-        if (choices.any { it.isConfig(key) }) {
-            choices.forEach {
-                it.value = it.isConfig(key)
-            }
-        }
-    }
 
     override fun addConfiguration(configurations: MutableList<Pair<String, String>>) {
         if (enabled) {

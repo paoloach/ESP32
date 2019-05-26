@@ -66,13 +66,6 @@ fun createMainFile(path:VirtualFile):VirtualFile{
     return helloWordFile
 }
 
-fun createConfigFolders(path: VirtualFile): VirtualFile {
-    val main = path.findChild(MAIN_DIR)?: path.createChildDirectory(null, MAIN_DIR)
-    val build = main.findChild(BUILD_DIR)?:main.createChildDirectory(null, BUILD_DIR)
-   return build.findChild(CONFIG_DIR)?:build.createChildDirectory(null, CONFIG_DIR)
-
-}
-
 
 fun createSdkConfigFile(entries: List<ConfigurationEntry>, path: VirtualFile) {
     val sdkConfig = path.findOrCreateChildData(null, CONFIG_FILE_NAME)

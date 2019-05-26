@@ -2,7 +2,6 @@ package it.achdjian.plugin.esp32.entry_type
 
 import it.achdjian.plugin.espparser.Expression
 import it.achdjian.plugin.espparser.SimpleExpression
-import it.achdjian.plugin.espparser.emptyExpression
 import java.awt.event.ItemEvent
 import java.awt.event.ItemListener
 
@@ -16,12 +15,12 @@ open class BoolConfigEntry(
 
     val forceTrueBy = mutableListOf<Expression>()
 
-    protected val listeners = ArrayList<(value: Boolean) -> Unit>()
+    private val listeners = ArrayList<(value: Boolean) -> Unit>()
 
     var value: Boolean
         get() {
-            forceTrueBy.firstOrNull{eval(it)}?.let { return true }
-            if (! enabled){
+            forceTrueBy.firstOrNull { eval(it) }?.let { return true }
+            if (!enabled) {
                 return false
             }
             values.forEach {
@@ -34,15 +33,13 @@ open class BoolConfigEntry(
         set(newVal) {
             values = listOf(Value(SimpleExpression(newVal.toString())))
             listeners.forEach { it(newVal) }
-            if (newVal){
+            if (newVal) {
 
             }
         }
 
-
-    override fun set(key: String, value: String) {
-        if (isConfig(key))
-            this.value = value == "1" || value.compareTo("true", true) == 0
+    override fun set(newValue: String) {
+        value = newValue == "y"
     }
 
 
@@ -57,7 +54,7 @@ open class BoolConfigEntry(
     }
 
     override fun addConfiguration(configurations: MutableList<Pair<String, String>>) {
-        if (value and enabled){
+        if (value and enabled) {
             configurations.add(Pair(configEntry, "1"))
             //associated.forEach { it.configEntry.forEach { ce -> configurations[ce] = "1" } }
         }

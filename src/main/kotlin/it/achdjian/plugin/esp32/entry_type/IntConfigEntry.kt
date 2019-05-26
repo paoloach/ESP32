@@ -28,9 +28,8 @@ open class IntConfigEntry(
         }
 
 
-    override fun set(key: String, value: String) {
-        if (isConfig(key))
-            this.value = value.toInt()
+    override fun set(newValue: String) {
+        value = newValue.toInt()
     }
 
     fun addListener(listener: (value: Int) -> Unit) {
@@ -55,10 +54,15 @@ class HexConfigEntry(
     min: Long,
     max: Long
 ) : IntConfigEntry(text, configEntry, description, values, min, max) {
+
     override fun addConfiguration(configurations: MutableList<Pair<String, String>>) {
         if (enabled) {
             configurations.add(Pair(configEntry, "0x" + value.toString(16)))
         }
+    }
+
+    override fun set(newValue: String) {
+        value = newValue.toInt(16)
     }
 }
 

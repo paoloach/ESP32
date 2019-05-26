@@ -25,9 +25,8 @@ open class StringConfigEntry(text: String, configEntry: String, description: Str
         }
 
 
-    override fun set(key: String, value: String) {
-        if (isConfig(key))
-            this.value = value
+    override fun set(newValue: String) {
+        value = newValue
     }
 
     override fun addConfiguration(configurations: MutableList<Pair<String, String>>) {
