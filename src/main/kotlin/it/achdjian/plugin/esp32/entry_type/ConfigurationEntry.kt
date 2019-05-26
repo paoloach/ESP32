@@ -17,6 +17,7 @@ abstract class ConfigurationEntry(val text: String, val description: String) {
         addListenerToDepending(dependsOn, listener)
 
     abstract fun addConfiguration(configurations: MutableList<Pair<String, String>>)
+    abstract fun set(key:String, newValue:String)
 
 }
 
@@ -75,7 +76,6 @@ abstract class SdkConfigEntry(
     var promptIf: Expression = emptyExpression
 
     open fun isConfig(configKey: String) = configEntry == configKey
-    abstract fun set(newValue:String)
 }
 
 fun <T : Any> convertString(clazz: KClass<T>, value: String): T {

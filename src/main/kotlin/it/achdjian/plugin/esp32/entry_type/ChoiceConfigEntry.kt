@@ -12,8 +12,9 @@ class ChoiceConfigEntry(
     default: List<Value>,
     dependsOn: Expression
 ) : SdkConfigEntry(text, description, configEntry, default) {
-    override fun set(newValue: String) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+    override fun set(key:String, newValue: String) {
+
     }
 
     var choiced: BoolConfigEntry? = null

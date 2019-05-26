@@ -38,8 +38,9 @@ open class BoolConfigEntry(
             }
         }
 
-    override fun set(newValue: String) {
-        value = newValue == "y"
+    override fun set(key:String, newValue: String) {
+        if (configEntry == key)
+            value = newValue == "y"
     }
 
 

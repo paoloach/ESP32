@@ -6,14 +6,14 @@ class SubMenuConfigEntry(
     val name: String,
     text: String,
     override val subMenu: List<ConfigurationEntry>,
-    var values: List<Value>
+    private var values: List<Value>
 ) :
     ConfigurationEntry(text, ""), MenuEntry {
-    val listeners = mutableListOf<(value: Boolean) -> Unit>()
+    private val listeners = mutableListOf<(value: Boolean) -> Unit>()
 
     var value: Boolean
         get() {
-            if (!enabled){
+            if (!enabled) {
                 return false
             }
             values.forEach {
@@ -35,4 +35,6 @@ class SubMenuConfigEntry(
             it.addConfiguration(configurations)
         }
     }
+
+    override fun set(key: String, newValue: String) = subMenu.forEach { it.set(key, newValue) }
 }

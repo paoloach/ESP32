@@ -1,11 +1,10 @@
 package it.achdjian.plugin.esp32.entry_type
 
-import it.achdjian.plugin.espparser.EspressifConfig
 import it.achdjian.plugin.espparser.Expression
 
 class SubMenuEntry(
     text: String,
-    val visibleIf: Expression,
+    private val visibleIf: Expression,
     override val subMenu: List<ConfigurationEntry>
 ) :
     ConfigurationEntry(text, ""), MenuEntry {
@@ -17,5 +16,9 @@ class SubMenuEntry(
         subMenu.forEach {
             it.addConfiguration(configurations)
         }
+    }
+
+    override fun set(key: String, newValue: String) {
+        subMenu.forEach { it.set(key, newValue) }
     }
 }

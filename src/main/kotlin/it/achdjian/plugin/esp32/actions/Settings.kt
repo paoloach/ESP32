@@ -2,6 +2,7 @@ package it.achdjian.plugin.esp32.actions
 
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogBuilder
@@ -12,8 +13,8 @@ import com.intellij.ui.ScrollPaneFactory
 import it.achdjian.plugin.esp32.configurator.CONFIG_FILE_NAME
 import it.achdjian.plugin.esp32.configurator.ESP32WizardPanel
 import it.achdjian.plugin.esp32.configurator.WizardData
-import it.achdjian.plugin.esp32.entry_type.SdkConfigEntry
 import it.achdjian.plugin.esp32.generator.createSdkConfigFile
+import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.io.File
 import javax.swing.AbstractAction
@@ -33,7 +34,9 @@ class SaveAction(
 }
 
 class Settings : AnAction("ESP32 setting...") {
-
+    companion object {
+        private val LOG = Logger.getInstance(Settings::class.java)
+    }
 
     /**
      * Implement this method to provide your action handler.
@@ -52,27 +55,25 @@ class Settings : AnAction("ESP32 setting...") {
         } else {
             val wizardData = WizardData()
 
-            wizardData
-                .entries
-                .filter { it is SdkConfigEntry }
-                .map { it as SdkConfigEntry }
-                .forEach { confEntry ->
-                    configEntries[confEntry.text]?.let { value ->
-                        confEntry.set(value)
-
-                    }
+            wizardData.entries.forEach { availableEntry ->
+                configEntries.forEach { configSdkEntry ->
+                    availableEntry.set(configSdkEntry.key, configSdkEntry.value)
                 }
+            }
 
 
             val contentPanel = JPanel()
             contentPanel.layout = BoxLayout(contentPanel, BoxLayout.Y_AXIS)
             val settingPanel = ESP32WizardPanel(contentPanel, wizardData.entries)
+            settingPanel.preferredSize = Dimension(500, 500)
+            settingPanel.size = Dimension(500, 500)
 
             val scrollPane = ScrollPaneFactory.createScrollPane(settingPanel, false)
 
             val dialog = DialogBuilder(project)
                 .centerPanel(scrollPane)
-                .title("Settings")
+                .title("ESP32 Settings")
+
 
             dialog.addAction(SaveAction(wizardData, getProjectPath(project), dialog.dialogWrapper))
             dialog.addCancelAction()
@@ -101,7 +102,9 @@ class Settings : AnAction("ESP32 setting...") {
                 .forEach {
                     val configPair = it.split("=")
                     if (configPair.size == 2) {
-                        val key = configPair[0]
+                        var key = configPair[0]
+                        if (key.startsWith("CONFIG_"))
+                            key = key.substring(7)
                         val value = configPair[1]
                         result[key] = value
                     }

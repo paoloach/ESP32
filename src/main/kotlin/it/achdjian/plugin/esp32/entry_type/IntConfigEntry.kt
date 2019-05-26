@@ -11,7 +11,7 @@ open class IntConfigEntry(
     val max: Long
 ) : SdkConfigEntry(text, description, configEntry, values) {
 
-    protected val listeners = ArrayList<(value: Int) -> Unit>()
+    private val listeners = ArrayList<(value: Int) -> Unit>()
 
     var value: Int
         get() {
@@ -28,14 +28,10 @@ open class IntConfigEntry(
         }
 
 
-    override fun set(newValue: String) {
-        value = newValue.toInt()
+    override fun set(key:String, newValue: String) {
+        if (key==configEntry)
+            value = newValue.toInt()
     }
-
-    fun addListener(listener: (value: Int) -> Unit) {
-        listeners.add(listener)
-    }
-
 
     override fun addConfiguration(configurations: MutableList<Pair<String, String>>) {
         if (enabled) {
@@ -61,8 +57,19 @@ class HexConfigEntry(
         }
     }
 
-    override fun set(newValue: String) {
-        value = newValue.toInt(16)
+    override fun set(key:String, newValue: String) {
+        if (configEntry == key) {
+            try {
+
+                if (newValue.startsWith("0x")) {
+                    value = newValue.substring(2).toInt(16)
+                } else {
+                    value = newValue.toInt(16)
+                }
+            } catch (e:Exception){
+                throw RuntimeException("Unable to convert the $key with value $newValue to an Integer", e)
+            }
+        }
     }
 }
 
