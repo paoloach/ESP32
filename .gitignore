@@ -1,1 +1,5 @@
 /build
+.idea/workspace.xml
+.gradle/4.10.3/fileHashes/
+.gradle/4.10.3/taskHistory/
+.gradle/buildOutputCleanup/buildOutputCleanup.lock
