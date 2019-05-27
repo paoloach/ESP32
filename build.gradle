@@ -34,9 +34,12 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 patchPluginXml {
+    sinceBuild "182.9999"
+    untilBuild "192.*"
+    
     changeNotes """
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>"""
+      first version
+      """
 }
 
 

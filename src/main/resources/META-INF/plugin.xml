@@ -4,11 +4,17 @@
     <vendor email="pachdjian@gmail.com"></vendor>
 
     <description><![CDATA[
-    This plugin allow to develop a ESP32 firmware inside CLion, enabling CLion to detect all the references of the ESP32 SDK
+    This plugin allow to develop an espressif ESP32 firmware inside CLion, allowing you to use all the advanced features of this IDE.
+    It free you to hardcode the crosscompiler path into the PATH environment and to use the IDE for flashing the ESP32.
 
-    Features:
-    <ul>
-    </ul>
+    You only have to set the espressif ESP32 sdk and crosscompiler paths into this plugin configuration.
+
+    In order to create a new project simply select the ESP32 c project and you will see all the available options as it shows the make menuconfig commands.
+
+    You can change these options during the developing process using the Tool/ESP32 menu.
+
+    When you want flash your firmware, select the flash  target and execute it.
+
     ]]></description>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
