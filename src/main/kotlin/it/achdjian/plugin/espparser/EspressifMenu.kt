@@ -84,7 +84,7 @@ class EspressifMenu(
                 dependsOn.add(ExpressionParser(trimmedLine.substring(10).trim()).expresison)
             }
             trimmedLine.startsWith("if") -> {
-                return EspressifIf(this, trimmedLine)
+                return EspressifIf(this, trimmedLine, sourcesList, readFile)
             }
             trimmedLine.startsWith("source ") -> {
                 val source = removeDoubleQuotes(trimmedLine.substring(6).trim())

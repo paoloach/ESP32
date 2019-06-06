@@ -108,7 +108,7 @@ open class EspressifConfig(
     override fun addLine(line: String): EspressifMenuParser {
         val trimmedLine = line.trim()
         if (helpText && trimmedLine.isNotEmpty()) {
-            val spaces = line.indexOfFirst { it != ' ' }
+            val spaces = line.indexOfFirst { it != ' ' && it !='\t'}
             if (spaces <= helpSpaces) {
                 helpText = false
             }
@@ -195,6 +195,10 @@ open class EspressifConfig(
                     }
                 }
             }
+            trimmedLine.startsWith("endchoice")->
+                return parent.addLine(line)
+            trimmedLine.startsWith("choice")->
+                return parent.addLine(line)
             trimmedLine.isEmpty() -> return this
             else -> {
                 if (parent is EspressifOwningConfig)

@@ -1,6 +1,9 @@
 package it.achdjian.plugin.espparser
 
-class EspressifIf(val parent:EspressifMenuParser, line:String) :EspressifMenuParser {
+import java.io.File
+
+class EspressifIf(val parent:EspressifMenuParser, line:String, val sourcesList: Map<String, List<File>>,
+                  val readFile: ReadFile ) :EspressifMenuParser {
     val condition: Expression
     val elements = mutableListOf<EspressifMenuElement>()
     val subIf= mutableListOf<EspressifIf>()
@@ -18,6 +21,12 @@ class EspressifIf(val parent:EspressifMenuParser, line:String) :EspressifMenuPar
                 elements.add(config)
                 config.dependsOn.add(condition)
                 return config
+            }
+            trimmedLine.startsWith("menu")->{
+                val subMenu = EspressifMenu(this, trimmedLine, sourcesList, readFile)
+                elements.add(subMenu)
+                subMenu.dependsOn.add(condition)
+                return subMenu
             }
             trimmedLine.startsWith("endif")->{
                 if (parent is EspressifIf){
@@ -37,7 +46,7 @@ class EspressifIf(val parent:EspressifMenuParser, line:String) :EspressifMenuPar
                 return parent
             }
             trimmedLine.startsWith("if")->{
-                val ifElement = EspressifIf(this,  trimmedLine)
+                val ifElement = EspressifIf(this,  trimmedLine, sourcesList, readFile)
                 subIf.add(ifElement)
                 return ifElement
             }

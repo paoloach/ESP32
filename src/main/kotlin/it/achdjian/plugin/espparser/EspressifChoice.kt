@@ -29,7 +29,7 @@ class EspressifChoice(
         val trimmedLine = line.trim()
 
         if (helping && trimmedLine.isNotEmpty()) {
-            val spaces = line.indexOfFirst { it != ' ' }
+            val spaces = line.indexOfFirst { it != ' '  && it !='\t' }
             if (help.isEmpty()) {
                 helpSpaces = spaces
             } else {
@@ -51,7 +51,8 @@ class EspressifChoice(
                 return this
             }
             trimmedLine.startsWith("#") -> return this
-            trimmedLine.startsWith("endchoice") -> return parent
+            trimmedLine.startsWith("endchoice") ->
+                return parent
             (trimmedLine.startsWith("prompt") || trimmedLine.startsWith("bool")) -> {
                 val start = trimmedLine.indexOf("\"", 4)
                 if (start > 0) {
