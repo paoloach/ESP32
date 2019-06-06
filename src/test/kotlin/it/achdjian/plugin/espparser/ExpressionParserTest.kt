@@ -132,6 +132,31 @@ internal class ExpressionParserTest {
         assertThat(right.value, isEmptyString())
     }
 
+
+
+
+    @Test
+    fun OrBracketAnd() {
+        val parser = ExpressionParser("(FLASHMODE_QIO || FLASHMODE_QOUT) && IDF_TARGET_ESP32")
+
+        assertThat(parser.expresison, instanceOf(AndOper::class.java) )
+
+        val andOper = parser.expresison as AndOper
+
+        assertThat(andOper.left, instanceOf(OrOper::class.java))
+        assertThat(andOper.right, instanceOf(SimpleExpression::class.java))
+
+        val left = andOper.left as OrOper
+        val orLeft = left.left as SimpleExpression
+        val orRight = left.right as SimpleExpression
+        val right = andOper.right as SimpleExpression
+
+
+        assertThat(right.value, Is("IDF_TARGET_ESP32"))
+        assertThat(orLeft.value, Is("FLASHMODE_QIO"))
+        assertThat(orRight.value, Is("FLASHMODE_QOUT"))
+    }
+
     @Test
     fun expressionWithComment() {
         val parser = ExpressionParser("BTDM_CONTROLLER_MODE_BR_EDR_ONLY || BTDM_CONTROLLER_MODE_BTDM  # NOERROR")

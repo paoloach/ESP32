@@ -165,9 +165,9 @@ class ExpressionParser(expr: String) {
         try {
             expresison = parse(expr)
         } catch (e: NotAvailableOperation) {
-            throw RuntimeException("Not available operation parsing line $expr")
+            throw RuntimeException("Not available operation parsing line $expr", e)
         } catch (e: ParserError) {
-            throw RuntimeException("Parser error for expression $expr")
+            throw RuntimeException("Parser error for expression $expr",  e)
         }
     }
 
@@ -251,7 +251,7 @@ class ExpressionParser(expr: String) {
                             token = ""
                         }
                         it == '=' || it == '>' || it == '&' || it == '|' -> {
-                            if (token.isNotEmpty()) {
+                            if (token.trim().isNotEmpty()) {
                                 tokens.push(SimpleExpression(removeDoubleQuotes(token.trim())))
                             }
                             token = it.toString()
