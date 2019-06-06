@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'it.achdjian.plugin'
-version '1.1'
+version '1.0.1'
 
 repositories {
     mavenCentral()
@@ -39,13 +39,14 @@ patchPluginXml {
     untilBuild "192.*"
     
     changeNotes """
-      first version
+      <p>&#8226; 1.0.1 &#8594; Fix espressif parser </p>
+      <p>&#8226; 1.0.0 &#8594; First release</p>
       """
 }
 
 
 task copyPlugin(type: Copy) {
-    from file("${buildDir}/libs/esp32-1.0.jar")
+    from file("${buildDir}/libs/esp32-1.0.1.jar")
     into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.1/config/plugins/ESP32/lib")
 }
 
