@@ -21,7 +21,18 @@ open class StringConfigEntry(text: String, configEntry: String, description: Str
             return ""
         }
         set(newVal) {
-            values = listOf(Value(SimpleExpression(newVal)))
+            val value = SimpleExpression(newVal)
+            if (values.size==1)
+                values = listOf(Value(value))
+//            else {
+//                values
+//                        .find { it.value == value }
+//                        ?.let {
+//                            if (it.condition is SimpleExpression){
+//
+//                            }
+//                        }
+//            }
         }
 
 

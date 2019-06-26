@@ -23,8 +23,10 @@ open class IntConfigEntry(
             return 0
         }
         set(newVal) {
-            values = listOf(Value(SimpleExpression(newVal.toString())))
-            listeners.forEach { it(newVal) }
+            if (values.size==1) {
+                values = listOf(Value(SimpleExpression(newVal.toString())))
+                listeners.forEach { it(newVal) }
+            }
         }
 
 

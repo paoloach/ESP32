@@ -12,7 +12,7 @@ open class BoolConfigEntry(
     values: List<Value>
 ) : SdkConfigEntry(text, description, configEntry, values), ItemListener {
 
-
+    var choiceConfigEntry: ChoiceConfigEntry? = null;
     val forceTrueBy = mutableListOf<Expression>()
 
     private val listeners = ArrayList<(value: Boolean) -> Unit>()
@@ -39,8 +39,10 @@ open class BoolConfigEntry(
         }
 
     override fun set(key:String, newValue: String) {
-        if (configEntry == key)
-            value = newValue == "y"
+        if (configEntry == key) {
+            val newStatus = newValue == "y"
+            value = newStatus
+        }
     }
 
 
@@ -56,7 +58,7 @@ open class BoolConfigEntry(
 
     override fun addConfiguration(configurations: MutableList<Pair<String, String>>) {
         if (value and enabled) {
-            configurations.add(Pair(configEntry, "1"))
+            configurations.add(Pair(configEntry, "y"))
             //associated.forEach { it.configEntry.forEach { ce -> configurations[ce] = "1" } }
         }
     }

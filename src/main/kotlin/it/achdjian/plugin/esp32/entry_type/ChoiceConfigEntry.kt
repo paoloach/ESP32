@@ -14,7 +14,9 @@ class ChoiceConfigEntry(
 ) : SdkConfigEntry(text, description, configEntry, default) {
 
     override fun set(key:String, newValue: String) {
-
+        choices.forEach { it.set(key, "n") }
+        choices.forEach { it.set(key, newValue) }
+        values = choices.firstOrNull{ it.value} ?.let { listOf(Value(SimpleExpression(it.configEntry))) } ?: values
     }
 
     var choiced: BoolConfigEntry? = null
@@ -29,6 +31,7 @@ class ChoiceConfigEntry(
         } else {
             choices.forEach { it.value = false }
         }
+        choices.forEach { it.choiceConfigEntry = this }
     }
 
     val default: BoolConfigEntry?

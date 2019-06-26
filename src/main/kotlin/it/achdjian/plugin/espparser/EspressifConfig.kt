@@ -195,11 +195,18 @@ open class EspressifConfig(
                     }
                 }
             }
-            trimmedLine.startsWith("endchoice")->
+            trimmedLine.startsWith("endchoice")-> {
+                if (parent is EspressifOwningConfig)
+                    parent.addConfig(this)
                 return parent.addLine(line)
-            trimmedLine.startsWith("choice")->
+            }
+            trimmedLine.startsWith("choice")->{
+                if (parent is EspressifOwningConfig)
+                    parent.addConfig(this)
                 return parent.addLine(line)
+            }
             trimmedLine.isEmpty() -> return this
+
             else -> {
                 if (parent is EspressifOwningConfig)
                     parent.addConfig(this)

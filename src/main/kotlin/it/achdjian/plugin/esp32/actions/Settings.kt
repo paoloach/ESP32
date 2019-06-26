@@ -16,6 +16,8 @@ import it.achdjian.plugin.esp32.configurator.WizardData
 import it.achdjian.plugin.esp32.generator.createSdkConfigFile
 import java.awt.Dimension
 import java.awt.event.ActionEvent
+import java.awt.event.ComponentEvent
+import java.awt.event.ComponentListener
 import java.io.File
 import javax.swing.AbstractAction
 import javax.swing.BoxLayout
@@ -33,10 +35,36 @@ class SaveAction(
 
 }
 
-class Settings : AnAction("ESP32 setting...") {
+class Settings : AnAction("ESP32 setting..."), ComponentListener {
     companion object {
         private val LOG = Logger.getInstance(Settings::class.java)
     }
+
+
+    var settingPanel:ESP32WizardPanel? = null
+
+
+    override fun componentMoved(p0: ComponentEvent?) {
+    }
+
+    override fun componentResized(p0: ComponentEvent?) {
+        p0?.let { event ->
+            if (event.source is JPanel) {
+
+                settingPanel?.let {
+                    it.size = Dimension(it.internalPanel.width, it.realHeight)
+                    it.preferredSize = Dimension(it.internalPanel.width, it.realHeight)
+                }
+            }
+        }
+    }
+
+    override fun componentHidden(p0: ComponentEvent?) {
+    }
+
+    override fun componentShown(p0: ComponentEvent?) {
+    }
+
 
     /**
      * Implement this method to provide your action handler.
@@ -64,9 +92,13 @@ class Settings : AnAction("ESP32 setting...") {
 
             val contentPanel = JPanel()
             contentPanel.layout = BoxLayout(contentPanel, BoxLayout.Y_AXIS)
-            val settingPanel = ESP32WizardPanel(contentPanel, wizardData.entries)
-            settingPanel.preferredSize = Dimension(500, 500)
-            settingPanel.size = Dimension(500, 500)
+
+            ESP32WizardPanel(contentPanel, wizardData.entries, true).let {
+                settingPanel=it;
+                it.internalPanel.addComponentListener(this)
+                it.preferredSize = Dimension(500, 500)
+                it.size = Dimension(500, 500)
+            }
 
             val scrollPane = ScrollPaneFactory.createScrollPane(settingPanel, false)
 
