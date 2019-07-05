@@ -42,8 +42,8 @@ open class EspressifConfig(
     val multiDefault = mutableListOf<Value>()
     var helpText = false
     private var helpSpaces = 0
-    var min = Int.MIN_VALUE.toLong()
-    var max = Int.MAX_VALUE.toLong()
+    var min = Int.MIN_VALUE.toLong().toString()
+    var max = Int.MAX_VALUE.toLong().toString()
     var envVariable: String = ""
 
     private val escapedHelp: String get() = help.replace("\"", "\\\"").replace("$", "\\$")
@@ -178,8 +178,18 @@ open class EspressifConfig(
             }
             trimmedLine.startsWith("range ") -> {
                 val tokens = trimmedLine.split(Regex("\\s+"))
-                min = tokens[1].toLong()
-                max = tokens[2].toLong()
+
+                min = tokens[1];
+                max = tokens[2];
+//                min = if (tokens[1].startsWith("0x"))
+//                    tokens[1].substring(2).toLong(16);
+//                else
+//                    tokens[1].toLong()
+//
+//                max = if (tokens[2].startsWith("0x"))
+//                    tokens[2].substring(2).toLong(16);
+//                else
+//                    tokens[2].toLong()
             }
             trimmedLine == "help" || trimmedLine.startsWith("help ") -> {
                 help = trimmedLine.substring(4).trim()

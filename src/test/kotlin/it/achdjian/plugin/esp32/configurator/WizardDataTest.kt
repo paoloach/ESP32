@@ -32,12 +32,9 @@ internal class WizardDataTest {
         val componentDir = File(idfPath, "components")
         val componentKConfig = componentDir.walk().filter { file->file.name=="Kconfig" }.toList()
         val componentKConfigProjbuild = componentDir.walk().filter { file->file.name=="Kconfig.projbuild" }.toList()
-        val sourcesList = mapOf(
-            "COMPONENT_KCONFIGS" to componentKConfig.toList(),
-            "COMPONENT_KCONFIGS_PROJBUILD" to componentKConfigProjbuild.toList()
-        )
 
-        val mainMenu = MainMenu(kConfig.readLines(), sourcesList, ReadFile())
+
+        val mainMenu = MainMenu(kConfig.readLines(), SourceList(), ReadFile())
         val entries = createMenuEntries(mainMenu, listOf())
 
 

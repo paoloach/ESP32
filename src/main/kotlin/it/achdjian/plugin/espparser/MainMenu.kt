@@ -1,22 +1,23 @@
 package it.achdjian.plugin.espparser
 
+import it.achdjian.plugin.esp32.configurator.SourceList
 import java.io.File
 import java.lang.RuntimeException
 import java.util.*
 import kotlin.collections.HashMap
 
-class MainMenu(lines: List<String>, sourcesList: Map<String, List<File>>, readFile: ReadFile) : EspressifMenuParser {
+class MainMenu(lines: List<String>, sourcesList: SourceList, readFile: ReadFile) : EspressifMenuParser {
     var prompt = ""
     val menuElements = mutableMapOf<String, EspressifMenuElement>()
-    var sourcesList = mapOf<String, List<File>>()
+    var sourcesList : SourceList
     var readFile = ReadFile()
 
     init {
-
+        this.sourcesList = sourcesList
         parse(lines, sourcesList, readFile)
     }
 
-    private fun parse(lines: List<String>, sourcesList: Map<String, List<File>>, readFile: ReadFile) {
+    private fun parse(lines: List<String>, sourcesList:SourceList, readFile: ReadFile) {
         this.readFile = readFile
         this.sourcesList = sourcesList
         var parser: EspressifMenuParser=this
@@ -61,7 +62,7 @@ class MainMenu(lines: List<String>, sourcesList: Map<String, List<File>>, readFi
                 val source = removeDoubleQuotes(trimmedLine.substring(6).trim())
                 if (source.isNotEmpty() && source[0] == '$') {
                     val envVariable = source.substring(1)
-                    val sources = sourcesList[envVariable] ?: throw InvalidEnvVariable(envVariable)
+                    val sources = sourcesList[envVariable]
                     var parser: EspressifMenuParser = this
                     sources.forEach {
                         val fileLines = readFile.read(it)
@@ -88,6 +89,6 @@ class UnknownToken(line: String) : RuntimeException("Found unknow token: $line")
 
 }
 
-class InvalidEnvVariable(val envVariable: String) : Exception()
+class InvalidEnvVariable(envVariable: String) : Exception("Unable to found " + envVariable)
 
-class InvalidSourceValue(val source: String) : Exception(source)
+class InvalidSourceValue(source: String) : Exception(source)

@@ -7,9 +7,12 @@ open class IntConfigEntry(
     configEntry: String,
     description: String,
     values: List<Value>,
-    val min: Long,
-    val max: Long
+    private val minStr: String,
+    private val maxStr: String
 ) : SdkConfigEntry(text, description, configEntry, values) {
+
+    val min: Long get() = convertoToLong(minStr)
+    val max: Long get() = convertoToLong(maxStr)
 
     private val listeners = ArrayList<(value: Int) -> Unit>()
 
@@ -23,15 +26,15 @@ open class IntConfigEntry(
             return 0
         }
         set(newVal) {
-            if (values.size==1) {
+            if (values.size == 1) {
                 values = listOf(Value(SimpleExpression(newVal.toString())))
                 listeners.forEach { it(newVal) }
             }
         }
 
 
-    override fun set(key:String, newValue: String) {
-        if (key==configEntry)
+    override fun set(key: String, newValue: String) {
+        if (key == configEntry)
             value = newValue.toInt()
     }
 
@@ -42,6 +45,20 @@ open class IntConfigEntry(
     }
 
 
+    private fun convertoToLong(value: String): Long {
+        return ConfigElements.configElements[value]?.let {
+            if (it is IntConfigEntry) {
+                0L
+            } else {
+                return 0L
+            }
+        } ?: if (value.startsWith("0x"))
+            value.substring(2).toLong(16);
+        else
+            value.toLong()
+
+    }
+
 }
 
 class HexConfigEntry(
@@ -49,8 +66,8 @@ class HexConfigEntry(
     configEntry: String,
     description: String,
     values: List<Value>,
-    min: Long,
-    max: Long
+    min: String,
+    max: String
 ) : IntConfigEntry(text, configEntry, description, values, min, max) {
 
     override fun addConfiguration(configurations: MutableList<Pair<String, String>>) {
@@ -59,7 +76,7 @@ class HexConfigEntry(
         }
     }
 
-    override fun set(key:String, newValue: String) {
+    override fun set(key: String, newValue: String) {
         if (configEntry == key) {
             try {
 
@@ -68,7 +85,7 @@ class HexConfigEntry(
                 } else {
                     value = newValue.toInt(16)
                 }
-            } catch (e:Exception){
+            } catch (e: Exception) {
                 throw RuntimeException("Unable to convert the $key with value $newValue to an Integer", e)
             }
         }

@@ -13,7 +13,7 @@ abstract class ConfigurationEntry(val text: String, val description: String) {
     open val enabled: Boolean
         get() = eval(dependsOn)
 
-    fun addListenerToDepending(listener: (value: Boolean) -> Unit) =
+    open fun addListenerToDepending(listener: (value: Boolean) -> Unit) =
         addListenerToDepending(dependsOn, listener)
 
     abstract fun addConfiguration(configurations: MutableList<Pair<String, String>>)

@@ -1,8 +1,9 @@
 package it.achdjian.plugin.espparser
 
+import it.achdjian.plugin.esp32.configurator.SourceList
 import java.io.File
 
-class EspressifIf(val parent:EspressifMenuParser, line:String, val sourcesList: Map<String, List<File>>,
+class EspressifIf(val parent:EspressifMenuParser, line:String, val sourcesList: SourceList,
                   val readFile: ReadFile ) :EspressifMenuParser {
     val condition: Expression
     val elements = mutableListOf<EspressifMenuElement>()

@@ -21,4 +21,9 @@ class SubMenuEntry(
     override fun set(key: String, newValue: String) {
         subMenu.forEach { it.set(key, newValue) }
     }
+
+    override fun addListenerToDepending(listener: (value: Boolean) -> Unit) {
+        addListenerToDepending(dependsOn, listener)
+        addListenerToDepending(visibleIf, listener)
+    }
 }

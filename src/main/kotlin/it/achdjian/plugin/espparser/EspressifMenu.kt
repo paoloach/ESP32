@@ -1,15 +1,15 @@
 package it.achdjian.plugin.espparser
 
-import java.io.File
+import it.achdjian.plugin.esp32.configurator.SourceList
 
 class EspressifMenu(
-    val parent: EspressifMenuParser,
+    private val parent: EspressifMenuParser,
     line: String,
-    val sourcesList: Map<String, List<File>>,
-    val readFile: ReadFile,
+    private val sourcesList: SourceList,
+    private val readFile: ReadFile,
     override val dependsOn: MutableSet<Expression> = mutableSetOf()
 ) : EspressifMenuElement, EspressifOwningConfig {
-    val internalName: String
+    private val internalName: String
 
     init {
         internalName = removeDoubleQuotes(line.substring(4).trim())
@@ -57,7 +57,7 @@ class EspressifMenu(
                 return EspressifConfig(this, trimmedLine)
             }
             trimmedLine == "menuconfig" || trimmedLine.startsWith("menuconfig ") -> {
-                return EspressifMenuConfig(this, trimmedLine);
+                return EspressifMenuConfig(this, trimmedLine)
             }
             trimmedLine == "choice" || trimmedLine.startsWith("choice ") -> {
                 val configName = trimmedLine.substring(6).trim()
@@ -90,7 +90,7 @@ class EspressifMenu(
                 val source = removeDoubleQuotes(trimmedLine.substring(6).trim())
                 if (source.isNotEmpty() && source[0] == '$') {
                     val envVariable = source.substring(1)
-                    val sources = sourcesList[envVariable] ?: throw InvalidEnvVariable(envVariable)
+                    val sources = sourcesList[envVariable]
                     sources.forEach {
                         val lines = readFile.read(it)
                         if (lines[0].startsWith("menu ")) {
