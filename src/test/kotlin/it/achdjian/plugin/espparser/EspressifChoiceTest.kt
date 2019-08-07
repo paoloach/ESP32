@@ -1,14 +1,30 @@
 package it.achdjian.plugin.espparser
 
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.MockK
+import it.achdjian.plugin.esp32.configurator.SourceList
 import org.hamcrest.CoreMatchers.instanceOf
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.hasSize
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.hamcrest.CoreMatchers.`is` as Is
 
 internal class EspressifChoiceTest {
+    @MockK
+    lateinit var readFile: ReadFile
+
+    @MockK
+    lateinit var sourcesList: SourceList
+
+    @BeforeEach
+    fun beforeEach() {
+        MockKAnnotations.init(this, relaxUnitFun = true)
+    }
+
+
     @Test
     fun SimpleTwoOption() {
         val lines = listOf(
@@ -25,7 +41,7 @@ internal class EspressifChoiceTest {
             "endchoice"
 
         )
-        val choice = EspressifChoice(EspressifMenuNullElement(),"FLASHMODE", listOf())
+        val choice = EspressifChoice(EspressifMenuNullElement(),"FLASHMODE", listOf(), sourcesList, readFile)
         var parser: EspressifMenuParser = choice
 
         lines.forEach {
@@ -68,7 +84,7 @@ internal class EspressifChoiceTest {
             "endchoice"
         )
 
-        val choice = EspressifChoice(EspressifMenuNullElement(),"ESPTOOLPY_BAUD", listOf())
+        val choice = EspressifChoice(EspressifMenuNullElement(),"ESPTOOLPY_BAUD", listOf(), sourcesList, readFile)
 
         var parser: EspressifMenuParser = choice
 
@@ -112,7 +128,7 @@ internal class EspressifChoiceTest {
             "endchoice"
         )
 
-        val choice = EspressifChoice(EspressifMenuNullElement(),"LOG_BOOTLOADER_LEVEL", listOf())
+        val choice = EspressifChoice(EspressifMenuNullElement(),"LOG_BOOTLOADER_LEVEL", listOf(), sourcesList, readFile)
 
         var parser: EspressifMenuParser = choice
 
@@ -165,7 +181,7 @@ internal class EspressifChoiceTest {
             "endchoice"
         )
 
-        val choice = EspressifChoice(EspressifMenuNullElement(),"OPTIMIZATION_ASSERTION_LEVEL", listOf())
+        val choice = EspressifChoice(EspressifMenuNullElement(),"OPTIMIZATION_ASSERTION_LEVEL", listOf(), sourcesList, readFile)
 
         var parser: EspressifMenuParser = choice
 

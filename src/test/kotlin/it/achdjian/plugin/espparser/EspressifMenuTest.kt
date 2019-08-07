@@ -3,6 +3,7 @@ package it.achdjian.plugin.espparser
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import it.achdjian.plugin.esp32.configurator.SourceList
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
 import org.junit.jupiter.api.BeforeEach
@@ -13,6 +14,10 @@ import org.hamcrest.CoreMatchers.`is` as Is
 internal class EspressifMenuTest {
     @MockK
     lateinit var readFile: ReadFile
+
+    @MockK
+    lateinit var sourcesList: SourceList
+
     val file = File("/tmp/source")
 
     @BeforeEach
@@ -275,13 +280,13 @@ internal class EspressifMenuTest {
                 "",
                 "endmenu\n")
 
-        val menu = EspressifMenu(EspressifMenuNullElement(), "menu \"Serial flasher config\"", mapOf(), readFile)
+        val menu = EspressifMenu(EspressifMenuNullElement(), "menu \"Serial flasher config\"", sourcesList, readFile)
         var parser: EspressifMenuParser = menu
         lines.forEach {
             parser = parser.addLine(it)
         }
         assertThat(parser, instanceOf(EspressifMenuNullElement::class.java))
-        assertThat(menu.elements, hasSize(16))
+        assertThat(menu.elements, hasSize(23))
     }
 
     @Test
@@ -303,10 +308,14 @@ internal class EspressifMenuTest {
         )
 
 
+        // mapOf("COMPONENT_KCONFIGS" to listOf(file)),
+        val sourceList = sourcesList
+        every { sourceList["COMPONENT_KCONFIGS"] }.returns( listOf(file));
+
         val menu = EspressifMenu(
             EspressifMenuNullElement(),
             "menu \"Component config\"",
-            mapOf("COMPONENT_KCONFIGS" to listOf(file)),
+            sourceList,
             readFile
         )
 
@@ -345,7 +354,7 @@ internal class EspressifMenuTest {
         )
 
 
-        val menu = EspressifMenu(EspressifFakeParent(), "menu \"Modbus configuration\"", mapOf(), readFile)
+        val menu = EspressifMenu(EspressifFakeParent(), "menu \"Modbus configuration\"", sourcesList, readFile)
         var parser: EspressifMenuParser = menu
         lines.forEach {
             parser = parser.addLine(it)
@@ -416,7 +425,7 @@ internal class EspressifMenuTest {
             "    endmenu"
         )
 
-        val menu = EspressifMenu(EspressifMenuNullElement(), "menu Bluetooth", mapOf(), readFile)
+        val menu = EspressifMenu(EspressifMenuNullElement(), "menu Bluetooth", sourcesList, readFile)
         var parser: EspressifMenuParser = menu
         lines.forEach {
             parser = parser.addLine(it)
@@ -466,12 +475,14 @@ internal class EspressifMenuTest {
             "endmenu"
         )
 
-        val menu = EspressifMenu(EspressifMenuNullElement(), "menu Bluetooth", mapOf(), readFile)
+        val menu = EspressifMenu(EspressifMenuNullElement(), "menu Bluetooth", sourcesList, readFile)
         var parser: EspressifMenuParser = menu
         lines.forEach {
             parser = parser.addLine(it)
         }
         assertThat(parser, instanceOf(EspressifMenuNullElement::class.java))
-        assertThat(menu.subMenus.map { it.name }, contains("Bluetooth controller"))
+        assertThat(menu.elements.map { it.name }, contains("USING_SPIFFS" ))
+        val menuConfig = menu.elements[0] as EspressifMenuConfig
+        assertThat(menuConfig.elements.map { it.name }, containsInAnyOrder("SPIFFS_MAX_PARTITIONS","Debug Configuration" ))
     }
 }

@@ -29,9 +29,6 @@ internal class WizardDataTest {
         MatcherAssert.assertThat(idfPath.exists(), CoreMatchers.`is`(true))
         val kConfig = File(idfPath, "Kconfig")
         MatcherAssert.assertThat(kConfig.exists(), CoreMatchers.`is`(true))
-        val componentDir = File(idfPath, "components")
-        val componentKConfig = componentDir.walk().filter { file->file.name=="Kconfig" }.toList()
-        val componentKConfigProjbuild = componentDir.walk().filter { file->file.name=="Kconfig.projbuild" }.toList()
 
 
         val mainMenu = MainMenu(kConfig.readLines(), SourceList(), ReadFile())

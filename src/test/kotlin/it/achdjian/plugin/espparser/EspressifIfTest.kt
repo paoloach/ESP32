@@ -1,19 +1,27 @@
 package it.achdjian.plugin.espparser
 
-import gherkin.lexer.Es
-import gherkin.lexer.No
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
+import io.mockk.MockKAnnotations
+import io.mockk.impl.annotations.MockK
+import it.achdjian.plugin.esp32.configurator.SourceList
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.contains
 import org.hamcrest.Matchers.containsInAnyOrder
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.system.measureNanoTime
-import org.hamcrest.CoreMatchers.`is` as Is
 
 internal class EspressifIfTest {
+    @MockK
+    lateinit var sourcesList: SourceList
+    @MockK
+    lateinit var readFile: ReadFile
+
+
+    @BeforeEach
+    fun setup() {
+        MockKAnnotations.init(this, relaxUnitFun = true)
+    }
+
     @Test
     fun ifConfig() {
         val lines = listOf(
@@ -50,7 +58,7 @@ internal class EspressifIfTest {
         )
 
 
-        val menu = EspressifMenu(EspressifMenuNullElement(), "menu testmenu", mapOf(), ReadFile())
+        val menu = EspressifMenu(EspressifMenuNullElement(), "menu testmenu", sourcesList, ReadFile())
         var parser: EspressifMenuParser = menu
         lines.forEach {
             parser = parser.addLine(it)
@@ -114,7 +122,7 @@ internal class EspressifIfTest {
         )
 
 
-        val menu = EspressifMenu(EspressifMenuNullElement(), "menu testmenu", mapOf(), ReadFile())
+        val menu = EspressifMenu(EspressifMenuNullElement(), "menu testmenu", sourcesList, ReadFile())
         var parser: EspressifMenuParser = menu
         lines.forEach {
             parser = parser.addLine(it)
@@ -138,5 +146,42 @@ internal class EspressifIfTest {
             )
         }
 
+    }
+
+    @Test
+    fun nestedIfMenuConfig() {
+
+        val lines = listOf(
+                    "        bool \"Support SPI to Ethernet Module\"",
+                    "        default y",
+                    "        help",
+                    "            ESP-IDF can also support some SPI-Ethernet module.",
+                    "",
+                    "    if ETH_USE_SPI_ETHERNET",
+                    "        menuconfig ETH_SPI_ETHERNET_DM9051",
+                    "            bool \"Use DM9051\"",
+                    "            default y",
+                    "            help",
+                    "                DM9051 is a fast Ethernet controller with an SPI interface.",
+                    "                It's also integrated with a 10/100M PHY and MAC.",
+                    "                Set true to enable DM9051 driver.",
+                    "",
+                    "        if ETH_SPI_ETHERNET_DM9051",
+                    "            config ETH_DM9051_INT_GPIO",
+                    "                int \"DM9051 Interrupt GPIO number\"",
+                    "                default 4",
+                    "                range 0 33",
+                    "                help",
+                    "                    Set the GPIO number used by DM9051's Interrupt pin.",
+                    "        endif",
+                    "    endif"
+        )
+
+        val menu = EspressifMenuConfig(EspressifMenuNullElement(), "menuconfig testmenu", sourcesList, readFile)
+        var parser: EspressifMenuParser = menu
+        lines.forEach {
+            parser = parser.addLine(it)
+        }
+        assertThat(menu.configs.map { it.internalName }, containsInAnyOrder("ETH_SPI_ETHERNET_DM9051","ETH_DM9051_INT_GPIO"))
     }
 }

@@ -3,6 +3,7 @@ package it.achdjian.plugin.espparser
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import it.achdjian.plugin.esp32.configurator.SourceList
 import it.achdjian.plugin.esp32.entry_type.Value
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.*
@@ -15,10 +16,11 @@ internal class MainMenuTest {
     @MockK
     lateinit var readFile: ReadFile
 
-    val sourcesList = mapOf(
-        "COMPONENT_KCONFIGS_PROJBUILD" to listOf(File("file1"), File("file2")),
-        "COMPONENT_KCONFIGS" to listOf(File("file3"), File("file4"))
-    )
+    val sourcesList = SourceList()
+    //mapOf(
+    //    "COMPONENT_KCONFIGS_PROJBUILD" to listOf(File("file1"), File("file2")),
+    //    "COMPONENT_KCONFIGS" to listOf(File("file3"), File("file4"))
+   // )
 
     val Kconfig1 = listOf(
         "mainmenu \"Espressif IoT Development Framework Configuration\"",

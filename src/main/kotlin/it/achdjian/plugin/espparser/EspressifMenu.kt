@@ -54,14 +54,14 @@ class EspressifMenu(
             trimmedLine.startsWith("#") -> return this
             trimmedLine.isEmpty() -> return this
             trimmedLine == "config" || trimmedLine.startsWith("config ") -> {
-                return EspressifConfig(this, trimmedLine)
+                return EspressifConfig(this, trimmedLine, sourcesList, readFile)
             }
             trimmedLine == "menuconfig" || trimmedLine.startsWith("menuconfig ") -> {
-                return EspressifMenuConfig(this, trimmedLine)
+                return EspressifMenuConfig(this, trimmedLine, sourcesList, readFile)
             }
             trimmedLine == "choice" || trimmedLine.startsWith("choice ") -> {
                 val configName = trimmedLine.substring(6).trim()
-                val choice = EspressifChoice(this, configName, configElements)
+                val choice = EspressifChoice(this, configName, configElements, sourcesList, readFile)
                 elements.add(choice)
                 return choice
             }

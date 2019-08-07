@@ -1,24 +1,23 @@
 package it.achdjian.plugin.espparser
 
+import it.achdjian.plugin.esp32.configurator.SourceList
 import it.achdjian.plugin.esp32.entry_type.Value
-import java.io.File
 
 open class EspressifConfig(
-    val parent: EspressifMenuParser,
-    line: String
+    private val parent: EspressifMenuParser,
+    line: String,
+    private val sourcesList: SourceList,
+    private val readFile: ReadFile
 
-) : EspressifMenuElement {
-    val internalName: String
+    ) : EspressifMenuElement {
+    val internalName
+            = when {
+        line.startsWith("config") -> line.substring(6).trim()
+        line.startsWith("menuconfig") -> line.substring(10).trim()
+        else -> throw RuntimeException("Error parsing $line")
+    }
     override val dependsOn = mutableSetOf<Expression>()
     val promptIf = mutableSetOf<Expression>()
-
-    init {
-        if (line.startsWith("config"))
-            internalName = line.substring(6).trim()
-        else if (line.startsWith("menuconfig"))
-            internalName = line.substring(10).trim()
-        else throw RuntimeException("Error parsing $line")
-    }
 
     override val configs: List<EspressifConfig>
         get() = listOf(this)
@@ -28,7 +27,7 @@ open class EspressifConfig(
 
     override val veriableDepending: List<String>
         get() {
-            return dependsOn.filter { it is SimpleExpression }.map { (it as SimpleExpression).value }.distinct()
+            return dependsOn.filterIsInstance<SimpleExpression>().map { it.value }.distinct()
         }
 
     override val valid: Boolean
@@ -40,55 +39,11 @@ open class EspressifConfig(
     var select = mutableListOf<String>()
 
     val multiDefault = mutableListOf<Value>()
-    var helpText = false
+    private var helpText = false
     private var helpSpaces = 0
     var min = Int.MIN_VALUE.toLong().toString()
     var max = Int.MAX_VALUE.toLong().toString()
     var envVariable: String = ""
-
-    private val escapedHelp: String get() = help.replace("\"", "\\\"").replace("$", "\\$")
-
-
-    private fun createBooleanConfigEntry(output: File) {
-        output.appendText("BoolConfigEntry(\"${text}\", \"${name}\", \"${escapedHelp}\", $multiDefault[\"true\"]")
-        output.appendText(dependsOn.toString())
-        if (select.isNotEmpty()) {
-            output.appendText(",associated=listOf(")
-            output.appendText(select.joinToString())
-            output.appendText(")")
-        }
-        output.appendText(")\n")
-    }
-
-
-    private fun parseBoolDefault(value: String): Boolean? {
-        if (value == "\"y\"")
-            return true
-        if (value == "y")
-            return true
-        if (value == "\"Y\"")
-            return true
-        if (value == "Y")
-            return true
-        if (value == "\"n\"")
-            return false
-        if (value == "\"N\"")
-            return false
-        if (value == "n")
-            return false
-        if (value == "N")
-            return false
-        if (value == "F")
-            return false
-        if (value == "f")
-            return false
-        if (value == "T")
-            return true
-        if (value == "t")
-            return true
-        return null
-
-    }
 
 
     private fun addText(trimmedLine: String) {
@@ -179,17 +134,8 @@ open class EspressifConfig(
             trimmedLine.startsWith("range ") -> {
                 val tokens = trimmedLine.split(Regex("\\s+"))
 
-                min = tokens[1];
-                max = tokens[2];
-//                min = if (tokens[1].startsWith("0x"))
-//                    tokens[1].substring(2).toLong(16);
-//                else
-//                    tokens[1].toLong()
-//
-//                max = if (tokens[2].startsWith("0x"))
-//                    tokens[2].substring(2).toLong(16);
-//                else
-//                    tokens[2].toLong()
+                min = tokens[1]
+                max = tokens[2]
             }
             trimmedLine == "help" || trimmedLine.startsWith("help ") -> {
                 help = trimmedLine.substring(4).trim()
@@ -214,6 +160,9 @@ open class EspressifConfig(
                 if (parent is EspressifOwningConfig)
                     parent.addConfig(this)
                 return parent.addLine(line)
+            }
+            trimmedLine.startsWith("if")-> {
+                return EspressifIf(this, trimmedLine, sourcesList, readFile)
             }
             trimmedLine.isEmpty() -> return this
 

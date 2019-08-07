@@ -39,17 +39,17 @@ class MainMenu(lines: List<String>, sourcesList: SourceList, readFile: ReadFile)
                 return this
             }
             trimmedLine.startsWith("choice")  -> {
-                val choice = EspressifChoice(this, trimmedLine, mutableListOf<EspressifConfig>())
+                val choice = EspressifChoice(this, trimmedLine, mutableListOf(), sourcesList, readFile)
                 menuElements[choice.name] = choice
                 return choice
             }
             trimmedLine.startsWith("config")  -> {
-                val config = EspressifConfig(this, trimmedLine)
+                val config = EspressifConfig(this, trimmedLine, sourcesList, readFile)
                 menuElements[config.name] = config
                 return config
             }
             trimmedLine.startsWith("menuconfig")  -> {
-                val config = EspressifMenuConfig(this, trimmedLine)
+                val config = EspressifMenuConfig(this, trimmedLine, sourcesList, readFile)
                 menuElements[config.name] = config
                 return config
             }

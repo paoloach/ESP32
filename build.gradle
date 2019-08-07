@@ -1,10 +1,10 @@
 plugins {
     id 'org.jetbrains.intellij' version '0.4.7'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.40'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.41'
 }
 
 group 'it.achdjian.plugin'
-version '1.0.3'
+version '1.0.4'
 
 repositories {
     mavenCentral()
@@ -25,7 +25,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2019.1'
+    version '2019.2'
     pluginName 'ESP32'
 }
 compileKotlin {
@@ -39,6 +39,7 @@ patchPluginXml {
     untilBuild "192.*"
     
     changeNotes """
+      <p>&#8226; 1.0.4 &#8594; Fix compatibility with CLion 2019.2  </p>
       <p>&#8226; 1.0.3 &#8594; Fix espressif parser </p>
       <p>&#8226; 1.0.2 &#8594; Fix settings panel </p>
       <p>&#8226; 1.0.1 &#8594; Fix espressif parser </p>
@@ -49,7 +50,7 @@ patchPluginXml {
 
 task copyPlugin(type: Copy) {
     from file("${buildDir}/libs/esp32-1.0.3.jar")
-    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.1/config/plugins/ESP32/lib")
+    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.2/config/plugins/ESP32/lib")
 }
 
 task execCLion(type: Exec) {

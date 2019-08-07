@@ -15,49 +15,71 @@ import it.achdjian.plugin.esp32.ui.getResourceAsString
 import javax.swing.JComponent
 
 class CProjectGenerator : CMakeAbstractCProjectGenerator() {
-    val wizardData = WizardData()
-//    var settingPanel = ESP32WizardPanel(createSettingsPanel(), wizardData.entries)
+    private val wizardData = WizardData()
 
     override fun getName(): String = "ESP32 C project"
 
     override fun createSourceFiles(projectName: String, path: VirtualFile): Array<VirtualFile> {
-        createSdkConfigFile(wizardData.entries,path)
-        val main = createMainFile(path)
-        return arrayOf(main)
+        if (ESP32SettingState.validSDKPath()) {
+            createSdkConfigFile(wizardData.entries, path)
+            val main = createMainFile(path)
+            return arrayOf(main)
+        } else{
+            return arrayOf()
+        }
     }
 
     override fun getSettingsPanel(): JComponent? {
-        val settingPanel = ESP32WizardPanel(createSettingsPanel(), wizardData.entries)
-        return settingPanel
+        if (ESP32SettingState.validSDKPath()){
+            return ESP32WizardPanel(createSettingsPanel(), wizardData.entries)
+        } else {
+            return MissingConfig(createSettingsPanel())
+        }
+
     }
 
     override fun getCMakeFileContent(projectName: String): String {
-        var cmakelists = getResourceAsString("templates/CMakeLists.txt")
-        cmakelists = cmakelists
-            .replace("__{project_name}__", projectName)
-            .replace("__{SDK_PATH}__", ESP32SettingState.sdkPath)
-        return cmakelists
+        if (ESP32SettingState.validSDKPath()) {
+            var cmakelists = getResourceAsString("templates/CMakeLists.txt")
+            cmakelists = cmakelists
+                .replace("__{project_name}__", projectName)
+                .replace("__{SDK_PATH}__", ESP32SettingState.sdkPath)
+            return cmakelists
+        } else{
+            return ""
+        }
     }
 
     override fun generateProject(project: Project, path: VirtualFile, cmakeSetting: CMakeProjectSettings, module: Module) {
-        super.generateProject(project, path, cmakeSetting, module)
-        val cMakeWorkspace = CMakeWorkspace.getInstance(project)
-        val settings = cMakeWorkspace.settings
-        val env = mapOf("PATH" to "${ESP32SettingState.crosscompilerPath}:/usr/bin:/sbin:/bin:/opt/bin")
-        var releaseProfile = CMakeSettings.Profile("Release", "Release", "", "-DCMAKE_TOOLCHAIN_FILE=CrossCompiler.cmake", true, env, null, null)
+        if (ESP32SettingState.validSDKPath()) {
+            super.generateProject(project, path, cmakeSetting, module)
+            val cMakeWorkspace = CMakeWorkspace.getInstance(project)
+            val settings = cMakeWorkspace.settings
+            val env = mapOf("PATH" to "${ESP32SettingState.crosscompilerPath}:/usr/bin:/sbin:/bin:/opt/bin")
+            val releaseProfile = CMakeSettings.Profile(
+                "Release",
+                "Release",
+                "",
+                "-DCMAKE_TOOLCHAIN_FILE=CrossCompiler.cmake",
+                true,
+                env,
+                null,
+                null
+            )
 
-        settings.profiles = listOf(releaseProfile)
+            settings.profiles = listOf(releaseProfile)
+        }
     }
 }
 
 fun createMainFile(path:VirtualFile):VirtualFile{
     val mainDir = path.findChild(MAIN_DIR)?: path.createChildDirectory(null, MAIN_DIR)
     val cMakeListsFile = mainDir.findOrCreateChildData(null, "CMakeLists.txt")
-    var cMakeListsData = getResourceAsString("templates/main/CMakeLists.txt")
+    val cMakeListsData = getResourceAsString("templates/main/CMakeLists.txt")
 
     val helloWordFile = mainDir.findOrCreateChildData(null, "hello_world_main.c")
 
-    var helloWordData = getResourceAsString("templates/main/hello_world_main.c")
+    val helloWordData = getResourceAsString("templates/main/hello_world_main.c")
     ApplicationManager.getApplication().runWriteAction {
         cMakeListsFile.setBinaryContent(cMakeListsData.toByteArray())
         helloWordFile.setBinaryContent(helloWordData.toByteArray())

@@ -22,20 +22,28 @@ class WizardData() {
     }
 
     fun updateEntries() {
+
         val idfPath = File(ESP32SettingState.sdkPath)
-        val kConfig = File(idfPath, "Kconfig")
+        if (idfPath.exists()) {
+            val kConfig = File(idfPath, "Kconfig")
+            if (kConfig.exists()) {
 
+                val sourceList = SourceList();
 
-        val sourceList = SourceList();
+                try {
+                    val mainMenu = MainMenu(kConfig.readLines(), sourceList, ReadFile())
+                    configList = createConfigList(mainMenu)
+                    entries = createMenuEntries(mainMenu, configList)
 
-        try {
-            val mainMenu = MainMenu(kConfig.readLines(), sourceList, ReadFile())
-            configList = createConfigList(mainMenu)
-            entries = createMenuEntries(mainMenu, configList)
-
-        } catch (e: Exception){
-            error = e.message?:"an exception of type ${e.javaClass.name}"
-            LOG.error(e)
+                } catch (e: Exception) {
+                    error = e.message ?: "an exception of type ${e.javaClass.name}"
+                    LOG.error(e)
+                }
+            } else {
+                LOG.error("SDK path %idfPath not valid")
+            }
+        } else {
+            LOG.error("SDK path %idfPath not valid")
         }
 
     }

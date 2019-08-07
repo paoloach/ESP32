@@ -1,11 +1,15 @@
 package it.achdjian.plugin.espparser
 
+import it.achdjian.plugin.esp32.configurator.SourceList
+
 data class ChoiceConfig(val type: ConfigType, val name: String, val text: String) {}
 
 class EspressifChoice(
     val parent: EspressifMenuParser,
     override val name: String,
     private val configElements: List<EspressifConfig>,
+    private val sourcesList: SourceList,
+    private val readFile: ReadFile,
     override val dependsOn: MutableSet<Expression> = mutableSetOf()
 ) : EspressifMenuElement {
     override val veriableDepending: List<String>
@@ -75,7 +79,7 @@ class EspressifChoice(
                 return this
             }
             trimmedLine.startsWith("config") -> {
-                val configElement = EspressifConfig(this, trimmedLine)
+                val configElement = EspressifConfig(this, trimmedLine, sourcesList, readFile)
                 listConfig.add(configElement)
                 return configElement
             }
