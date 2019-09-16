@@ -1,3 +1,4 @@
+gradle.properties
 /build
 .idea/workspace.xml
 .gradle/4.10.3/fileHashes/

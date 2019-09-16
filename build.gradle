@@ -4,12 +4,15 @@ plugins {
 }
 
 group 'it.achdjian.plugin'
-version '1.0.4'
+version '1.0.5'
 
 repositories {
     mavenCentral()
 }
 
+publishPlugin {
+    token intellijPublishToken
+}
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
@@ -39,6 +42,7 @@ patchPluginXml {
     untilBuild "192.*"
     
     changeNotes """
+      <p>&#8226; 1.0.5 &#8594; Fix project creation  </p>
       <p>&#8226; 1.0.4 &#8594; Fix compatibility with CLion 2019.2  </p>
       <p>&#8226; 1.0.3 &#8594; Fix espressif parser </p>
       <p>&#8226; 1.0.2 &#8594; Fix settings panel </p>
@@ -49,7 +53,7 @@ patchPluginXml {
 
 
 task copyPlugin(type: Copy) {
-    from file("${buildDir}/libs/esp32-1.0.3.jar")
+    from file("${buildDir}/libs/esp32-1.0.5.jar")
     into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.2/config/plugins/ESP32/lib")
 }
 

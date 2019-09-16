@@ -4,6 +4,7 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.util.containers.toArray
 import com.jetbrains.cidr.cpp.cmake.CMakeSettings
 import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.CMakeAbstractCProjectGenerator
 import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.settings.CMakeProjectSettings
@@ -22,8 +23,9 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
     override fun createSourceFiles(projectName: String, path: VirtualFile): Array<VirtualFile> {
         if (ESP32SettingState.validSDKPath()) {
             createSdkConfigFile(wizardData.entries, path)
-            val main = createMainFile(path)
-            return arrayOf(main)
+            val files = mutableListOf<VirtualFile>()
+            createMainFile(path, files)
+            return files.toTypedArray()
         } else{
             return arrayOf()
         }
@@ -72,31 +74,35 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
     }
 }
 
-fun createMainFile(path:VirtualFile):VirtualFile{
-    val mainDir = path.findChild(MAIN_DIR)?: path.createChildDirectory(null, MAIN_DIR)
-    val cMakeListsFile = mainDir.findOrCreateChildData(null, "CMakeLists.txt")
-    val cMakeListsData = getResourceAsString("templates/main/CMakeLists.txt")
+fun createMainFile(
+    path: VirtualFile,
+    files: MutableList<VirtualFile>
+){
 
-    val helloWordFile = mainDir.findOrCreateChildData(null, "hello_world_main.c")
-
-    val helloWordData = getResourceAsString("templates/main/hello_world_main.c")
     ApplicationManager.getApplication().runWriteAction {
+        val mainDir = path.findChild(MAIN_DIR)?: path.createChildDirectory(null, MAIN_DIR)
+        val cMakeListsFile = mainDir.findOrCreateChildData(null, "CMakeLists.txt")
+        val cMakeListsData = getResourceAsString("templates/main/CMakeLists.txt")
+
+        val helloWordFile = mainDir.findOrCreateChildData(null, "hello_world_main.c")
+
+
+        val helloWordData = getResourceAsString("templates/main/hello_world_main.c")
         cMakeListsFile.setBinaryContent(cMakeListsData.toByteArray())
         helloWordFile.setBinaryContent(helloWordData.toByteArray())
+        files.add(helloWordFile)
     }
-
-    return helloWordFile
 }
 
 
 fun createSdkConfigFile(entries: List<ConfigurationEntry>, path: VirtualFile) {
-    val sdkConfig = path.findOrCreateChildData(null, CONFIG_FILE_NAME)
     val configurations = mutableListOf<Pair<String,String>>()
     entries.forEach { it.addConfiguration(configurations) }
 
     val data = configurations.joinToString(separator = "\n") { "CONFIG_${it.first}=${it.second}" }
 
     ApplicationManager.getApplication().runWriteAction {
+        val sdkConfig = path.findOrCreateChildData(null, CONFIG_FILE_NAME)
         sdkConfig.setBinaryContent(data.toByteArray())
     }
 }
