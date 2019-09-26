@@ -1,15 +1,9 @@
 package it.achdjian.plugin.espparser
 
-import java.lang.RuntimeException
-import java.util.*
 
+open class Expression(value: String) : Token(value)
 
-interface Expression {
-    fun isValid(): Boolean
-}
-
-class SimpleExpression(val value: String) : Expression {
-    override fun isValid(): Boolean = true
+class SimpleExpression(val value: String) : Expression(value) {
     override fun equals(other: Any?): Boolean = other is SimpleExpression && other.value == value
     override fun hashCode(): Int {
         return value.hashCode()
@@ -20,20 +14,7 @@ class SimpleExpression(val value: String) : Expression {
     }
 }
 
-class UndefinedExpr : Expression {
-    override fun isValid(): Boolean = false
-    override fun equals(other: Any?): Boolean = other is UndefinedExpr
-    override fun hashCode(): Int {
-        return false.hashCode()
-    }
-
-    override fun toString(): String {
-        return "Undefined expression"
-    }
-}
-
-object emptyExpression : Expression {
-    override fun isValid(): Boolean = true
+object emptyExpression : Expression("empty expression") {
     override fun equals(other: Any?): Boolean = other is emptyExpression
     override fun hashCode(): Int {
         return true.hashCode()
@@ -44,121 +25,212 @@ object emptyExpression : Expression {
     }
 }
 
+open class Operation : Expression("operation")
 
-interface Operation : Expression {
-    fun apply(tokens: Stack<Expression>)
+abstract class UnaryOperation(val expression: Expression) : Operation()
+
+abstract class BinaryOperation(val left: Expression, val right: Expression) : Operation() {
+    override fun hashCode(): Int {
+        var result = left.hashCode()
+        result = 31 * result + right.hashCode()
+        return result
+    }
 }
 
-class NotOper(val expression: Expression = UndefinedExpr()) : Operation {
-    override fun isValid(): Boolean = expression.isValid()
+class NotOper(expression: Expression) : UnaryOperation(expression) {
 
-    override fun apply(tokens: Stack<Expression>) {
-        val oper = tokens.pop()
-        val not = NotOper(oper)
-        tokens.push(not)
-    }
-
-    override fun equals(other: Any?): Boolean  = other is NotOper && other.expression == expression
+    override fun equals(other: Any?): Boolean = other is NotOper && other.expression == expression
     override fun hashCode(): Int {
         return expression.hashCode()
     }
 }
 
-class AndOper(val left: Expression = UndefinedExpr(), val right: Expression = UndefinedExpr()) : Operation {
-    override fun isValid(): Boolean = left.isValid() && right.isValid()
+class AndOper(left: Expression, right: Expression) : BinaryOperation(left, right) {
+    override fun equals(other: Any?): Boolean = other is AndOper && other.left == left && other.right == other.right
 
-    override fun apply(tokens: Stack<Expression>) {
-        if (tokens.size <2){
-            throw ParserError()
-        }
-        val right = tokens.pop()
-        val left = tokens.pop()
-        val and = AndOper(left, right)
-        tokens.push(and)
-    }
-
-    override fun equals(other: Any?): Boolean  = other is AndOper && other.left == left && other.right == other.right
-    override fun hashCode(): Int {
-        var result = left.hashCode()
-        result = 31 * result + right.hashCode()
-        return result
-    }
 }
 
-class OrOper(val left: Expression = UndefinedExpr(), val right: Expression = UndefinedExpr()) : Operation {
-    override fun isValid(): Boolean = left.isValid() && right.isValid()
-
-    override fun apply(tokens: Stack<Expression>) {
-        if (tokens.size <2){
-            throw ParserError()
-        }
-        val right = tokens.pop()
-        val left = tokens.pop()
-        val or = OrOper(left, right)
-        tokens.push(or)
-    }
-
-    override fun equals(other: Any?): Boolean  = other is OrOper && other.left == left && other.right == other.right
-
-    override fun hashCode(): Int {
-        var result = left.hashCode()
-        result = 31 * result + right.hashCode()
-        return result
-    }
+class OrOper(left: Expression, right: Expression) : BinaryOperation(left, right) {
+    override fun equals(other: Any?): Boolean = other is OrOper && other.left == left && other.right == other.right
 }
 
-class GTOper(val left: Expression = UndefinedExpr(), val right: Expression = UndefinedExpr()) : Operation {
-    override fun isValid(): Boolean = left.isValid() && right.isValid()
-
-    override fun apply(tokens: Stack<Expression>) {
-        if (tokens.size <2){
-            throw ParserError()
-        }
-        val right = tokens.pop()
-        val left = tokens.pop()
-        val gt = GTOper(left, right)
-        tokens.push(gt)
-    }
-
-    override fun hashCode(): Int {
-        var result = left.hashCode()
-        result = 31 * result + right.hashCode()
-        return result
-    }
-
-    override fun equals(other: Any?): Boolean  = other is GTOper && other.left == left && other.right == other.right
+class GTOper(left: Expression, right: Expression) : BinaryOperation(left, right) {
+    override fun equals(other: Any?): Boolean = other is GTOper && other.left == left && other.right == other.right
 }
 
-class EqualOper(val left: Expression = UndefinedExpr(), val right: Expression = UndefinedExpr()) : Operation {
-    override fun isValid(): Boolean = left.isValid() && right.isValid()
-
-    override fun apply(tokens: Stack<Expression>) {
-        if (tokens.size <2){
-            throw ParserError()
-        }
-        val right = tokens.pop()
-        val left = tokens.pop()
-        val and = EqualOper(left, right)
-        tokens.push(and)
-    }
-
-    override fun equals(other: Any?): Boolean  = other is EqualOper && other.left == left && other.right == other.right
-
-    override fun hashCode(): Int {
-        var result = left.hashCode()
-        result = 31 * result + right.hashCode()
-        return result
-    }
+class GTEOper(left: Expression, right: Expression) : BinaryOperation(left, right) {
+    override fun equals(other: Any?): Boolean = other is GTOper && other.left == left && other.right == other.right
 }
 
+class LTOper(left: Expression, right: Expression) : BinaryOperation(left, right) {
+    override fun equals(other: Any?): Boolean = other is GTOper && other.left == left && other.right == other.right
+}
 
+class LTEOper(left: Expression, right: Expression) : BinaryOperation(left, right) {
+    override fun equals(other: Any?): Boolean = other is GTOper && other.left == left && other.right == other.right
+}
+
+class EqualOper(left: Expression, right: Expression) : BinaryOperation(left, right) {
+    override fun equals(other: Any?): Boolean = other is EqualOper && other.left == left && other.right == other.right
+}
 
 class NotAvailableOperation : RuntimeException()
-class ParserError : RuntimeException()
+open class ParserError(message: String = "") : RuntimeException(message)
+class NotMatchingBracket : ParserError("Not matching bracket")
+class InvalidNotArgument(token: Token) : ParserError("Invalid not argument: ${token.text}")
+class InvalidLeftArgument(token: Token) : ParserError("Invalid left argument: ${token.text}")
+class InvalidRightArgument(token: Token) : ParserError("Invalid left argument: ${token.text}")
+class InvalidExpressionError(token: Token) : ParserError("${token.text} is an invalid expression")
+
+private fun extractInsideBracket(iter: ListIterator<Token>): List<Token> {
+    val insideBracketList = mutableListOf<Token>()
+    var bracketCount = 0
+    while (iter.hasPrevious()) {
+        val token = iter.next()
+        when (token) {
+            is OpenBracket -> bracketCount++
+            is CloseBracket -> {
+                if (bracketCount == 0) {
+                    return insideBracketList
+                } else {
+                    bracketCount--
+                }
+            }
+        }
+        insideBracketList.add(token)
+    }
+    throw NotMatchingBracket()
+}
+
+fun List<Token>.applyUnary(): List<Token> {
+    val result = mutableListOf<Token>()
+    val iter = listIterator()
+
+    while (iter.hasNext()) {
+        when (val token = iter.next()) {
+            is NotOperatorToken -> {
+                val argument = iter.next()
+                if (argument is Expression)
+                    result.add(NotOper(argument))
+                else
+                    throw InvalidNotArgument(argument)
+            }
+            else -> result.add(token)
+        }
+    }
+
+    return result
+}
+
+fun List<Token>.applyIntegerBinaryOperator(): List<Token> {
+    val result = mutableListOf<Token>()
+    val iter = listIterator()
+
+    while (iter.hasNext()) {
+        when (val token = iter.next()) {
+            is GtOperator, is GteOperator, is LtOperator, is LteOperator, is EqualOperator -> {
+                result.removeAt(result.lastIndex)
+                iter.previous()
+                val left = iter.previous()
+                iter.next()
+                iter.next()
+                val right = iter.next()
+                if (left !is Expression)
+                    throw InvalidLeftArgument(left)
+                if (right !is Expression)
+                    throw InvalidRightArgument(right)
+                when (token) {
+                    is EqualOperator -> result.add(EqualOper(left, right))
+                    is GtOperator -> result.add(GTOper(left, right))
+                    is GteOperator -> result.add(GTEOper(left, right))
+                    is LteOperator -> result.add(LTOper(left, right))
+                    is LtOperator -> result.add(LTEOper(left, right))
+                }
+
+            }
+            else -> result.add(token)
+        }
+    }
+
+    return result
+}
+
+fun List<Token>.applyBooleanBinaryOperator(): List<Token> {
+    val result = mutableListOf<Token>()
+    val iter = listIterator()
+
+    while (iter.hasNext()) {
+        when (val token = iter.next()) {
+            is AndOperator, is OrOperator -> {
+                result.removeAt(result.lastIndex)
+                iter.previous()
+                val left = iter.previous()
+                iter.next()
+                iter.next()
+                val right = iter.next()
+                if (left !is Expression)
+                    throw InvalidLeftArgument(left)
+                if (right !is Expression)
+                    throw InvalidRightArgument(right)
+                when (token) {
+                    is AndOperator -> result.add(AndOper(left, right))
+                    is OrOperator -> result.add(OrOper(left, right))
+                }
+            }
+            else -> result.add(token)
+        }
+    }
+
+    return result
+}
+
+fun List<Token>.parse(): Expression {
+    val tokenWithoutBracket = parseBracket()
+        .applyUnary()
+        .applyIntegerBinaryOperator()
+        .applyBooleanBinaryOperator()
+
+    if (tokenWithoutBracket.isEmpty())
+        return emptyExpression
+    if (tokenWithoutBracket.size > 1)
+        throw ParserError()
+    val expression = tokenWithoutBracket[0]
+    if (expression !is Expression)
+        throw InvalidExpressionError(expression)
+
+    return expression
+}
+
+
+fun List<Token>.parseBracket(): List<Token> {
+    val result = mutableListOf<Token>()
+
+    val iter = listIterator()
+    while (iter.hasNext()) {
+        val token = iter.next()
+        if (token is OpenBracket) {
+            val expression = extractInsideBracket(iter).parse()
+            result.add(expression)
+        } else {
+            result.add(token)
+        }
+    }
+    return result
+}
+
+
+fun List<Token>.parseSimpleExpression() =
+    map {
+        if (it is ValueToken) {
+            if (it.text.isNotEmpty() && it.text.startsWith('\"') && it.text.endsWith('\"')){
+                SimpleExpression(it.text.substring(1, it.text.length-1))
+            } else
+                SimpleExpression(it.text)
+        } else
+            it
+    }
 
 class ExpressionParser(expr: String) {
-    private val tokens = Stack<Expression>()
-
     val expresison: Expression
 
     init {
@@ -167,7 +239,7 @@ class ExpressionParser(expr: String) {
         } catch (e: NotAvailableOperation) {
             throw RuntimeException("Not available operation parsing line $expr", e)
         } catch (e: ParserError) {
-            throw RuntimeException("Parser error for expression $expr",  e)
+            throw RuntimeException("Parser error for expression $expr", e)
         }
     }
 
@@ -177,122 +249,6 @@ class ExpressionParser(expr: String) {
             return emptyExpression
         }
 
-        var bracketCount = 0
-        var bracketContent = ""
-        var bracketOn = false
-        var token = ""
-        var tokenOper=false
-        var noOper = true
-        var end=false
-
-        ("$expr ").forEach {
-            if (!end) {
-                if (tokenOper) {
-                    when (token) {
-                        "=" -> {
-                            tokens.push(EqualOper())
-                            token = ""
-                            noOper = true
-                        }
-                        ">" -> {
-                            if (it == '=') {
-                                noOper = false
-                                tokens.push(GTOper())
-                                token = ""
-                            } else {
-                                throw ParserError()
-                            }
-                        }
-                        "&" -> {
-                            if (it == '&') {
-                                noOper = false
-                                tokens.push(AndOper())
-                                token = ""
-                            } else {
-                                throw ParserError()
-                            }
-                        }
-                        "|" -> {
-                            if (it == '|') {
-                                noOper = false
-                                tokens.push(OrOper())
-                                token = ""
-                            } else {
-                                throw ParserError()
-                            }
-                        }
-                        else -> throw ParserError()
-
-                    }
-                    tokenOper = false
-                }
-                if (noOper) {
-                    when {
-                        it == '(' -> {
-                            bracketCount++
-                            bracketOn = true
-                        }
-                        it == ')' -> {
-                            if (bracketCount == 1) {
-                                bracketOn = false
-                                val parser = ExpressionParser(bracketContent)
-                                tokens.push(parser.expresison)
-                                applyOper()
-                                bracketContent = ""
-                                token = ""
-                            } else {
-                                bracketCount--
-                            }
-                        }
-                        bracketOn ->
-                            bracketContent += it
-                        it == '!' -> {
-                            tokens.push(NotOper())
-                            token = ""
-                        }
-                        it == '=' || it == '>' || it == '&' || it == '|' -> {
-                            if (token.trim().isNotEmpty()) {
-                                tokens.push(SimpleExpression(removeDoubleQuotes(token.trim())))
-                            }
-                            token = it.toString()
-                            tokenOper = true
-                        }
-                        it == ' ' && token.isNotEmpty() -> {
-                            tokens.push(SimpleExpression(removeDoubleQuotes(token.trim())))
-                            applyOper()
-                            token = ""
-                        }
-                        it == '#' ->  end =true
-                        else -> {
-                            token += it
-                        }
-                    }
-
-                } else {
-                    noOper = true
-                }
-            }
-        }
-        if (tokens.size > 1) {
-            throw ParserError()
-        }
-        return tokens.pop()
+        return tokenize(expr).parseSimpleExpression().parse()
     }
-
-
-    private fun applyOper() {
-        if (tokens.empty()) {
-            throw NotAvailableOperation()
-        }
-
-        while (tokens.size > 1 && tokens.peek().isValid()) {
-
-            val operand = tokens.pop()
-            val oper = tokens.pop() as? Operation ?: throw NotAvailableOperation()
-            tokens.push(operand)
-            oper.apply(tokens)
-        }
-    }
-
-
 }

@@ -78,19 +78,39 @@ internal class ExpressionParserTest {
     fun GreaterEqualSimplyName() {
         val parser = ExpressionParser("A_CONFIG >= B_CONFIG")
 
-        assertThat(parser.expresison, instanceOf(GTOper::class.java) )
+        assertThat(parser.expresison, instanceOf(GTEOper::class.java) )
 
-        val gtOper = parser.expresison as GTOper
+        val gteOper = parser.expresison as GTEOper
 
-        assertThat(gtOper.left, instanceOf(SimpleExpression::class.java))
-        assertThat(gtOper.right, instanceOf(SimpleExpression::class.java))
+        assertThat(gteOper.left, instanceOf(SimpleExpression::class.java))
+        assertThat(gteOper.right, instanceOf(SimpleExpression::class.java))
 
-        val left = gtOper.left as SimpleExpression
-        val right = gtOper.right as SimpleExpression
+        val left = gteOper.left as SimpleExpression
+        val right = gteOper.right as SimpleExpression
 
 
         assertThat(left.value, Is("A_CONFIG"))
         assertThat(right.value, Is("B_CONFIG"))
+    }
+
+
+    @Test
+    fun NotANDGreaterEqualSimplyName2() {
+        val parser = ExpressionParser("!FREERTOS_UNICORE  && ESP32_REV_MIN < 2")
+
+        assertThat(parser.expresison, instanceOf(AndOper::class.java) )
+
+        val andOper = parser.expresison as AndOper
+
+        assertThat(andOper.left, instanceOf(NotOper::class.java))
+        assertThat(andOper.right, instanceOf(LTEOper::class.java))
+
+        val left = andOper.left as NotOper
+        val right = andOper.right as LTEOper
+
+
+        assertThat(right.left, instanceOf(SimpleExpression::class.java))
+        assertThat(right.right, instanceOf(SimpleExpression::class.java))
     }
 
     @Test

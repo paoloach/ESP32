@@ -27,7 +27,6 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version '2018.1.4'
     localPath '/opt/clion/'
     type 'CL'
     pluginName 'ESP32'
@@ -40,7 +39,7 @@ compileTestKotlin {
 }
 patchPluginXml {
     sinceBuild "182.9999"
-    untilBuild "192.*"
+    untilBuild "193.*"
     
     changeNotes """
       <p>&#8226; 1.0.5 &#8594; Fix project creation  </p>
