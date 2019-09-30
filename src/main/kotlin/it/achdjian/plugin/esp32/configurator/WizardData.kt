@@ -43,7 +43,7 @@ class WizardData() {
                 LOG.error("SDK path %idfPath not valid")
             }
         } else {
-            LOG.error("SDK path %idfPath not valid")
+//            LOG.error("SDK path %idfPath not valid")
         }
 
     }
