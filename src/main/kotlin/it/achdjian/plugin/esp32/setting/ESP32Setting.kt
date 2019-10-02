@@ -7,17 +7,77 @@ import com.intellij.ui.TextFieldWithHistoryWithBrowseButton
 import com.intellij.ui.components.installFileCompletionAndBrowseDialog
 import com.intellij.ui.layout.LCFlags
 import com.intellij.ui.layout.panel
+import java.awt.Color
+import java.io.File
+import javax.swing.BorderFactory
 import javax.swing.JComponent
+import javax.swing.border.Border
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
+
+fun DocumentEvent.getText(): String = document.getText(0, document.length)
+
+class SDKPathDocumentListener(var path: String) : DocumentListener {
+    var component: JComponent?
+    get() = _component
+    set(value) {_component=value
+    _border = value?.border
+    changeBorder()
+    }
+
+    private var _component: JComponent? = null
+    private var _border: Border? = null
+
+
+    override fun insertUpdate(p: DocumentEvent) {
+        path = p.getText()
+        changeBorder()
+
+    }
+
+    override fun removeUpdate(p: DocumentEvent) {
+        path = p.getText()
+        changeBorder()
+    }
+
+    override fun changedUpdate(p: DocumentEvent) {
+        path = p.getText()
+        changeBorder()
+    }
+
+    private fun changeBorder() {
+        _component?.let {
+            if (!validSDKPath(path)) {
+                it.border = BorderFactory.createLineBorder(Color.RED)
+            } else {
+                it.border =_border
+            }
+        }
+    }
+
+}
+
+
+class GccPathDocumentListener(var path: String) : DocumentListener {
+    override fun insertUpdate(p: DocumentEvent) {
+        path = p.getText()
+    }
+
+    override fun removeUpdate(p: DocumentEvent) {
+        path = p.getText()
+    }
+
+    override fun changedUpdate(p: DocumentEvent) {
+        path = p.getText()
+    }
+
+}
+
 
 class ESP32Setting : Configurable {
 
-    private var esp32Sdk: String
-    private var crosscompiler: String
-
-    init {
-        esp32Sdk = ESP32SettingState.sdkPath
-        crosscompiler = ESP32SettingState.crosscompilerPath
-    }
+    private var esp32Sdk: SDKPathDocumentListener = SDKPathDocumentListener(ESP32SettingState.sdkPath)
+    private var crosscompiler: GccPathDocumentListener = GccPathDocumentListener(ESP32SettingState.crosscompilerPath)
 
     /**
      * Indicates whether the Swing form was modified or not.
@@ -26,8 +86,7 @@ class ESP32Setting : Configurable {
      * @return `true` if the settings were modified, `false` otherwise
      */
     override fun isModified(): Boolean {
-        return true
-        //return esp32Sdk != state.sdkPath || gcc != state.gccPath || cxx != state.cxxPath
+        return esp32Sdk.path != ESP32SettingState.sdkPath || crosscompiler.path != ESP32SettingState.crosscompilerPath
     }
 
     /**
@@ -46,8 +105,8 @@ class ESP32Setting : Configurable {
      *
      */
     override fun apply() {
-        ESP32SettingState.sdkPath = esp32Sdk
-        ESP32SettingState.crosscompilerPath = crosscompiler
+        ESP32SettingState.sdkPath = esp32Sdk.path
+        ESP32SettingState.crosscompilerPath = crosscompiler.path
     }
 
     /**
@@ -66,6 +125,8 @@ class ESP32Setting : Configurable {
                 val component = TextFieldWithHistoryWithBrowseButton()
                 val editor = component.childComponent.textEditor
                 editor.text = ESP32SettingState.sdkPath
+                editor.document.addDocumentListener(esp32Sdk)
+                esp32Sdk.component = component.childComponent
                 installFileCompletionAndBrowseDialog(
                     null,
                     component,
@@ -74,8 +135,8 @@ class ESP32Setting : Configurable {
                     FileChooserDescriptorFactory.createSingleFolderDescriptor(),
                     TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
                 ) {
-                    esp32Sdk = it.path
-                    esp32Sdk
+                    esp32Sdk.path = it.path
+                    esp32Sdk.path
                 }
                 component()
             }
@@ -83,6 +144,7 @@ class ESP32Setting : Configurable {
                 val component = TextFieldWithHistoryWithBrowseButton()
                 val editor = component.childComponent.textEditor
                 editor.text = ESP32SettingState.crosscompilerPath
+                editor.document.addDocumentListener(crosscompiler)
                 installFileCompletionAndBrowseDialog(
                     null,
                     component,
@@ -91,8 +153,8 @@ class ESP32Setting : Configurable {
                     FileChooserDescriptorFactory.createSingleFileDescriptor(),
                     TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
                 ) {
-                    crosscompiler = it.path
-                    crosscompiler
+                    crosscompiler.path = it.path
+                    crosscompiler.path
                 }
                 component()
             }
