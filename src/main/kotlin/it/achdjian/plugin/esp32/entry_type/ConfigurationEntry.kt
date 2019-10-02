@@ -166,7 +166,16 @@ fun <T : Any> eval(clazz: KClass<T>, expression: Expression): T {
             return (evalBool(expression.left) || evalBool(expression.right)) as T
         }
         is GTOper -> {
+            return (evalInt(expression.left) > evalInt(expression.right)) as T
+        }
+        is GTEOper -> {
             return (evalInt(expression.left) >= evalInt(expression.right)) as T
+        }
+        is LTOper -> {
+            return (evalInt(expression.left) < evalInt(expression.right)) as T
+        }
+        is LTEOper -> {
+            return (evalInt(expression.left) <= evalInt(expression.right)) as T
         }
         is EqualOper -> {
             if (expression.left::class != expression.right::class) {

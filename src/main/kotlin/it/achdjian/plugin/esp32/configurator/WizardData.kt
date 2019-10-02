@@ -9,8 +9,11 @@ import it.achdjian.plugin.espparser.*
 import java.io.File
 
 class WizardData() {
-    lateinit var entries: List<ConfigurationEntry>
-    lateinit private var configList: List<EspressifConfig>
+    var sdkPath = ESP32SettingState.sdkPath
+    val entries: List<ConfigurationEntry>
+        get() = getEntry()
+    private var configList: List<EspressifConfig> = listOf()
+    private var _entries: List<ConfigurationEntry> = listOf()
     var error = ""
 
     companion object {
@@ -21,31 +24,32 @@ class WizardData() {
         updateEntries()
     }
 
-    fun updateEntries() {
+    private fun getEntry(): List<ConfigurationEntry> {
+        if (ESP32SettingState.sdkPath != sdkPath){
+            updateEntries()
+        }
+        return _entries
+    }
 
+    private fun updateEntries() {
+        sdkPath = ESP32SettingState.sdkPath
         val idfPath = File(ESP32SettingState.sdkPath)
         if (idfPath.exists()) {
             val kConfig = File(idfPath, "Kconfig")
             if (kConfig.exists()) {
-
-                val sourceList = SourceList();
+                val sourceList = SourceList()
 
                 try {
                     val mainMenu = MainMenu(kConfig.readLines(), sourceList, ReadFile())
                     configList = createConfigList(mainMenu)
-                    entries = createMenuEntries(mainMenu, configList)
+                    _entries = createMenuEntries(mainMenu, configList)
 
                 } catch (e: Exception) {
                     error = e.message ?: "an exception of type ${e.javaClass.name}"
                     LOG.error(e)
                 }
-            } else {
-                LOG.error("SDK path %idfPath not valid")
             }
-        } else {
-            LOG.error("SDK path %idfPath not valid")
         }
-
     }
 }
 

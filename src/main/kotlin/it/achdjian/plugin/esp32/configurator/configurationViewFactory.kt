@@ -1,9 +1,15 @@
 package it.achdjian.plugin.esp32.configurator
 
+import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
+import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.ui.TextComponentAccessor
+import com.intellij.ui.TextFieldWithHistoryWithBrowseButton
+import com.intellij.ui.components.installFileCompletionAndBrowseDialog
 import it.achdjian.plugin.espparser.AndOper
 import it.achdjian.plugin.esp32.entry_type.*
 import it.achdjian.plugin.esp32.entry_type.ConfigElements.configElements
+import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import it.achdjian.plugin.esp32.ui.ButtonTitledBorder
 import java.awt.BorderLayout
 import java.awt.Color
@@ -104,17 +110,36 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             return panel
         }
         is StringConfigEntry -> {
-            val jTextField = JTextField()
             val panel = JPanel()
             panel.layout = GridLayout(1, 2)
             panel.add(jLabel)
+            if (configurationEntry.configEntry=="SDK_PYTHON"){
+                val component = TextFieldWithHistoryWithBrowseButton()
+                val editor = component.childComponent.textEditor
+                editor.text = configurationEntry.value
 
-            jTextField.text = configurationEntry.value
-            jTextField.addFocusListener(StringFocusListener(configurationEntry, jTextField))
-            jTextField.addActionListener {
-                configurationEntry.value = jTextField.text
+                installFileCompletionAndBrowseDialog(
+                    null,
+                    component,
+                    editor,
+                    configurationEntry.text,
+                    FileChooserDescriptorFactory.createSingleFileDescriptor(),
+                    TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
+                ) {
+                    configurationEntry.value = it.path
+                    configurationEntry.value
+                }
+                panel.add(component)
+            } else {
+                val jTextField = JTextField()
+
+                jTextField.text = configurationEntry.value
+                jTextField.addFocusListener(StringFocusListener(configurationEntry, jTextField))
+                jTextField.addActionListener {
+                    configurationEntry.value = jTextField.text
+                }
+                panel.add(jTextField)
             }
-            panel.add(jTextField)
             panel.isVisible = configurationEntry.enabled
             configurationEntry.addListenerToDepending { panel.isVisible = it }
             return panel
