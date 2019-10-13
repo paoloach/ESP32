@@ -35,13 +35,46 @@ class SaveAction(
 
 }
 
+fun getProjectPath(project: Project): VirtualFile {
+    val modules = ModuleManager.getInstance(project).modules
+    if (modules.isEmpty())
+        throw RuntimeException("Project has no modules")
+    val moduleFile = modules[0].moduleFile
+    return moduleFile!!.parent.parent
+}
+
+fun configParsing(project: Project): Map<String, String> {
+    val result = mutableMapOf<String, String>()
+    val parent = getProjectPath(project)
+
+    val config = parent.findChild(CONFIG_FILE_NAME)
+
+    config?.let { file ->
+        File(file.path)
+            .readLines()
+            .filter { !it.startsWith("#") }
+            .forEach {
+                val configPair = it.split("=")
+                if (configPair.size == 2) {
+                    var key = configPair[0]
+                    if (key.startsWith("CONFIG_"))
+                        key = key.substring(7)
+                    val value = configPair[1]
+                    result[key] = value
+                }
+            }
+    } ?: Messages.showErrorDialog(project, "Unable to find $CONFIG_FILE_NAME file", "ESP32 plugin")
+
+    return result
+}
+
 class Settings : AnAction("ESP32 setting..."), ComponentListener {
     companion object {
         private val LOG = Logger.getInstance(Settings::class.java)
     }
 
 
-    var settingPanel:ESP32WizardPanel? = null
+    private var settingPanel:ESP32WizardPanel? = null
 
 
     override fun componentMoved(p0: ComponentEvent?) {
@@ -94,7 +127,7 @@ class Settings : AnAction("ESP32 setting..."), ComponentListener {
             contentPanel.layout = BoxLayout(contentPanel, BoxLayout.Y_AXIS)
 
             ESP32WizardPanel(contentPanel, wizardData.entries, true).let {
-                settingPanel=it;
+                settingPanel=it
                 it.internalPanel.addComponentListener(this)
                 it.preferredSize = Dimension(500, 500)
                 it.size = Dimension(500, 500)
@@ -113,36 +146,7 @@ class Settings : AnAction("ESP32 setting..."), ComponentListener {
         }
     }
 
-    private fun getProjectPath(project: Project): VirtualFile {
-        val modules = ModuleManager.getInstance(project).modules
-        if (modules.isEmpty())
-            throw RuntimeException("Project has no modules")
-        val moduleFile = modules[0].moduleFile
-        return moduleFile!!.parent.parent
-    }
 
-    private fun configParsing(project: Project): Map<String, String> {
-        val result = mutableMapOf<String, String>()
-        val parent = getProjectPath(project)
 
-        val config = parent.findChild(CONFIG_FILE_NAME)
 
-        config?.let { file ->
-            File(file.path)
-                .readLines()
-                .filter { !it.startsWith("#") }
-                .forEach {
-                    val configPair = it.split("=")
-                    if (configPair.size == 2) {
-                        var key = configPair[0]
-                        if (key.startsWith("CONFIG_"))
-                            key = key.substring(7)
-                        val value = configPair[1]
-                        result[key] = value
-                    }
-                }
-        } ?: Messages.showErrorDialog(project, "Unable to find $CONFIG_FILE_NAME file", "ESP32 plugin")
-
-        return result
-    }
 }

@@ -26,6 +26,7 @@
     <depends>com.intellij.modules.clion</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <configurationType implementation="it.achdjian.plugin.esp32.configurations.flash.FlashConfigurationType"/>
         <directoryProjectGenerator implementation="it.achdjian.plugin.esp32.generator.CProjectGenerator"/>
         <applicationConfigurable order="last" id="ESP32.plugin.achdjian.it" displayName="ESP32 config" groupId="build" instance="it.achdjian.plugin.esp32.setting.ESP32Setting"/>
     </extensions>
