@@ -8,7 +8,13 @@ class FlashConfigurationType : ConfigurationTypeBase(
     FLASH_CONFIGURATION_DESCRIPTION,
     ICON_FLASH
 ) {
+    companion object {
+        var factory: FlashConfigurationFactory?=null
+    }
+
     init {
-        addFactory(FlashConfigurationFactory(this))
+        if (factory == null)
+            factory = FlashConfigurationFactory(this)
+        factory?.let { addFactory(it)}
     }
 }

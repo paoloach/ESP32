@@ -1,14 +1,18 @@
 package it.achdjian.plugin.esp32.generator
 
+import com.intellij.execution.RunManagerEx
+import com.intellij.execution.impl.RunManagerImpl
+import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.util.containers.toArray
 import com.jetbrains.cidr.cpp.cmake.CMakeSettings
 import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.CMakeAbstractCProjectGenerator
 import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.settings.CMakeProjectSettings
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
+import it.achdjian.plugin.esp32.configurations.flash.FlashConfigurationType
+import it.achdjian.plugin.esp32.configurations.flash.FlashRunConfiguration
 import it.achdjian.plugin.esp32.configurator.*
 import it.achdjian.plugin.esp32.entry_type.ConfigurationEntry
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
@@ -55,22 +59,40 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
     override fun generateProject(project: Project, path: VirtualFile, cmakeSetting: CMakeProjectSettings, module: Module) {
         if (ESP32SettingState.validSDKPath()) {
             super.generateProject(project, path, cmakeSetting, module)
-            val cMakeWorkspace = CMakeWorkspace.getInstance(project)
-            val settings = cMakeWorkspace.settings
-            val env = mapOf("PATH" to "${ESP32SettingState.crosscompilerPath}:/usr/bin:/sbin:/bin:/opt/bin")
-            val releaseProfile = CMakeSettings.Profile(
-                "Release",
-                "Release",
-                "",
-                "-DCMAKE_TOOLCHAIN_FILE=CrossCompiler.cmake",
-                true,
-                env,
-                null,
-                null
-            )
-
-            settings.profiles = listOf(releaseProfile)
+            generateCrossCompilerConfiguration(project)
+            generateFlashConfiguration(project)
         }
+    }
+
+    private fun  generateCrossCompilerConfiguration(project: Project){
+        val cMakeWorkspace = CMakeWorkspace.getInstance(project)
+        val settings = cMakeWorkspace.settings
+        val env = mapOf("PATH" to "${ESP32SettingState.crosscompilerPath}:/usr/bin:/sbin:/bin:/opt/bin")
+        val releaseProfile = CMakeSettings.Profile(
+            "Release",
+            "Release",
+            "",
+            "-DCMAKE_TOOLCHAIN_FILE=CrossCompiler.cmake",
+            true,
+            env,
+            null,
+            null
+        )
+
+        settings.profiles = listOf(releaseProfile)
+    }
+
+    private fun generateFlashConfiguration(project: Project) {
+        val runManager = RunManagerEx.getInstanceEx(project) as RunManagerImpl
+        FlashConfigurationType.factory ?.let {
+            val newConfig = RunnerAndConfigurationSettingsImpl(
+                runManager,
+                FlashRunConfiguration(project, it, "Flash"),
+                false
+            )
+            runManager.addConfiguration(newConfig)
+        }
+
     }
 }
 
