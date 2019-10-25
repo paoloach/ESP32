@@ -128,9 +128,11 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
                 FlashRunConfiguration(project, it, "Flash"),
                 false
             )
-            runManager.addConfiguration(newConfig)
 
+            runManager.addConfiguration(newConfig)
             runManager.selectedConfiguration = newConfig
+
+            project.save()
         }
 
     }

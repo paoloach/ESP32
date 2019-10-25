@@ -13,7 +13,7 @@ import com.intellij.openapi.util.WriteExternalException
 import org.jdom.Element
 
 class FlashRunConfiguration(project: Project, factory: ConfigurationFactory, name:String) : RunConfigurationBase<FlashConfigurationState>(project, factory, name) {
-    val flashConfigurationState = FlashConfigurationState()
+    val flashConfigurationState = FlashConfigurationState(project)
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         FlashSettingEditor(project)

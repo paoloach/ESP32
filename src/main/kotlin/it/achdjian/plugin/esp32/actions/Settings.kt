@@ -35,19 +35,17 @@ class SaveAction(
 
 }
 
-fun getProjectPath(project: Project): VirtualFile {
+fun getProjectPath(project: Project): VirtualFile? {
     val modules = ModuleManager.getInstance(project).modules
     if (modules.isEmpty())
         throw RuntimeException("Project has no modules")
     val moduleFile = modules[0].moduleFile
-    return moduleFile!!.parent.parent
+    return moduleFile?.parent?.parent
 }
 
 fun configParsing(project: Project): Map<String, String> {
     val result = mutableMapOf<String, String>()
-    val parent = getProjectPath(project)
-
-    val config = parent.findChild(CONFIG_FILE_NAME)
+    val config = getProjectPath(project)?.findChild(CONFIG_FILE_NAME)
 
     config?.let { file ->
         File(file.path)
@@ -140,9 +138,11 @@ class Settings : AnAction("ESP32 setting..."), ComponentListener {
                 .title("ESP32 Settings")
 
 
-            dialog.addAction(SaveAction(wizardData, getProjectPath(project), dialog.dialogWrapper))
-            dialog.addCancelAction()
-            dialog.show()
+            getProjectPath(project)?.let {
+                dialog.addAction(SaveAction(wizardData, it, dialog.dialogWrapper))
+                dialog.addCancelAction()
+                dialog.show()
+            }
         }
     }
 
