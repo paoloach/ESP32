@@ -15,13 +15,15 @@ class SourceList(val idfPath:String  = ESP32SettingState.sdkPath) {
     private val componentKConfigProjbuild = componentDir.walk().filter { file -> file.name == "Kconfig.projbuild" }.toList()
     private val sourcesList = mapOf(
         "COMPONENT_KCONFIGS" to componentKConfig.toList(),
-        "COMPONENT_KCONFIGS_PROJBUILD" to componentKConfigProjbuild.toList()
+        "COMPONENT_KCONFIGS_SOURCE_FILE" to componentKConfig.toList(),
+        "COMPONENT_KCONFIGS_PROJBUILD" to componentKConfigProjbuild.toList(),
+        "COMPONENT_KCONFIGS_PROJBUILD_SOURCE_FILE" to componentKConfigProjbuild.toList()
     )
 
 
     private fun addNewEnvVariable(envVariable: String): List<File> {
         envVariable.replace("\$IDF_PATH",idfPath )
-        val file=File(envVariable);
+        val file=File(envVariable)
         return if (file.exists()){
             if (file.isDirectory){
                 componentDir.walk().toList()

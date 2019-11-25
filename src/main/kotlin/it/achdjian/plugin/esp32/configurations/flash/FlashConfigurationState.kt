@@ -23,7 +23,7 @@ class FlashConfigurationState(project: Project? = null) : RunConfigurationOption
     }
 
     companion object {
-        private val LOG = Logger.getInstance(ESP32SettingState::class.java)
+        private val LOG = Logger.getInstance(FlashConfigurationState::class.java)
         const val ATTR_NAME_CONF_NAME="configurationName"
         const val ATTR_NAME_PORT="port"
         const val ATTR_NAME_BAUD="baud"

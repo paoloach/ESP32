@@ -15,6 +15,8 @@
 
     When you want flash your firmware, select the flash  target and execute it.
 
+    There is also a serial terminal allowing you to see the ESP32 logs inside the IDE
+
     ]]></description>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
@@ -26,9 +28,14 @@
     <depends>com.intellij.modules.clion</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="ESP32 Serial Monitor" anchor="bottom"
+                    factoryClass="it.achdjian.plugin.esp32.serial.SerialMonitorToolWindowFactory"
+                    canCloseContents="false" secondary="false"/>
+
         <configurationType implementation="it.achdjian.plugin.esp32.configurations.flash.FlashConfigurationType"/>
         <directoryProjectGenerator implementation="it.achdjian.plugin.esp32.generator.CProjectGenerator"/>
         <applicationConfigurable order="last" id="ESP32.plugin.achdjian.it" displayName="ESP32 config" groupId="build" instance="it.achdjian.plugin.esp32.setting.ESP32Setting"/>
+        <projectService serviceInterface="it.achdjian.plugin.esp32.serial.SerialService" serviceImplementation="it.achdjian.plugin.esp32.serial.JsscSerialService"/>
     </extensions>
 
     <actions>
@@ -42,5 +49,12 @@
             <add-to-group group-id="ToolsMenu"/>
         </group>
     </actions>
+
+
+    <project-components>
+        <component>
+            <implementation-class>it.achdjian.plugin.esp32.serial.SerialMonitorView</implementation-class>
+        </component>
+    </project-components>
 
 </idea-plugin>

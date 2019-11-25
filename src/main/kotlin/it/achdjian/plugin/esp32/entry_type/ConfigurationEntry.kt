@@ -155,6 +155,12 @@ fun <T : Any> eval(clazz: KClass<T>, expression: Expression): T {
                 else -> throw RuntimeException("Unable to convert emptyExpression to ${clazz.simpleName}")
             }
         }
+        is EnvironmentExpression -> {
+            configElements[expression.value]?.let {
+
+                return it.text as T
+            } ?: return "" as T
+        }
         is SimpleExpression -> return convertSimpleExpression(clazz, expression, configElements)
         is NotOper -> {
             return (!evalBool(expression.expression)) as T

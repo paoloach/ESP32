@@ -43,7 +43,7 @@ fun getProjectPath(project: Project): VirtualFile? {
     return moduleFile?.parent?.parent
 }
 
-fun configParsing(project: Project): Map<String, String> {
+fun configParsing(project: Project, showDialog: Boolean=true): Map<String, String> {
     val result = mutableMapOf<String, String>()
     val config = getProjectPath(project)?.findChild(CONFIG_FILE_NAME)
 
@@ -57,11 +57,17 @@ fun configParsing(project: Project): Map<String, String> {
                     var key = configPair[0]
                     if (key.startsWith("CONFIG_"))
                         key = key.substring(7)
-                    val value = configPair[1]
+                    var value = configPair[1].trim()
+                    if (value.startsWith("\"")){
+                       value = value.substring(1)
+                    }
+                    if (value.endsWith("\"")){
+                        value = value.substring(0, value.length-1)
+                    }
                     result[key] = value
                 }
             }
-    } ?: Messages.showErrorDialog(project, "Unable to find $CONFIG_FILE_NAME file", "ESP32 plugin")
+    } ?: if (showDialog) Messages.showErrorDialog(project, "Unable to find $CONFIG_FILE_NAME file", "ESP32 plugin")
 
     return result
 }

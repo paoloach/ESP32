@@ -3,7 +3,7 @@ package it.achdjian.plugin.espparser
 
 open class Expression(value: String) : Token(value)
 
-class SimpleExpression(val value: String) : Expression(value) {
+open class SimpleExpression(val value: String) : Expression(value) {
     override fun equals(other: Any?): Boolean = other is SimpleExpression && other.value == value
     override fun hashCode(): Int {
         return value.hashCode()
@@ -11,6 +11,16 @@ class SimpleExpression(val value: String) : Expression(value) {
 
     override fun toString(): String {
         return value
+    }
+}
+
+class EnvironmentExpression(value: String) : SimpleExpression(value) {
+    override fun toString(): String {
+        if (value=="IDF_TARGET")
+            return "esp32"
+        else {
+            return System.getenv(value) ?: ""
+        }
     }
 }
 
@@ -222,10 +232,12 @@ fun List<Token>.parseBracket(): List<Token> {
 fun List<Token>.parseSimpleExpression() =
     map {
         if (it is ValueToken) {
-            if (it.text.isNotEmpty() && it.text.startsWith('\"') && it.text.endsWith('\"')){
-                SimpleExpression(it.text.substring(1, it.text.length-1))
+            if (it.text.isNotEmpty() && it.text.startsWith('\"') && it.text.endsWith('\"')) {
+                SimpleExpression(it.text.substring(1, it.text.length - 1))
             } else
                 SimpleExpression(it.text)
+        } else if (it is EnvironmentToken){
+            EnvironmentExpression(it.text)
         } else
             it
     }

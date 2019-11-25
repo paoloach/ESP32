@@ -55,7 +55,7 @@ class ButtonTitledBorder(title: String, val parent: Component, val statusChange:
         label.paint(g)
 
         val separatorX = labelX + labelSize.width + ButtonTitledSeparator.SEPARATOR_LEFT_INSET
-        val separatorY = labelY + if (UIUtil.isUnderAquaLookAndFeel()) 2 else labelSize.height / 2 - 1
+        val separatorY = labelY +   labelSize.height / 2 - 1
         val separatorW = Math.max(0, width - separatorX - ButtonTitledSeparator.SEPARATOR_RIGHT_INSET)
         val separatorH = 2
 

@@ -1,35 +1,36 @@
 package it.achdjian.plugin.espparser
 
-open class Token(val text:String)
+open class Token(val text: String)
 
-class ValueToken(text:String) : Token(text)
-class OpenBracket:Token("(")
-class CloseBracket:Token(")")
+class ValueToken(text: String) : Token(text)
+class EnvironmentToken(text: String) : Token(text)
+class OpenBracket : Token("(")
+class CloseBracket : Token(")")
 
-open class Operator(text:String): Token(text)
+open class Operator(text: String) : Token(text)
 
-open class UnaryOperatorToken(text:String): Operator(text)
+open class UnaryOperatorToken(text: String) : Operator(text)
 
-class NotOperatorToken: UnaryOperatorToken("!")
+class NotOperatorToken : UnaryOperatorToken("!")
 
-open class BinaryOperator(text:String): Operator(text)
+open class BinaryOperator(text: String) : Operator(text)
 
-class AndOperator: BinaryOperator("&&")
+class AndOperator : BinaryOperator("&&")
 
-class OrOperator: BinaryOperator("||")
-class EqualOperator: BinaryOperator("==")
-class GtOperator: BinaryOperator(">")
-class GteOperator: BinaryOperator(">=")
-class LtOperator: BinaryOperator("<")
-class LteOperator: BinaryOperator("<=")
+class OrOperator : BinaryOperator("||")
+class EqualOperator : BinaryOperator("==")
+class GtOperator : BinaryOperator(">")
+class GteOperator : BinaryOperator(">=")
+class LtOperator : BinaryOperator("<")
+class LteOperator : BinaryOperator("<=")
 
-class InvalidTokeException(invalidToken:String) : RuntimeException("Invalid token: $invalidToken")
+class InvalidTokeException(invalidToken: String) : RuntimeException("Invalid token: $invalidToken")
 
 
-fun operatorSecondChar(c: Char, prevOper: Char, result: MutableList<Token>) : Boolean{
-    when(prevOper){
+fun operatorSecondChar(c: Char, prevOper: Char, result: MutableList<Token>): Boolean {
+    when (prevOper) {
         '=' -> {
-            when(c){
+            when (c) {
                 '=' -> result.add(EqualOperator())
                 '>' -> result.add(GteOperator())
                 '<' -> result.add(LteOperator())
@@ -59,7 +60,7 @@ fun operatorSecondChar(c: Char, prevOper: Char, result: MutableList<Token>) : Bo
             }
         }
         '&' -> {
-            if (c == '&'){
+            if (c == '&') {
                 result.add(AndOperator())
                 return true
             } else {
@@ -67,7 +68,7 @@ fun operatorSecondChar(c: Char, prevOper: Char, result: MutableList<Token>) : Bo
             }
         }
         '|' -> {
-            if (c == '|'){
+            if (c == '|') {
                 result.add(OrOperator())
                 return true
             } else {
@@ -78,69 +79,120 @@ fun operatorSecondChar(c: Char, prevOper: Char, result: MutableList<Token>) : Bo
     }
 }
 
+interface Tokenizer {
+    fun newToken(c: Char): Tokenizer
+}
+
+class CommentTokenizer : Tokenizer {
+    override fun newToken(c: Char): Tokenizer {
+        return this
+    }
+
+}
+
+class EnvironmentTokenizer(val result: MutableList<Token>, val previousTokenizer: Tokenizer) : Tokenizer {
+    private enum class Status { BEGIN_BRACKET, VALUE, END_BRACKET }
+
+    private var envName = ""
+
+    private var status = Status.BEGIN_BRACKET
+    override fun newToken(c: Char): Tokenizer {
+        when (status) {
+            Status.BEGIN_BRACKET -> {
+                if (c == '(') {
+                    status = Status.END_BRACKET
+                } else {
+                    throw RuntimeException("Unexpected character $c after the character $$ ")
+                }
+            }
+            Status.END_BRACKET -> {
+                if (c != ')') {
+                    envName += c
+                } else {
+                    result.add(EnvironmentToken(envName))
+                    return previousTokenizer
+                }
+            }
+
+        }
+        return this
+    }
+}
+
+class NormalTokenizer(val result: MutableList<Token>) : Tokenizer {
+    private var prevOper = ' '
+    private var tokenOper = false
+    private var varName = ""
+    private val commentTokenizer = CommentTokenizer()
+    override fun newToken(c: Char): Tokenizer {
+        var consumed = false
+        if (tokenOper) {
+            consumed = operatorSecondChar(c, prevOper, result)
+            tokenOper = false
+        }
+
+
+        if (!consumed)
+            when (c) {
+                ' ', '\t' -> {
+                    if (varName.isNotEmpty()) {
+                        result.add(ValueToken(varName))
+                        varName = ""
+                    }
+                }
+                '!' -> {
+                    if (varName.isNotEmpty()) {
+                        result.add(ValueToken(varName))
+                        varName = ""
+                    }
+                    result.add(NotOperatorToken())
+                }
+                '(' -> {
+                    if (varName.isNotEmpty()) {
+                        result.add(ValueToken(varName))
+                        varName = ""
+                    }
+                    result.add(OpenBracket())
+                }
+                ')' -> {
+                    if (varName.isNotEmpty()) {
+                        result.add(ValueToken(varName))
+                        varName = ""
+                    }
+                    result.add(CloseBracket())
+                }
+                '=', '>', '<', '&', '|' -> {
+                    prevOper = c
+                    tokenOper = true
+                    if (varName.isNotEmpty()) {
+                        result.add(ValueToken(varName))
+                        varName = ""
+                    }
+                }
+                '$' -> {
+                    return  EnvironmentTokenizer(result, this)
+                }
+                '#' -> {
+                    return commentTokenizer
+                }
+
+                else -> {
+                    varName += c
+                }
+            }
+        return this
+    }
+
+}
 
 fun tokenize(expr: String): List<Token> {
     val result: MutableList<Token> = mutableListOf()
-    var prevOper = ' '
-    var tokenOper = false
-    var varName =""
-    var comment=false
+    var tokenizer: Tokenizer = NormalTokenizer(result)
 
     ("$expr ").forEach {
-        if (!comment) {
-            var consumed = false
-            if (tokenOper) {
-                consumed = operatorSecondChar(it, prevOper, result)
-                tokenOper=false
-            }
+        tokenizer = tokenizer.newToken(it)
 
-
-            if (!consumed)
-                when (it) {
-                    ' ', '\t' -> {
-                        if (varName.isNotEmpty()) {
-                            result.add(ValueToken(varName))
-                            varName = ""
-                        }
-                    }
-                    '!' -> {
-                        if (varName.isNotEmpty()) {
-                            result.add(ValueToken(varName))
-                            varName = ""
-                        }
-                        result.add(NotOperatorToken())
-                    }
-                    '(' -> {
-                        if (varName.isNotEmpty()) {
-                            result.add(ValueToken(varName))
-                            varName = ""
-                        }
-                        result.add(OpenBracket())
-                    }
-                    ')' -> {
-                        if (varName.isNotEmpty()) {
-                            result.add(ValueToken(varName))
-                            varName = ""
-                        }
-                        result.add(CloseBracket())
-                    }
-                    '=', '>','<', '&', '|' -> {
-                        prevOper = it
-                        tokenOper = true
-                        if (varName.isNotEmpty()) {
-                            result.add(ValueToken(varName))
-                            varName = ""
-                        }
-                    }
-                    '#' -> {
-                        comment = true
-                    }
-                    else -> {
-                        varName += it
-                    }
-                }
-            }
-        }
-    return result
     }
+    return result
+}
 

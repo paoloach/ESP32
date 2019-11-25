@@ -65,13 +65,8 @@ class FlashSettingEditor(private val project: @NotNull Project) : SettingsEditor
         espToolPy.selectedItem = port
 
         availableBaudRate.forEach { espToolBaudrate.addItem(it) }
-        val baud = if (state.baud == null)
-            config["ESPTOOLPY_BAUD"]?.toIntOrNull()
-        else
-            state.baud
-        baud?.let {
-            espToolBaudrate.selectedItem = DEFAULT_BAUD
-        } ?: selectBaud(baud)
+        val baud = state.baud
+        espToolBaudrate.selectedItem = baud
     }
 
 

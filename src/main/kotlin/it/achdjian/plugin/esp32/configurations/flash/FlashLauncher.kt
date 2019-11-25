@@ -29,8 +29,8 @@ class FlashLauncher(
             cmdLine.withEnvironment(it.additionalEnvironment)
         }
 
-        flashConfigurationState.port?.let { cmdLine.withEnvironment("ESPPORT",  "/dev/$it")}
-        flashConfigurationState.baud?.let { cmdLine.withEnvironment("ESPBAUD", it.toString())}
+        flashConfigurationState.port.let { cmdLine.withEnvironment("ESPPORT",  "/dev/$it")}
+        flashConfigurationState.baud.let { cmdLine.withEnvironment("ESPBAUD", it.toString())}
         return KillableColoredProcessHandler(cmdLine)
     }
 

@@ -97,7 +97,7 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
 
                 runManager.removeConfigurations(toRemove)
 
-            } catch (e: TimeoutException) {
+            } catch (e: TimeoutException)   {
                 LOG.warn("workspace building too long")
             }
         }
