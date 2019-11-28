@@ -41,7 +41,7 @@ class EspressifMenu(
             return elements
         }
     val elements = mutableListOf<EspressifMenuElement>()
-    val menuConfigs = mutableMapOf<String, EspressifMenuConfig>()
+    val menuConfigs = mutableListOf<EspressifMenuConfig>()
     private val configElements = mutableListOf<EspressifConfig>()
     val subMenus = mutableListOf<EspressifMenu>()
     var visibleIf: Expression = emptyExpression
@@ -67,6 +67,7 @@ class EspressifMenu(
             }
             trimmedLine.startsWith("menu ") -> {
                 val subMenu = EspressifMenu(this, trimmedLine, sourcesList, readFile)
+                elements.add(subMenu)
                 subMenus.add(subMenu)
                 return subMenu
             }
@@ -104,6 +105,7 @@ class EspressifMenu(
                                     throw RuntimeException(message, e)
                                 }
                             }
+                            elements.add(subMenu)
                             subMenus.add(subMenu)
                         } else if (lines[0].startsWith("menuconfig ")) {
                             var parser: EspressifMenuParser = this
@@ -131,16 +133,18 @@ class EspressifMenu(
     override fun addConfig(config: EspressifConfig) {
         var ownerMenuConfig = false
         config.veriableDepending.forEach {
-            menuConfigs[it]?.let {
-                it.elements.add(config)
-                ownerMenuConfig = true
-            }
+            menuConfigs
+                .firstOrNull { menuConfigs->menuConfigs.name == it }
+                ?.let {
+                    it.elements.add(config)
+                    ownerMenuConfig = true
+                }
         }
         if (!ownerMenuConfig) {
             elements.add(config)
             configElements.add(config)
             if (config is EspressifMenuConfig)
-                menuConfigs[config.name] = config
+                menuConfigs.add(config)
         }
     }
 

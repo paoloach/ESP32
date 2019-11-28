@@ -8,7 +8,7 @@ import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import it.achdjian.plugin.espparser.*
 import java.io.File
 
-class WizardData() {
+class WizardData {
     var sdkPath = ESP32SettingState.sdkPath
     val entries: List<ConfigurationEntry>
         get() = getEntry()
@@ -71,12 +71,12 @@ fun createMenuEntries(
     }
 
     return mainMenu.menuElements.map {
-        if (it.value is EspressifMenu) {
-            val espressifMenu = it.value as EspressifMenu
+        if (it is EspressifMenu) {
+            val espressifMenu = it
             val list = createSubList(espressifMenu)
-            SubMenuEntry(it.key, espressifMenu.visibleIf, list)
+            SubMenuEntry(it.name, espressifMenu.visibleIf, list)
         } else {
-            createElement(it.value)
+            createElement(it)
         }
     }
 }
@@ -89,7 +89,7 @@ private fun createConfigList(mainMenu: MainMenu): List<EspressifConfig> {
     val list = mutableListOf<EspressifConfig>()
 
     mainMenu.menuElements.forEach {
-        list.addAll(it.value.configs)
+        list.addAll(it.configs)
     }
 
     return list
@@ -137,7 +137,7 @@ private fun createElement(
         }
         is EspressifMenu -> {
             val subList = espressifElement.elements.map { createElement(it) }.toMutableList()
-            subList.addAll(espressifElement.subMenus.map { createElement(it) })
+          //  subList.addAll(espressifElement.subMenus.map { createElement(it) })
             val subMenu = SubMenuEntry(espressifElement.name, espressifElement.visibleIf, subList)
             subMenu.dependsOn = joinDependsOn(espressifElement.dependsOn)
 

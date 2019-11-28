@@ -41,7 +41,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             checkBox.isSelected = configurationEntry.value
             panel.add(checkBox)
             panel.isVisible = configurationEntry.enabled
-            configurationEntry.addListenerToDepending() { panel.isVisible = it }
+            configurationEntry.addListenerToDepending { panel.isVisible = it }
             return panel
         }
         is SubMenuConfigEntry -> {
@@ -59,7 +59,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
                     checkBox.isSelected = it.value
                     boolPanel.add(checkBox)
                     boolPanel.isVisible = configurationEntry.enabled
-                    configurationEntry.addListenerToDepending() { boolPanel.isVisible = it }
+                    configurationEntry.addListenerToDepending { boolPanel.isVisible = it }
 
                     val menuPanel = menuPanel(configurationEntry, configurationEntry )
                     panel.add(boolPanel)
@@ -95,6 +95,17 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
 
             comboBox.selectedItem = configurationEntry.default?.text
             panel.add(comboBox)
+            panel.isVisible = configurationEntry.enabled
+            configurationEntry.addListenerToDepending { panel.isVisible = it }
+            return panel
+        }
+        is HexConfigEntry -> {
+            val panel = JPanel()
+            panel.layout = GridLayout(1, 2)
+            jLabel.text = jLabel.text + " (hex value)"
+            panel.add(jLabel)
+            val textField = IntegerTextField(configurationEntry,16)
+            panel.add(textField)
             panel.isVisible = configurationEntry.enabled
             configurationEntry.addListenerToDepending { panel.isVisible = it }
             return panel
@@ -159,7 +170,7 @@ private fun menuPanel(configurationEntry: ConfigurationEntry, menuEntry: MenuEnt
     menuEntry.subMenu.forEach { configuratorViewFactory(it)?.let { view -> internalPanel.add(view) } }
     internalPanel.isVisible = false
     panel.border = ButtonTitledBorder(configurationEntry.text, panel) {
-        internalPanel.setVisible(!it)
+        internalPanel.isVisible = !it
     }
 
     panel.isVisible = configurationEntry.enabled
@@ -199,7 +210,7 @@ class IntInputVerifier(private val min: Long, private val max: Long) : InputVeri
 }
 
 
-class IntegerTextField(private val intConfigEntry: IntConfigEntry) : JFormattedTextField(NumberFormat.getInstance()),
+class IntegerTextField(private val intConfigEntry: IntConfigEntry, val radix: Int=10) : JTextField(),
     DocumentListener {
     companion object {
         val NORMAL_BACKGROUND = Color(255, 255, 255)
@@ -207,7 +218,7 @@ class IntegerTextField(private val intConfigEntry: IntConfigEntry) : JFormattedT
 
     init {
         background = NORMAL_BACKGROUND
-        text = intConfigEntry.value.toString()
+        text = intConfigEntry.value.toString(16)
         document.addDocumentListener(this)
         inputVerifier = IntInputVerifier(intConfigEntry.min, intConfigEntry.max)
     }
@@ -221,7 +232,7 @@ class IntegerTextField(private val intConfigEntry: IntConfigEntry) : JFormattedT
         val length = documentEvent.document.length
         val str = documentEvent.document.getText(0, length)
         try {
-            intConfigEntry.value = str.toInt()
+            intConfigEntry.value = str.toInt(radix)
             background = NORMAL_BACKGROUND
         } catch (e: Exception) {
             background = IntInputVerifier.ERROR_BACKGROUND
@@ -233,7 +244,7 @@ class IntegerTextField(private val intConfigEntry: IntConfigEntry) : JFormattedT
         val length = documentEvent.document.length
         val str = documentEvent.document.getText(0, length)
         try {
-            intConfigEntry.value = str.toInt()
+            intConfigEntry.value = str.toInt(radix)
             background = NORMAL_BACKGROUND
         } catch (e: Exception) {
             background = IntInputVerifier.ERROR_BACKGROUND
@@ -244,13 +255,14 @@ class IntegerTextField(private val intConfigEntry: IntConfigEntry) : JFormattedT
         val length = documentEvent.document.length
         val str = documentEvent.document.getText(0, length)
         try {
-            intConfigEntry.value = str.toInt()
+            intConfigEntry.value = str.toInt(radix)
             background = NORMAL_BACKGROUND
         } catch (e: Exception) {
             background = IntInputVerifier.ERROR_BACKGROUND
         }
     }
 }
+
 
 class StringFocusListener(
     private val stringConfigEntry: StringConfigEntry,

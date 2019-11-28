@@ -1,14 +1,10 @@
 package it.achdjian.plugin.espparser
 
 import it.achdjian.plugin.esp32.configurator.SourceList
-import java.io.File
-import java.lang.RuntimeException
-import java.util.*
-import kotlin.collections.HashMap
 
 class MainMenu(lines: List<String>, sourcesList: SourceList, readFile: ReadFile) : EspressifMenuParser {
     var prompt = ""
-    val menuElements = mutableMapOf<String, EspressifMenuElement>()
+    val menuElements = mutableListOf<EspressifMenuElement>()
     var sourcesList : SourceList
     var readFile = ReadFile()
 
@@ -40,22 +36,26 @@ class MainMenu(lines: List<String>, sourcesList: SourceList, readFile: ReadFile)
             }
             trimmedLine.startsWith("choice")  -> {
                 val choice = EspressifChoice(this, trimmedLine, mutableListOf(), sourcesList, readFile)
-                menuElements[choice.name] = choice
+                //menuElements[choice.name] = choice
+                menuElements.add(choice)
                 return choice
             }
             trimmedLine.startsWith("config")  -> {
                 val config = EspressifConfig(this, trimmedLine, sourcesList, readFile)
-                menuElements[config.name] = config
+                //menuElements[config.name] = config
+                menuElements.add( config)
                 return config
             }
             trimmedLine.startsWith("menuconfig")  -> {
                 val config = EspressifMenuConfig(this, trimmedLine, sourcesList, readFile)
-                menuElements[config.name] = config
+                //menuElements[config.name] = config
+                menuElements.add(config)
                 return config
             }
             trimmedLine.startsWith("menu")  -> {
                 val menu = EspressifMenu(this, trimmedLine, sourcesList, readFile)
-                menuElements[menu.name] = menu
+                //menuElements[menu.name] = menu
+                menuElements.add( menu)
                 return menu
             }
             trimmedLine.startsWith("source")  -> {
@@ -85,9 +85,7 @@ class MainMenu(lines: List<String>, sourcesList: SourceList, readFile: ReadFile)
     }
 }
 
-class UnknownToken(line: String) : RuntimeException("Found unknow token: $line") {
-
-}
+class UnknownToken(line: String) : RuntimeException("Found unknow token: $line")
 
 class InvalidEnvVariable(envVariable: String) : Exception("Unable to found " + envVariable)
 

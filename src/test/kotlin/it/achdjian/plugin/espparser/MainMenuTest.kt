@@ -82,10 +82,11 @@ internal class MainMenuTest {
     fun configFromEnv() {
         val mainMenu = MainMenu(Kconfig1, sourcesList, readFile)
 
-        assertThat(mainMenu.menuElements, hasKey("IDF_CMAKE"))
-        assertThat(mainMenu.menuElements["IDF_CMAKE"], instanceOf(EspressifConfig::class.java))
+        val element = mainMenu.menuElements.filter { it.name == "IDF_CMAKE" }
+        assertThat(element, hasSize(1))
+        assertThat(element[0], instanceOf(EspressifConfig::class.java))
 
-        val espressifConfg = mainMenu.menuElements["IDF_CMAKE"] as EspressifConfig
+        val espressifConfg = element[0] as EspressifConfig
 
         assertThat(espressifConfg.type, Is(ConfigType.Boolean))
         assertThat(espressifConfg.envVariable, Is("IDF_CMAKE"))
@@ -94,10 +95,11 @@ internal class MainMenuTest {
     @Test
     fun configStringWithMultipleDefault() {
         val mainMenu = MainMenu(Kconfig1, sourcesList, readFile)
-        assertThat(mainMenu.menuElements, hasKey("IDF_TARGET"))
-        assertThat(mainMenu.menuElements["IDF_TARGET"], instanceOf(EspressifConfig::class.java))
+        val element = mainMenu.menuElements.filter { it.name == "IDF_TARGET" }
+        assertThat(element, hasSize(1))
+        assertThat(element[0], instanceOf(EspressifConfig::class.java))
 
-        val espressifConfg = mainMenu.menuElements["IDF_TARGET"] as EspressifConfig
+        val espressifConfg = element[0] as EspressifConfig
 
         val expected = EqualOper(SimpleExpression("IDF_TARGET_ENV"), SimpleExpression(""))
 
@@ -114,15 +116,19 @@ internal class MainMenuTest {
     @Test
     fun subMenu() {
         val mainMenu = MainMenu(Kconfig1, sourcesList, readFile)
-        assertThat(mainMenu.menuElements, hasKey("SDK tool configuration"))
-        assertThat(mainMenu.menuElements["SDK tool configuration"], instanceOf(EspressifMenu::class.java))
+
+        val element = mainMenu.menuElements.filter { it.name == "SDK tool configuration"}
+        assertThat(element, hasSize(1))
+        assertThat(element[0], instanceOf(EspressifMenu::class.java))
     }
 
     @Test
     fun stringConfigIntoSubmenu() {
         val mainMenu = MainMenu(Kconfig1, sourcesList, readFile)
 
-        val espressifMenu = mainMenu.menuElements["SDK tool configuration"] as EspressifMenu
+        val sdkToolConfig = mainMenu.menuElements.first { it.name == "SDK tool configuration"}
+
+        val espressifMenu = sdkToolConfig as EspressifMenu
         val element = espressifMenu.allElements.first { it.name == "TOOLPREFIX" }
         assertThat(element, instanceOf(EspressifConfig::class.java))
 
@@ -138,10 +144,9 @@ internal class MainMenuTest {
     @Test
     fun sourceFromAnotherFile() {
         val mainMenu = MainMenu(Kconfig1, sourcesList, readFile)
-        assertThat(mainMenu.menuElements, hasKey("ESP32-specific"))
-        assertThat(mainMenu.menuElements["ESP32-specific"], instanceOf(EspressifMenu::class.java))
+        assertThat(mainMenu.menuElements.first { it.name == "ESP32-specific"}, instanceOf(EspressifMenu::class.java))
 
-        val espressifMenu = mainMenu.menuElements["ESP32-specific"] as EspressifMenu
+        val espressifMenu = mainMenu.menuElements.first { it.name == "ESP32-specific"} as EspressifMenu
         val element = espressifMenu.allElements.first { it.name == "IDF_TARGET_ESP32" }
         assertThat(element, instanceOf(EspressifConfig::class.java))
     }
