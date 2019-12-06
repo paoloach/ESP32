@@ -1,10 +1,10 @@
 plugins {
     id 'org.jetbrains.intellij' version '0.4.7'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.60'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
 }
 
 group 'it.achdjian.plugin'
-version '1.2.0'
+version '1.2.1'
 
 repositories {
     mavenCentral()
@@ -17,7 +17,7 @@ publishPlugin {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile files('lib/jssc-2.8.0.jar')
-    compile "org.jetbrains.kotlin:kotlin-stdlib:1.3.60"
+    compile "org.jetbrains.kotlin:kotlin-stdlib:1.3.61"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
@@ -42,6 +42,7 @@ patchPluginXml {
     untilBuild "193.*"
     
     changeNotes """
+      <p>&#8226; 1.2.1 &#8594; Fixes: Hex type, menu order and get the serial baud rate from the right property </p>
       <p>&#8226; 1.2.0 &#8594; Added serial terminal for monitoring </p>
       <p>&#8226; 1.1.0 &#8594; Added the configuraiton for flashing </p>
       <p>&#8226; 1.0.7 &#8594; Better missing setting management  </p>

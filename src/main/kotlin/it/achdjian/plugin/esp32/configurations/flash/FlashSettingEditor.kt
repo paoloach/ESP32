@@ -6,32 +6,11 @@ import com.intellij.ui.layout.panel
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 import com.jetbrains.cidr.ui.ActionItemsComboBox
 import it.achdjian.plugin.esp32.actions.configParsing
+import it.achdjian.plugin.esp32.availableBaudRate
 import org.jetbrains.annotations.NotNull
 import java.io.File
 
 class FlashSettingEditor(private val project: @NotNull Project) : SettingsEditor<FlashRunConfiguration>() {
-    companion object {
-        const val DEFAULT_BAUD = 115200
-        val availableBaudRate = listOf(
-            300,
-            600,
-            1200,
-            2400,
-            4800,
-            9600,
-            19200,
-            38400,
-            57600,
-            DEFAULT_BAUD,
-            230400,
-            460800,
-            576000,
-            921600,
-            1000000,
-            2000000
-        )
-    }
-
     private val configuration = ActionItemsComboBox<String>()
     private val espToolPy = ActionItemsComboBox<String>()
     private val espToolBaudrate = ActionItemsComboBox<Int>()

@@ -1,7 +1,10 @@
 package it.achdjian.plugin.esp32.serial
 
+import com.intellij.execution.RunManagerEx
 import com.intellij.openapi.project.Project
 import it.achdjian.plugin.esp32.actions.configParsing
+import it.achdjian.plugin.esp32.configurationName
+import it.achdjian.plugin.esp32.configurations.flash.FlashRunConfiguration
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import jssc.SerialNativeInterface
 import java.io.File
@@ -10,10 +13,18 @@ import java.util.regex.Pattern
 import kotlin.math.min
 
 
-fun getSerialPort(project: Project): SerialPortData ?{
+fun getSerialPort(project: Project): SerialPortData? {
+    val flashConfPort = RunManagerEx.getInstanceEx(project)
+        .allSettings
+        .firstOrNull { it.name == configurationName }
+        ?.configuration
+        ?.let {
+            (it as FlashRunConfiguration).flashConfigurationState.port
+        }
+
     val config = configParsing(project)
-    val port = config["ESPTOOLPY_PORT"]?.let { it } ?: ESP32SettingState.serialPortName
-    val baud = config["ESPTOOLPY_BAUD"]?.toIntOrNull() ?: ESP32SettingState.serialPortBaud
+    val port = flashConfPort ?: ESP32SettingState.serialPortName
+    val baud = config["CONFIG_ESPTOOLPY_MONITOR_BAUD"]?.toIntOrNull() ?: ESP32SettingState.serialPortBaud
 
 
     val portNames = SerialPortList.getPortNames()
@@ -62,7 +73,7 @@ object SerialPortList {
 
     fun getPortNames() = getPortNames(PORTNAMES_PATH, PORTNAMES_REGEXP, PortNameComparator)
 
-    fun getPortNames(searchPath: String?, pattern: Pattern?, comparator: Comparator<String>?): List<String> {
+    private fun getPortNames(searchPath: String?, pattern: Pattern?, comparator: Comparator<String>?): List<String> {
         if (searchPath == null || pattern == null || comparator == null) {
             return listOf()
         }
@@ -87,12 +98,11 @@ object SerialPortList {
         pattern: Pattern,
         comparator: Comparator<String>
     ): List<String> {
-        val searchPath = if (search == "")
-            search
-        else if (search.endsWith("/"))
-            search
-        else
-            "$search/"
+        val searchPath = when {
+            search == "" -> search
+            search.endsWith("/") -> search
+            else -> "$search/"
+        }
         var returnArray = listOf<String>()
         val dir = File(searchPath)
         if (dir.exists() && dir.isDirectory) {

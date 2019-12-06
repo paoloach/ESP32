@@ -7,11 +7,11 @@ import java.io.File
 
 fun validSDKPath(sdkPath:String):Boolean {
     val idfPath = File(sdkPath)
-    if (idfPath.exists()) {
+    return if (idfPath.exists()) {
         val kConfig = File(idfPath, "Kconfig")
-        return kConfig.exists()
+        kConfig.exists()
     } else {
-        return false
+        false
     }
 }
 
@@ -37,7 +37,7 @@ object ESP32SettingState {
         set(portName) =  PropertiesComponent.getInstance().setValue(SERIAL_PORT_KEY, portName)
 
     var serialPortBaud: Int
-        get() = PropertiesComponent.getInstance().getInt(SERIAL_PORT_BAUD_KEY, 115200)
+        get() = PropertiesComponent.getInstance().getInt(SERIAL_PORT_BAUD_KEY, 921600)
         set(baud) =  PropertiesComponent.getInstance().setValue(SERIAL_PORT_BAUD_KEY, baud,0)
 
 

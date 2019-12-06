@@ -3,6 +3,7 @@ package it.achdjian.plugin.esp32.configurations.flash
 import com.intellij.execution.configurations.RunConfigurationOptions
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
+import it.achdjian.plugin.esp32.DEFAULT_BAUD
 import it.achdjian.plugin.esp32.actions.configParsing
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import org.jdom.Element
@@ -11,7 +12,7 @@ import org.jdom.Element
 class FlashConfigurationState(project: Project? = null) : RunConfigurationOptions() {
     var configurationName:String?=null
     var port = "ttyUSB0"
-    var baud = FlashSettingEditor.DEFAULT_BAUD
+    var baud = DEFAULT_BAUD
 
     init {
 //        project?.let {
@@ -40,7 +41,7 @@ class FlashConfigurationState(project: Project? = null) : RunConfigurationOption
     fun fromElement(element: Element) {
         configurationName = element.getAttributeValue(ATTR_NAME_CONF_NAME)
         port = element.getAttributeValue(ATTR_NAME_PORT)
-        baud = element.getAttributeValue(ATTR_NAME_BAUD) ?.let { it.toIntOrNull() } ?: FlashSettingEditor.DEFAULT_BAUD
+        baud = element.getAttributeValue(ATTR_NAME_BAUD) ?.let { it.toIntOrNull() } ?: DEFAULT_BAUD
     }
 
 }

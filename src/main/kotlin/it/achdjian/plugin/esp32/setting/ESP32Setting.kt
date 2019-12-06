@@ -1,5 +1,6 @@
 package it.achdjian.plugin.esp32.setting
 
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.TextComponentAccessor
@@ -7,8 +8,11 @@ import com.intellij.ui.TextFieldWithHistoryWithBrowseButton
 import com.intellij.ui.components.installFileCompletionAndBrowseDialog
 import com.intellij.ui.layout.LCFlags
 import com.intellij.ui.layout.panel
+import com.jetbrains.cidr.ui.ActionItemsComboBox
+import it.achdjian.plugin.esp32.actions.Settings
+import it.achdjian.plugin.esp32.availableBaudRate
+import it.achdjian.plugin.esp32.serial.SerialPortList
 import java.awt.Color
-import java.io.File
 import javax.swing.BorderFactory
 import javax.swing.JComponent
 import javax.swing.border.Border
@@ -75,9 +79,15 @@ class GccPathDocumentListener(var path: String) : DocumentListener {
 
 
 class ESP32Setting : Configurable {
-
+    val LOG = Logger.getInstance(ESP32Setting::class.java)
+    private val espToolBaudrate = ActionItemsComboBox<Int>()
+    private val espToolPy = ActionItemsComboBox<String>()
     private var esp32Sdk: SDKPathDocumentListener = SDKPathDocumentListener(ESP32SettingState.sdkPath)
     private var crosscompiler: GccPathDocumentListener = GccPathDocumentListener(ESP32SettingState.crosscompilerPath)
+
+    init {
+        availableBaudRate.forEach { espToolBaudrate.addItem(it) }
+    }
 
     /**
      * Indicates whether the Swing form was modified or not.
@@ -86,7 +96,10 @@ class ESP32Setting : Configurable {
      * @return `true` if the settings were modified, `false` otherwise
      */
     override fun isModified(): Boolean {
-        return esp32Sdk.path != ESP32SettingState.sdkPath || crosscompiler.path != ESP32SettingState.crosscompilerPath
+        return esp32Sdk.path != ESP32SettingState.sdkPath
+                || crosscompiler.path != ESP32SettingState.crosscompilerPath
+                || espToolPy.selectedItem != ESP32SettingState.serialPortName
+                || espToolBaudrate.selectedItem != ESP32SettingState.serialPortBaud
     }
 
     /**
@@ -107,6 +120,8 @@ class ESP32Setting : Configurable {
     override fun apply() {
         ESP32SettingState.sdkPath = esp32Sdk.path
         ESP32SettingState.crosscompilerPath = crosscompiler.path
+        espToolPy.selectedItem?.let { ESP32SettingState.serialPortName = it as String }
+        espToolBaudrate.selectedItem?.let { ESP32SettingState.serialPortBaud = it as Int }
     }
 
     /**
@@ -157,6 +172,19 @@ class ESP32Setting : Configurable {
                     crosscompiler.path
                 }
                 component()
+            }
+            row("Default serial port: "){
+                espToolPy.isEditable = true
+                espToolPy.removeAll()
+                val portList = SerialPortList.getPortNames()
+                portList.forEach { espToolPy.addItem(it) }
+                espToolPy.addItem(ESP32SettingState.serialPortName)
+                espToolPy.selectedItem = ESP32SettingState.serialPortName
+                espToolPy()
+            }
+            row("Default serial flashing baud rate"){
+                espToolBaudrate.selectedItem = ESP32SettingState.serialPortBaud
+                espToolBaudrate()
             }
         }
 }
