@@ -7,10 +7,15 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
+import com.intellij.openapi.wm.ex.ToolWindowManagerEx
+import com.intellij.platform.GeneratorPeerImpl
+import com.intellij.platform.ProjectGeneratorPeer
 import com.jetbrains.cidr.cpp.cmake.CMakeSettings
 import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.CMakeAbstractCProjectGenerator
+import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.CMakeProjectGenerator
 import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.settings.CMakeProjectSettings
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 import com.jetbrains.cidr.cpp.execution.CMakeAppRunConfigurationType
@@ -18,10 +23,12 @@ import it.achdjian.plugin.esp32.configurations.flash.FlashConfigurationType
 import it.achdjian.plugin.esp32.configurations.flash.FlashRunConfiguration
 import it.achdjian.plugin.esp32.configurator.*
 import it.achdjian.plugin.esp32.entry_type.ConfigurationEntry
+import it.achdjian.plugin.esp32.serial.SerialMonitorView
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import it.achdjian.plugin.esp32.ui.getResourceAsString
 import java.util.concurrent.TimeoutException
 import javax.swing.JComponent
+import javax.swing.JPanel
 
 class CProjectGenerator : CMakeAbstractCProjectGenerator() {
     companion object {
@@ -35,7 +42,7 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
 
     override fun getName(): String = "ESP32 C project"
 
-    override fun createSourceFiles(projectName: String, path: VirtualFile): Array<VirtualFile> {
+     override fun createSourceFiles(projectName: String, path: VirtualFile): Array<VirtualFile> {
         if (ESP32SettingState.validSDKPath()) {
             createSdkConfigFile(wizardData.entries, path)
             val files = mutableListOf<VirtualFile>()
@@ -46,7 +53,7 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
         }
     }
 
-    override fun getSettingsPanel(): JComponent? {
+    override fun getSettingsPanel(): JComponent {
         if (ESP32SettingState.validSDKPath()) {
             return ESP32WizardPanel(createSettingsPanel(), wizardData.entries)
         } else {
@@ -78,9 +85,16 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
             generateCrossCompilerConfiguration(project)
             generateFlashConfiguration(project)
             project.putUserData(esp32Project, true)
+
+            val toolWindowManagerEx = ToolWindowManagerEx.getInstanceEx(project)
+            val toolWindow = toolWindowManagerEx.getToolWindow("ESP32 Serial Monitor")
+            toolWindow?.let {
+                toolWindow.setAvailable(true) {
+//                    project.getComponent(SerialMonitorView::class.java)?.initToolWindow(toolWindow)
+                }
+            }
+
             removeCmakeConfiguration(project)
-
-
         }
     }
 

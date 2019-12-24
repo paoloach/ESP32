@@ -69,7 +69,7 @@ internal class EspressifIfTest {
             menu.elements.map { it.name }, contains("FREERTOS_DEBUG_INTERNALS", "FREERTOS_TASK_FUNCTION_WRAPPER")
         )
 
-        menu.menuConfigs.get("FREERTOS_DEBUG_INTERNALS")?.let { subMenu ->
+        menu.menuConfigs.first { it.name=="FREERTOS_DEBUG_INTERNALS" }.let { subMenu->
             assertThat(subMenu.elements.map { it.name }, contains("FREERTOS_PORTMUX_DEBUG"))
             val config = subMenu.elements.first { it.name == "FREERTOS_PORTMUX_DEBUG" } as EspressifConfig
             assertThat(config.dependsOn, contains(SimpleExpression("FREERTOS_DEBUG_INTERNALS") as Expression))
@@ -133,7 +133,7 @@ internal class EspressifIfTest {
             menu.elements.map { it.name }, contains("FREERTOS_DEBUG_INTERNALS", "FREERTOS_TASK_FUNCTION_WRAPPER")
         )
 
-        menu.menuConfigs.get("FREERTOS_DEBUG_INTERNALS")?.let { subMenu ->
+        menu.menuConfigs.first { it.name=="FREERTOS_DEBUG_INTERNALS" }.let { subMenu->
             assertThat(subMenu.elements.map { it.name }, contains("FREERTOS_PORTMUX_DEBUG","FREERTOS_PORTMUX_DEBUG_RECURSIVE"))
             val config1 = subMenu.elements.first { it.name == "FREERTOS_PORTMUX_DEBUG" } as EspressifConfig
             assertThat(config1.dependsOn, contains(SimpleExpression("FREERTOS_DEBUG_INTERNALS") as Expression))

@@ -101,7 +101,7 @@ private fun createSubList(
     val elementList = menu.elements.map { createElement(it) }
     val list = menu.subMenus.map { createElement(it) }.toMutableList()
     list.addAll(elementList)
-    return list
+    return elementList.toMutableList()
 }
 
 private fun createElement(

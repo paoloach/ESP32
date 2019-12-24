@@ -16,12 +16,12 @@ publishPlugin {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile files('lib/jssc-2.8.0.jar')
-    compile "org.jetbrains.kotlin:kotlin-stdlib:1.3.61"
+    implementation files('lib/jssc-2.8.0.jar')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.3.61"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
-    testCompile group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest-all', version: '1.3'
     testImplementation "io.mockk:mockk:1.9.3"
 }
 
@@ -58,8 +58,8 @@ patchPluginXml {
 
 
 task copyPlugin(type: Copy) {
-    from file("${buildDir}/libs/esp32-1.2.0.jar")
-    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.2/config/plugins/ESP32/lib")
+    from file("${buildDir}/libs/esp32-1.2.1.jar")
+    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.3/config/plugins/ESP32/lib")
 }
 
 task execCLion(type: Exec) {
