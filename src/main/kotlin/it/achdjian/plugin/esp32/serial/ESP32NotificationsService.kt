@@ -4,7 +4,7 @@ import com.intellij.notification.Notification
 import com.intellij.notification.NotificationGroup
 import com.intellij.notification.NotificationType
 
-object NotificationsService {
+object ESP32NotificationsService {
     private var notificationGroup = NotificationGroup.toolWindowGroup("Serial Monitor Notification", "Serial Monitor")
 
     fun createNotification(content: String, type: NotificationType): Notification {

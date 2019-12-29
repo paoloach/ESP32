@@ -10,17 +10,17 @@ import it.achdjian.plugin.esp32.ICON_SERIAL
 import it.achdjian.plugin.esp32.configurationName
 import it.achdjian.plugin.esp32.configurations.flash.FlashRunConfiguration
 
-class ConnectDisconnectAction : ToggleAction("Connect", "Connect to ESP8266", ICON_SERIAL), DumbAware {
+class ESP32ConnectDisconnectAction : ToggleAction("Connect", "Connect to ESP32", ICON_SERIAL), DumbAware {
 
     override fun isSelected(event: AnActionEvent): Boolean =
         event.project?.let {
-            ServiceManager.getService(it, SerialService::class.java).isConnected()
+            ServiceManager.getService(it, ESP32SerialService::class.java).isConnected()
         } ?: false
 
     override fun setSelected(event: AnActionEvent, doConnect: Boolean) {
         event.project?.let {project->
             val serialPortData = getFlashConfiguration(project) ?: getSerialPort(project)
-            val serialService = ServiceManager.getService(project, SerialService::class.java)
+            val serialService = ServiceManager.getService(project, ESP32SerialService::class.java)
             //val serialPortData  = getSerialPort(project )
             serialPortData?.let {
                 try {
@@ -29,12 +29,12 @@ class ConnectDisconnectAction : ToggleAction("Connect", "Connect to ESP8266", IC
                     } else {
                         serialService.close()
                     }
-                } catch (sme: SerialMonitorException) {
+                } catch (sme: ESP32SerialMonitorException) {
                     sme.message?.let { message ->
-                        NotificationsService.createErrorNotification(message).notify(project)
+                        ESP32NotificationsService.createErrorNotification(message).notify(project)
                     }
                 }
-            } ?: NotificationsService.createErrorNotification("Unable to get the serial port to use").notify(project)
+            } ?: ESP32NotificationsService.createErrorNotification("Unable to get the serial port to use").notify(project)
         }
     }
 
@@ -45,7 +45,7 @@ class ConnectDisconnectAction : ToggleAction("Connect", "Connect to ESP8266", IC
         presentation.isEnabled = false
         event.project?.let { project ->
             presentation.isEnabled = true
-            val serialService = ServiceManager.getService(project, SerialService::class.java)
+            val serialService = ServiceManager.getService(project, ESP32SerialService::class.java)
             if (serialService.isConnected()) {
                 presentation.text = "Disconnect"
             } else {
@@ -54,9 +54,9 @@ class ConnectDisconnectAction : ToggleAction("Connect", "Connect to ESP8266", IC
         }
     }
 
-    private fun getFlashConfiguration(project: Project): SerialPortData? {
+    private fun getFlashConfiguration(project: Project): ESP32SerialPortData? {
         val conf = RunManagerEx.getInstanceEx(project).allSettings.firstOrNull{it.name ==configurationName} ?: return null
         val flashConfigurationState = (conf.configuration as FlashRunConfiguration).flashConfigurationState
-        return SerialPortData(flashConfigurationState.port, flashConfigurationState.baud)
+        return ESP32SerialPortData(flashConfigurationState.port, flashConfigurationState.baud)
     }
 }

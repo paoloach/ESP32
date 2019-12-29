@@ -9,16 +9,16 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.util.Consumer
-import it.achdjian.plugin.esp32.serial.console.AnsiConsoleView
+import it.achdjian.plugin.esp32.serial.console.ESP32AnsiConsoleView
 import java.awt.BorderLayout
 import javax.swing.JPanel
 
 
-class SerialMonitorPanel(val project: Project) : JPanel(), Disposable {
-    private val mySerialService: SerialService
+class ESP32SerialMonitorPanel(val project: Project) : JPanel(), Disposable {
+    private val myESP32SerialService: ESP32SerialService
     private val dataListener: Consumer<ByteArray>
 
-    private val consoleView = AnsiConsoleView(project, true)
+    private val consoleView = ESP32AnsiConsoleView(project, true)
 
 
     init {
@@ -36,14 +36,14 @@ class SerialMonitorPanel(val project: Project) : JPanel(), Disposable {
         dataListener = Consumer {
             consoleView.print(String(it), ConsoleViewContentType.NORMAL_OUTPUT)
         }
-        mySerialService = ServiceManager.getService(project, SerialService::class.java)
-        mySerialService.addDataListener(dataListener)
+        myESP32SerialService = ServiceManager.getService(project, ESP32SerialService::class.java)
+        myESP32SerialService.addDataListener(dataListener)
     }
 
 
     override fun dispose() {
         Disposer.dispose(consoleView)
-        mySerialService.removeDataListener(dataListener)
+        myESP32SerialService.removeDataListener(dataListener)
     }
 
 

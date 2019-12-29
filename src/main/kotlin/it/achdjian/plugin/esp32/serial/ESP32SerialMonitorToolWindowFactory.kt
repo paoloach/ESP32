@@ -5,9 +5,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.wm.ToolWindow
 import com.intellij.openapi.wm.ToolWindowFactory
 import it.achdjian.plugin.esp32.actions.configParsing
-import it.achdjian.plugin.esp32.generator.CProjectGenerator.Companion.esp32Project
 
-class SerialMonitorToolWindowFactory : ToolWindowFactory, DumbAware {
+class ESP32SerialMonitorToolWindowFactory : ToolWindowFactory, DumbAware {
     override fun createToolWindowContent(project: Project, toolWindow: ToolWindow) {
         project.getComponent(SerialMonitorView::class.java)?.initToolWindow(toolWindow)
     }

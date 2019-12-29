@@ -13,7 +13,7 @@ import java.util.regex.Pattern
 import kotlin.math.min
 
 
-fun getSerialPort(project: Project): SerialPortData? {
+fun getSerialPort(project: Project): ESP32SerialPortData? {
     val flashConfPort = RunManagerEx.getInstanceEx(project)
         .allSettings
         .firstOrNull { it.name == configurationName }
@@ -29,9 +29,9 @@ fun getSerialPort(project: Project): SerialPortData? {
 
     val portNames = SerialPortList.getPortNames()
     if (portNames.isEmpty())
-        return SerialPortData(port, baud)
+        return ESP32SerialPortData(port, baud)
     SerialPortList.getPortNames().firstOrNull { it == port }?.let {
-        return SerialPortData(
+        return ESP32SerialPortData(
             port,
             baud
         )

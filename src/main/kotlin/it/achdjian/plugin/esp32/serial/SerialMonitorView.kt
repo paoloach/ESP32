@@ -12,10 +12,10 @@ import com.intellij.ui.content.ContentFactory
 
 class SerialMonitorView(val project: Project) : ProjectComponent {
 
-    private var serialMonitorPanel: SerialMonitorPanel?=null
+    private var serialMonitorPanel: ESP32SerialMonitorPanel?=null
     fun initToolWindow(toolWindow: ToolWindow) {
 
-        val serialMonitorPanel = SerialMonitorPanel(project)
+        val serialMonitorPanel = ESP32SerialMonitorPanel(project)
         this.serialMonitorPanel = serialMonitorPanel
 
         val panel = SimpleToolWindowPanel(false, true)
@@ -33,8 +33,8 @@ class SerialMonitorView(val project: Project) : ProjectComponent {
     private fun createToolbar(): ActionToolbar {
         val group = DefaultActionGroup()
 
-        group.add(ConnectDisconnectAction())
-        group.add(FlashAction(project))
+        group.add(ESP32ConnectDisconnectAction())
+        group.add(ESP32FlashAction(project))
 
         return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, false)
     }

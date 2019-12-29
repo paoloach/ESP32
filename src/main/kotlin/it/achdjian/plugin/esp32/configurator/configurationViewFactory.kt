@@ -1,16 +1,14 @@
 package it.achdjian.plugin.esp32.configurator
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.ui.ComboBox
 import com.intellij.openapi.ui.TextComponentAccessor
 import com.intellij.ui.TextFieldWithHistoryWithBrowseButton
 import com.intellij.ui.components.installFileCompletionAndBrowseDialog
-import it.achdjian.plugin.espparser.AndOper
 import it.achdjian.plugin.esp32.entry_type.*
 import it.achdjian.plugin.esp32.entry_type.ConfigElements.configElements
-import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import it.achdjian.plugin.esp32.ui.ButtonTitledBorder
+import it.achdjian.plugin.espparser.AndOper
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Component
@@ -18,8 +16,6 @@ import java.awt.GridLayout
 import java.awt.event.FocusEvent
 import java.awt.event.FocusListener
 import java.awt.event.KeyEvent
-import java.lang.RuntimeException
-import java.text.NumberFormat
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener

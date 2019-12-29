@@ -29,13 +29,13 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow id="ESP32 Serial Monitor" anchor="bottom"
-                    factoryClass="it.achdjian.plugin.esp32.serial.SerialMonitorToolWindowFactory"
+                    factoryClass="it.achdjian.plugin.esp32.serial.ESP32SerialMonitorToolWindowFactory"
                     canCloseContents="false" secondary="false"/>
 
-        <configurationType implementation="it.achdjian.plugin.esp32.configurations.flash.FlashConfigurationType"/>
+        <configurationType implementation="it.achdjian.plugin.esp32.configurations.flash.ESP32FlashConfigurationType"/>
         <directoryProjectGenerator implementation="it.achdjian.plugin.esp32.generator.CProjectGenerator"/>
         <applicationConfigurable order="last" id="ESP32.plugin.achdjian.it" displayName="ESP32 config" groupId="build" instance="it.achdjian.plugin.esp32.setting.ESP32Setting"/>
-        <projectService serviceInterface="it.achdjian.plugin.esp32.serial.SerialService" serviceImplementation="it.achdjian.plugin.esp32.serial.JsscSerialService"/>
+        <projectService serviceInterface="it.achdjian.plugin.esp32.serial.ESP32SerialService" serviceImplementation="it.achdjian.plugin.esp32.serial.ESP32JsscESP32SerialService"/>
     </extensions>
 
     <actions>

@@ -59,7 +59,7 @@ patchPluginXml {
 
 
 task copyPlugin(type: Copy) {
-    from file("${buildDir}/libs/esp32-1.2.1.jar")
+    from file("${buildDir}/libs/esp32-${version}.jar")
     into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.3/config/plugins/ESP32/lib")
 }
 

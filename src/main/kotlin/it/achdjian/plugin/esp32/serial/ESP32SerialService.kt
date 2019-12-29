@@ -4,7 +4,7 @@ import com.intellij.openapi.Disposable
 import com.intellij.util.Consumer
 import jssc.SerialPort
 
-interface SerialService : Disposable {
+interface ESP32SerialService : Disposable {
     fun isConnected(): Boolean
     fun connect(portName: String, baudRate: Int)
     fun close()

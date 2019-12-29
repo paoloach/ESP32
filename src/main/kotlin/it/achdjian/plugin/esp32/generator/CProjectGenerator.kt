@@ -7,28 +7,22 @@ import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.Module
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.openapi.wm.ex.ToolWindowManagerEx
-import com.intellij.platform.GeneratorPeerImpl
-import com.intellij.platform.ProjectGeneratorPeer
 import com.jetbrains.cidr.cpp.cmake.CMakeSettings
 import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.CMakeAbstractCProjectGenerator
-import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.CMakeProjectGenerator
 import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.settings.CMakeProjectSettings
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 import com.jetbrains.cidr.cpp.execution.CMakeAppRunConfigurationType
-import it.achdjian.plugin.esp32.configurations.flash.FlashConfigurationType
+import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashConfigurationType
 import it.achdjian.plugin.esp32.configurations.flash.FlashRunConfiguration
 import it.achdjian.plugin.esp32.configurator.*
 import it.achdjian.plugin.esp32.entry_type.ConfigurationEntry
-import it.achdjian.plugin.esp32.serial.SerialMonitorView
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import it.achdjian.plugin.esp32.ui.getResourceAsString
 import java.util.concurrent.TimeoutException
 import javax.swing.JComponent
-import javax.swing.JPanel
 
 class CProjectGenerator : CMakeAbstractCProjectGenerator() {
     companion object {
@@ -136,7 +130,7 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
 
     private fun generateFlashConfiguration(project: Project) {
         val runManager = RunManagerEx.getInstanceEx(project) as RunManagerImpl
-        FlashConfigurationType.factory?.let {
+        ESP32FlashConfigurationType.factory?.let {
             val newConfig = RunnerAndConfigurationSettingsImpl(
                 runManager,
                 FlashRunConfiguration(project, it, "Flash"),

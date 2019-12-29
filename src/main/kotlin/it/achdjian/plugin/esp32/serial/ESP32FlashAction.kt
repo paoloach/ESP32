@@ -12,19 +12,19 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import it.achdjian.plugin.esp32.ICON_SERIAL_FLASH
-import it.achdjian.plugin.esp32.configurations.flash.FlashConfigurationType
+import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashConfigurationType
 
-class FlashAction(val project: Project) : ToggleAction("Flash", "Flash the ESP8266", ICON_SERIAL_FLASH), DumbAware {
+class ESP32FlashAction(val project: Project) : ToggleAction("Flash", "Flash the ESP32", ICON_SERIAL_FLASH), DumbAware {
     override fun isSelected(p0: AnActionEvent): Boolean {
         return false
     }
 
     override fun setSelected(p0: AnActionEvent, p1: Boolean) {
-        val serialService = ServiceManager.getService(project, SerialService::class.java)
+        val serialService = ServiceManager.getService(project, ESP32SerialService::class.java)
         val runManager = RunManagerEx.getInstanceEx(project) as RunManagerImpl
         runManager
             .allSettings
-            .firstOrNull { it.type is FlashConfigurationType }
+            .firstOrNull { it.type is ESP32FlashConfigurationType }
             ?.let {
                 serialService.close()
 

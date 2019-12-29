@@ -2,7 +2,7 @@ package it.achdjian.plugin.esp32.configurations.flash
 
 import com.intellij.execution.configurations.ConfigurationTypeBase
 
-class FlashConfigurationType : ConfigurationTypeBase(
+class ESP32FlashConfigurationType : ConfigurationTypeBase(
     FLASH_CONFIGURATION_ID,
     FLASH_CONFIGURATION_NAME,
     FLASH_CONFIGURATION_DESCRIPTION,

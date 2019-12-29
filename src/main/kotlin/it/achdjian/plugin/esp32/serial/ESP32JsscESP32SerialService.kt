@@ -6,7 +6,7 @@ import jssc.SerialPortEvent
 import jssc.SerialPortException
 import java.util.*
 
-class JsscSerialService : SerialService {
+class ESP32JsscESP32SerialService : ESP32SerialService {
     override var port: SerialPort? = null
     override var baudRate: Int = 115200
     private val dataListeners = Collections.synchronizedSet(mutableSetOf<Consumer<ByteArray>>())
@@ -26,7 +26,7 @@ class JsscSerialService : SerialService {
                 it.openPort()
                 val res = it.setParams(baudRate, dataBits, stopBits, parity, true, true)
                 if (!res) {
-                    throw SerialMonitorException("Failed to set SerialPort parameters")
+                    throw ESP32SerialMonitorException("Failed to set SerialPort parameters")
                 }
                 it.addEventListener {
                     serialEventListener(it)
@@ -34,14 +34,14 @@ class JsscSerialService : SerialService {
             }
         } catch (e: SerialPortException) {
             if (e.portName.startsWith("/dev") && SerialPortException.TYPE_PERMISSION_DENIED == e.exceptionType) {
-                throw SerialMonitorException(String.format("Error opening serial port \"%s\".", portName))
+                throw ESP32SerialMonitorException(String.format("Error opening serial port \"%s\".", portName))
             }
             port = null
-            throw SerialMonitorException(String.format("Error opening serial port \"%s\".", portName), e)
+            throw ESP32SerialMonitorException(String.format("Error opening serial port \"%s\".", portName), e)
         }
 
         if (port == null) {
-            throw SerialMonitorException(String.format("Serial port \"%s\" not found.", portName))
+            throw ESP32SerialMonitorException(String.format("Serial port \"%s\" not found.", portName))
         }
         notifyStateListeners(true) // notify successful connect
     }
@@ -55,7 +55,7 @@ class JsscSerialService : SerialService {
                 }
                 it.closePort()
             } catch (e: SerialPortException) {
-                e.message?.let { throw SerialMonitorException(it, e) }
+                e.message?.let { throw ESP32SerialMonitorException(it, e) }
             } finally {
                 port = null
                 notifyStateListeners(false)
@@ -69,7 +69,7 @@ class JsscSerialService : SerialService {
             try {
                 it.writeBytes(bytes)
             } catch (e: SerialPortException) {
-                throw SerialMonitorException(e.message, e)
+                throw ESP32SerialMonitorException(e.message, e)
             }
         }
     }
@@ -119,7 +119,7 @@ class JsscSerialService : SerialService {
                     }
                 }
             } catch (e: SerialPortException) {
-                throw SerialMonitorException(e.message, e)
+                throw ESP32SerialMonitorException(e.message, e)
             }
 
         }
