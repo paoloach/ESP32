@@ -12,14 +12,14 @@ import com.intellij.openapi.util.InvalidDataException
 import com.intellij.openapi.util.WriteExternalException
 import org.jdom.Element
 
-class FlashRunConfiguration(project: Project, factory: ConfigurationFactory, name:String) : RunConfigurationBase<FlashConfigurationState>(project, factory, name) {
-    val flashConfigurationState = FlashConfigurationState(project)
+class ESP32FlashRunConfiguration(project: Project, factory: ConfigurationFactory, name:String) : RunConfigurationBase<ESP32FlashConfigurationState>(project, factory, name) {
+    val flashConfigurationState = ESP32FlashConfigurationState(project)
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
-        FlashSettingEditor(project)
+        ESP32FlashSettingEditor(project)
 
     override fun getState(executor: Executor, executionEnvironment: ExecutionEnvironment): RunProfileState? {
-        return FlashLauncher(executionEnvironment, flashConfigurationState)
+        return ESP32FlashLauncher(executionEnvironment, flashConfigurationState)
     }
 
     @Throws(WriteExternalException::class)
@@ -33,7 +33,7 @@ class FlashRunConfiguration(project: Project, factory: ConfigurationFactory, nam
     }
 
     override  fun clone(): RunConfiguration {
-        val cloned = super.clone() as FlashRunConfiguration
+        val cloned = super.clone() as ESP32FlashRunConfiguration
         cloned.flashConfigurationState.configurationName = flashConfigurationState.configurationName
         cloned.flashConfigurationState.port = flashConfigurationState.port
         cloned.flashConfigurationState.baud = flashConfigurationState.baud

@@ -7,10 +7,9 @@ import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 import com.jetbrains.cidr.ui.ActionItemsComboBox
 import it.achdjian.plugin.esp32.actions.configParsing
 import it.achdjian.plugin.esp32.availableBaudRate
-import org.jetbrains.annotations.NotNull
 import java.io.File
 
-class FlashSettingEditor(private val project: @NotNull Project) : SettingsEditor<FlashRunConfiguration>() {
+class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP32FlashRunConfiguration>() {
     private val configuration = ActionItemsComboBox<String>()
     private val espToolPy = ActionItemsComboBox<String>()
     private val espToolBaudrate = ActionItemsComboBox<Int>()
@@ -20,20 +19,20 @@ class FlashSettingEditor(private val project: @NotNull Project) : SettingsEditor
 
     }
 
-    override fun resetEditorFrom(runConfiguration: FlashRunConfiguration) {
+    override fun resetEditorFrom(runConfigurationESP32: ESP32FlashRunConfiguration) {
         val targets = CMakeWorkspace.getInstance(project).modelTargets
         configuration.removeAll()
         espToolPy.removeAll()
         targets.find { it.name == "flash" }
-            ?.let { it.buildConfigurations.forEach {conf-> configuration.addItem(conf.profileName) } }
+            ?.let { it.buildConfigurations.forEach { conf -> configuration.addItem(conf.profileName) } }
 
-        val state = runConfiguration.flashConfigurationState
+        val state = runConfigurationESP32.flashConfigurationState
         state.configurationName?.let { configuration.selectedItem = state.configurationName }
 
         val portList = createPortList()
         portList.forEach { espToolPy.addItem(it) }
-        val config = configParsing(runConfiguration.project)
-        val port = if (state.port.isNullOrBlank()) {
+        val config = configParsing(runConfigurationESP32.project)
+        val port = if (state.port.isBlank()) {
             config["ESPTOOLPY_PORT"]?.let { it }
         } else {
             state.port
@@ -49,16 +48,9 @@ class FlashSettingEditor(private val project: @NotNull Project) : SettingsEditor
     }
 
 
-    private fun selectBaud(baud: Int?){
-        if (!availableBaudRate.contains(baud)) {
-            espToolBaudrate.addItem(baud)
-        }
-        espToolBaudrate.selectedItem = baud
-    }
+    override fun applyEditorTo(runConfigurationESP32: ESP32FlashRunConfiguration) {
 
-    override fun applyEditorTo(runConfiguration: FlashRunConfiguration) {
-
-        val state = runConfiguration.flashConfigurationState
+        val state = runConfigurationESP32.flashConfigurationState
         configuration.selectedItem?.let { state.configurationName = it as String }
         espToolPy.selectedItem?.let { state.port = it as String }
         espToolBaudrate.selectedItem?.let { state.baud = it as Int }

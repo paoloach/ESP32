@@ -8,9 +8,9 @@ import com.intellij.execution.runners.ExecutionEnvironment
 import com.jetbrains.cidr.cpp.cmake.CMakeSettings
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 
-class FlashLauncher(
+class ESP32FlashLauncher(
     executeEnvironment: ExecutionEnvironment,
-    private val flashConfigurationState: FlashConfigurationState
+    private val ESP32FlashConfigurationState: ESP32FlashConfigurationState
 ) : CommandLineState(executeEnvironment){
 
     override fun startProcess(): ProcessHandler {
@@ -29,8 +29,8 @@ class FlashLauncher(
             cmdLine.withEnvironment(it.additionalEnvironment)
         }
 
-        flashConfigurationState.port.let { cmdLine.withEnvironment("ESPPORT",  "/dev/$it")}
-        flashConfigurationState.baud.let { cmdLine.withEnvironment("ESPBAUD", it.toString())}
+        ESP32FlashConfigurationState.port.let { cmdLine.withEnvironment("ESPPORT",  "/dev/$it")}
+        ESP32FlashConfigurationState.baud.let { cmdLine.withEnvironment("ESPBAUD", it.toString())}
         return KillableColoredProcessHandler(cmdLine)
     }
 

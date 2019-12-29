@@ -16,7 +16,7 @@ import com.jetbrains.cidr.cpp.cmake.projectWizard.generators.settings.CMakeProje
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 import com.jetbrains.cidr.cpp.execution.CMakeAppRunConfigurationType
 import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashConfigurationType
-import it.achdjian.plugin.esp32.configurations.flash.FlashRunConfiguration
+import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashRunConfiguration
 import it.achdjian.plugin.esp32.configurator.*
 import it.achdjian.plugin.esp32.entry_type.ConfigurationEntry
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
@@ -130,10 +130,10 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
 
     private fun generateFlashConfiguration(project: Project) {
         val runManager = RunManagerEx.getInstanceEx(project) as RunManagerImpl
-        ESP32FlashConfigurationType.factory?.let {
+        ESP32FlashConfigurationType.factoryESP32?.let {
             val newConfig = RunnerAndConfigurationSettingsImpl(
                 runManager,
-                FlashRunConfiguration(project, it, "Flash"),
+                ESP32FlashRunConfiguration(project, it, "Flash"),
                 false
             )
 

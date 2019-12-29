@@ -9,12 +9,12 @@ class ESP32FlashConfigurationType : ConfigurationTypeBase(
     ICON_FLASH
 ) {
     companion object {
-        var factory: FlashConfigurationFactory?=null
+        var factoryESP32: ESP32FlashConfigurationFactory?=null
     }
 
     init {
-        if (factory == null)
-            factory = FlashConfigurationFactory(this)
-        factory?.let { addFactory(it)}
+        if (factoryESP32 == null)
+            factoryESP32 = ESP32FlashConfigurationFactory(this)
+        factoryESP32?.let { addFactory(it)}
     }
 }

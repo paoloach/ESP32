@@ -4,7 +4,7 @@ import com.intellij.execution.RunManagerEx
 import com.intellij.openapi.project.Project
 import it.achdjian.plugin.esp32.actions.configParsing
 import it.achdjian.plugin.esp32.configurationName
-import it.achdjian.plugin.esp32.configurations.flash.FlashRunConfiguration
+import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashRunConfiguration
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import jssc.SerialNativeInterface
 import java.io.File
@@ -19,7 +19,7 @@ fun getSerialPort(project: Project): ESP32SerialPortData? {
         .firstOrNull { it.name == configurationName }
         ?.configuration
         ?.let {
-            (it as FlashRunConfiguration).flashConfigurationState.port
+            (it as ESP32FlashRunConfiguration).flashConfigurationState.port
         }
 
     val config = configParsing(project)

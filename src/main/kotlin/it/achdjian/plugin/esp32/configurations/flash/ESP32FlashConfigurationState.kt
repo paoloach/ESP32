@@ -4,27 +4,16 @@ import com.intellij.execution.configurations.RunConfigurationOptions
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import it.achdjian.plugin.esp32.DEFAULT_BAUD
-import it.achdjian.plugin.esp32.actions.configParsing
-import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import org.jdom.Element
 
 
-class FlashConfigurationState(project: Project? = null) : RunConfigurationOptions() {
+class ESP32FlashConfigurationState(project: Project? = null) : RunConfigurationOptions() {
     var configurationName:String?=null
     var port = "ttyUSB0"
     var baud = DEFAULT_BAUD
 
-    init {
-//        project?.let {
-//            val config = configParsing(it)
-//            port =  config["ESPTOOLPY_PORT"]?.let { it } ?: "ttyUSB0"
-//            baud = config["ESPTOOLPY_BAUD"]?.toIntOrNull() ?: FlashSettingEditor.DEFAULT_BAUD
-//        }
-
-    }
-
     companion object {
-        private val LOG = Logger.getInstance(FlashConfigurationState::class.java)
+        private val LOG = Logger.getInstance(ESP32FlashConfigurationState::class.java)
         const val ATTR_NAME_CONF_NAME="configurationName"
         const val ATTR_NAME_PORT="port"
         const val ATTR_NAME_BAUD="baud"

@@ -8,7 +8,7 @@ import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import it.achdjian.plugin.esp32.ICON_SERIAL
 import it.achdjian.plugin.esp32.configurationName
-import it.achdjian.plugin.esp32.configurations.flash.FlashRunConfiguration
+import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashRunConfiguration
 
 class ESP32ConnectDisconnectAction : ToggleAction("Connect", "Connect to ESP32", ICON_SERIAL), DumbAware {
 
@@ -56,7 +56,7 @@ class ESP32ConnectDisconnectAction : ToggleAction("Connect", "Connect to ESP32",
 
     private fun getFlashConfiguration(project: Project): ESP32SerialPortData? {
         val conf = RunManagerEx.getInstanceEx(project).allSettings.firstOrNull{it.name ==configurationName} ?: return null
-        val flashConfigurationState = (conf.configuration as FlashRunConfiguration).flashConfigurationState
+        val flashConfigurationState = (conf.configuration as ESP32FlashRunConfiguration).flashConfigurationState
         return ESP32SerialPortData(flashConfigurationState.port, flashConfigurationState.baud)
     }
 }
