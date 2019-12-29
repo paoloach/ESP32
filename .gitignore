@@ -1,6 +1,9 @@
+local.properties
+
 gradle.properties
 /build
-.idea/workspace.xml
-.gradle/4.10.3/fileHashes/
-.gradle/4.10.3/taskHistory/
-.gradle/buildOutputCleanup/buildOutputCleanup.lock
+.idea
+.gradle/4.10.3
+.gradle/6.0.1
+.gradle/buildOutputCleanup
+.gradle
