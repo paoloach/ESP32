@@ -15,7 +15,7 @@ class ParsingMenuTest {
     fun parsing() {
         MockKAnnotations.init(this, relaxUnitFun = true)
 
-        val envPath = System.getenv("IDF_PATH")
+        val envPath = System.getenv("IDF_PATH") ?: "/home/paolo/esp2866/espressif/esp-idf"
         assertThat(envPath, notNullValue())
         val idfPath = File(envPath)
         assertThat(idfPath.exists(), Is(true))

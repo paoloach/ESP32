@@ -1,7 +1,5 @@
 package it.achdjian.plugin.esp32
 
-import it.achdjian.plugin.esp32.configurations.flash.FlashSettingEditor
-
 val configurationName = "ESP32 flash rom"
 
 const val DEFAULT_BAUD = 115200

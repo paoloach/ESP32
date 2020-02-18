@@ -37,34 +37,34 @@ class CProjectGenerator : CMakeAbstractCProjectGenerator() {
     override fun getName(): String = "ESP32 C project"
 
      override fun createSourceFiles(projectName: String, path: VirtualFile): Array<VirtualFile> {
-        if (ESP32SettingState.validSDKPath()) {
-            createSdkConfigFile(wizardData.entries, path)
-            val files = mutableListOf<VirtualFile>()
-            createMainFile(path, files)
-            return files.toTypedArray()
-        } else {
-            return arrayOf()
-        }
+         return if (ESP32SettingState.validSDKPath()) {
+             createSdkConfigFile(wizardData.entries, path)
+             val files = mutableListOf<VirtualFile>()
+             createMainFile(path, files)
+             files.toTypedArray()
+         } else {
+             arrayOf()
+         }
     }
 
     override fun getSettingsPanel(): JComponent {
-        if (ESP32SettingState.validSDKPath()) {
-            return ESP32WizardPanel(createSettingsPanel(), wizardData.entries)
+        return if (ESP32SettingState.validSDKPath()) {
+            ESP32WizardPanel(createSettingsPanel(), wizardData.entries)
         } else {
-            return MissingConfig(createSettingsPanel())
+            MissingConfig(createSettingsPanel())
         }
 
     }
 
     override fun getCMakeFileContent(projectName: String): String {
-        if (ESP32SettingState.validSDKPath()) {
+        return if (ESP32SettingState.validSDKPath()) {
             var cmakelists = getResourceAsString("templates/CMakeLists.txt")
             cmakelists = cmakelists
                 .replace("__{project_name}__", projectName)
                 .replace("__{SDK_PATH}__", ESP32SettingState.sdkPath)
-            return cmakelists
+            cmakelists
         } else {
-            return ""
+            ""
         }
     }
 

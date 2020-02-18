@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.7'
+    id 'org.jetbrains.intellij' version '0.4.16'
     id 'org.jetbrains.kotlin.jvm' version '1.3.61'
 }
 
@@ -29,7 +29,7 @@ dependencies {
 intellij {
     localPath '/opt/clion/'
     type 'CL'
-    pluginName 'ESP32'
+    pluginName 'esp32'
 }
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
@@ -38,7 +38,7 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 patchPluginXml {
-    sinceBuild "182.9999"
+    sinceBuild "192.*"
     untilBuild "193.*"
     
     changeNotes """

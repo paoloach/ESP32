@@ -91,18 +91,17 @@ class CommentTokenizer : Tokenizer {
 }
 
 class EnvironmentTokenizer(val result: MutableList<Token>, val previousTokenizer: Tokenizer) : Tokenizer {
-    private enum class Status { BEGIN_BRACKET, VALUE, END_BRACKET }
+    private enum class Status { END_BRACKET, BEGIN, END_WORLD }
 
     private var envName = ""
 
-    private var status = Status.BEGIN_BRACKET
+    private var status = Status.BEGIN
     override fun newToken(c: Char): Tokenizer {
         when (status) {
-            Status.BEGIN_BRACKET -> {
-                if (c == '(') {
-                    status = Status.END_BRACKET
-                } else {
-                    throw RuntimeException("Unexpected character $c after the character $$ ")
+            Status.BEGIN -> {
+                when (c) {
+                    '(' -> status == Status.END_BRACKET
+                    else -> status = Status.END_WORLD
                 }
             }
             Status.END_BRACKET -> {
@@ -113,8 +112,16 @@ class EnvironmentTokenizer(val result: MutableList<Token>, val previousTokenizer
                     return previousTokenizer
                 }
             }
-
+            Status.END_WORLD -> {
+                if (c != ' ') {
+                    envName += c
+                } else {
+                    result.add(EnvironmentToken(envName))
+                    return previousTokenizer
+                }
+            }
         }
+
         return this
     }
 }
@@ -170,7 +177,7 @@ class NormalTokenizer(val result: MutableList<Token>) : Tokenizer {
                     }
                 }
                 '$' -> {
-                    return  EnvironmentTokenizer(result, this)
+                    return EnvironmentTokenizer(result, this)
                 }
                 '#' -> {
                     return commentTokenizer
