@@ -38,6 +38,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             panel.add(checkBox)
             panel.isVisible = configurationEntry.enabled
             configurationEntry.addListenerToDepending { panel.isVisible = it }
+            panel.name = "Boolconfig ${configurationEntry.text}"
             return panel
         }
         is SubMenuConfigEntry -> {
@@ -60,6 +61,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
                     val menuPanel = menuPanel(configurationEntry, configurationEntry )
                     panel.add(boolPanel)
                     panel.add(menuPanel)
+                    panel.name = "SubMenuConfig ${configurationEntry.text}"
                     panel
                 } else {
                     throw RuntimeException("")
@@ -69,8 +71,9 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
         }
         is SubMenuEntry -> {
             val panel = menuPanel(configurationEntry,configurationEntry)
+            panel.name = "submenu ${configurationEntry.text}"
             return panel
-        }
+            }
         is ChoiceConfigEntry -> {
             val panel = JPanel()
             panel.layout = GridLayout(1, 2)
@@ -93,6 +96,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             panel.add(comboBox)
             panel.isVisible = configurationEntry.enabled
             configurationEntry.addListenerToDepending { panel.isVisible = it }
+            panel.name = "choice  ${configurationEntry.text}"
             return panel
         }
         is HexConfigEntry -> {
@@ -104,6 +108,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             panel.add(textField)
             panel.isVisible = configurationEntry.enabled
             configurationEntry.addListenerToDepending { panel.isVisible = it }
+            panel.name = configurationEntry.text
             return panel
         }
         is IntConfigEntry -> {
@@ -114,6 +119,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             panel.add(textField)
             panel.isVisible = configurationEntry.enabled
             configurationEntry.addListenerToDepending { panel.isVisible = it }
+            panel.name = configurationEntry.text
             return panel
         }
         is StringConfigEntry -> {
@@ -149,6 +155,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             }
             panel.isVisible = configurationEntry.enabled
             configurationEntry.addListenerToDepending { panel.isVisible = it }
+            panel.name = configurationEntry.text
             return panel
 
         }

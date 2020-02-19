@@ -9,16 +9,16 @@ import javax.swing.BoxLayout
 import javax.swing.JPanel
 
 
-class ESP32WizardPanel(clionPanel: JPanel, entriesMenu: List<ConfigurationEntry>,autoResize:Boolean = false) : JPanel(BorderLayout()),
+class ESP32WizardPanel(clionPanel: JPanel, entriesMenu: List<ConfigurationEntry>, autoResize: Boolean = false) :
+    JPanel(BorderLayout()),
     ComponentListener {
-
 
     var realHeight = 0
     override fun componentMoved(p0: ComponentEvent?) {
     }
 
     override fun componentResized(p0: ComponentEvent?) {
-        realHeight = internalPanel.components.map { it.height }.sum()
+        realHeight = internalPanel.components.map { it.preferredSize.height }.sum()
         internalPanel.size = Dimension(internalPanel.width, realHeight)
         internalPanel.preferredSize = Dimension(internalPanel.width, realHeight)
     }
@@ -30,8 +30,8 @@ class ESP32WizardPanel(clionPanel: JPanel, entriesMenu: List<ConfigurationEntry>
     }
 
 
-
     val internalPanel = JPanel()
+
     init {
         add(clionPanel, BorderLayout.PAGE_START)
         internalPanel.layout = BoxLayout(internalPanel, BoxLayout.Y_AXIS)
