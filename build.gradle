@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'it.achdjian.plugin'
-version '1.2.2'
+version '1.2.3'
 
 repositories {
     mavenCentral()
@@ -42,6 +42,7 @@ patchPluginXml {
     untilBuild "193.*"
     
     changeNotes """
+      <p>&#8226; 1.2.3 &#8594; Fix parsing issue and resize setting </p>
       <p>&#8226; 1.2.2 &#8594; Fixes: start serial console when a new project is created and setting pannel </p>
       <p>&#8226; 1.2.1 &#8594; Fixes: Hex type, menu order and get the serial baud rate from the right property </p>
       <p>&#8226; 1.2.0 &#8594; Added serial terminal for monitoring </p>
