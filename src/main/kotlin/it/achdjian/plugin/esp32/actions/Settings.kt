@@ -13,7 +13,6 @@ import com.intellij.ui.ScrollPaneFactory
 import it.achdjian.plugin.esp32.configurator.CONFIG_FILE_NAME
 import it.achdjian.plugin.esp32.configurator.ESP32WizardPanel
 import it.achdjian.plugin.esp32.configurator.WizardData
-import it.achdjian.plugin.esp32.entry_type.ESP32ConfigElements.esp32configElements
 import it.achdjian.plugin.esp32.generator.createSdkConfigFile
 import java.awt.Dimension
 import java.awt.event.ActionEvent
@@ -144,15 +143,11 @@ class Settings : AnAction("ESP32 setting..."), ComponentListener {
                 .centerPanel(scrollPane)
                 .title("ESP32 Settings")
 
-            LOG.info("IDF TARGET: ${esp32configElements["IDF_TARGET"]!!.values[0]}")
-
             getProjectPath(project)?.let {
                 dialog.addAction(SaveAction(wizardData, it, dialog.dialogWrapper))
                 dialog.addCancelAction()
                 dialog.show()
             }
-
-            LOG.info("IDF TARGET: ${esp32configElements["IDF_TARGET"]!!.values[0]}")
 
         }
     }
