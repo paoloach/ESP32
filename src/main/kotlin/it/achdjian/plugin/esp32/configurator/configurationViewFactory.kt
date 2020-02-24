@@ -50,13 +50,13 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
         }
         is SubMenuConfigEntry -> {
             return esp32configElements[configurationEntry.name]?.let {
-                if (it is BoolConfigEntry){
-                    val panel=JPanel()
+                if (it is BoolConfigEntry) {
+                    val panel = JPanel()
                     panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
 
-                    val boolPanel= createBoolPanel(jLabel, it)
+                    val boolPanel = createBoolPanel(jLabel, it)
 
-                    val menuPanel = menuPanel(configurationEntry, configurationEntry )
+                    val menuPanel = menuPanel(configurationEntry, configurationEntry)
                     panel.add(boolPanel)
                     panel.add(menuPanel)
                     panel.name = "SubMenuConfig ${configurationEntry.text}"
@@ -65,13 +65,14 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
                     throw RuntimeException("")
                 }
 
-            } ?:     throw RuntimeException("Wrong SubMenuConfigEntry: missing configurationEntry ${configurationEntry.name}")
+            }
+                ?: throw RuntimeException("Wrong SubMenuConfigEntry: missing configurationEntry ${configurationEntry.name}")
         }
         is SubMenuEntry -> {
-            val panel = menuPanel(configurationEntry,configurationEntry)
+            val panel = menuPanel(configurationEntry, configurationEntry)
             panel.name = "submenu ${configurationEntry.text}"
             return panel
-            }
+        }
         is ChoiceConfigEntry -> {
             val panel = JPanel()
             panel.layout = GridLayout(1, 2)
@@ -102,7 +103,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             panel.layout = GridLayout(1, 2)
             jLabel.text = jLabel.text + " (hex value)"
             panel.add(jLabel)
-            val textField = IntegerTextField(configurationEntry,16)
+            val textField = IntegerTextField(configurationEntry, 16)
             panel.add(textField)
             panel.isVisible = configurationEntry.enabled
             configurationEntry.addListenerToDepending { panel.isVisible = it }
@@ -124,7 +125,7 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
             val panel = JPanel()
             panel.layout = GridLayout(1, 2)
             panel.add(jLabel)
-            if (configurationEntry.configEntry=="SDK_PYTHON"){
+            if (configurationEntry.configEntry == "SDK_PYTHON") {
                 val component = TextFieldWithHistoryWithBrowseButton()
                 val editor = component.childComponent.textEditor
                 editor.text = configurationEntry.value
@@ -171,7 +172,7 @@ private fun menuPanel(configurationEntry: ConfigurationEntry, menuEntry: MenuEnt
     menuEntry.subMenu.forEach { configuratorViewFactory(it)?.let { view -> internalPanel.add(view) } }
     internalPanel.isVisible = false
     panel.border = ButtonTitledBorder(configurationEntry.text, panel) {
-        internalPanel.isVisible = !it
+        internalPanel.setVisible(!it)
     }
 
     panel.isVisible = configurationEntry.enabled
@@ -211,7 +212,7 @@ class IntInputVerifier(private val min: Long, private val max: Long) : InputVeri
 }
 
 
-class IntegerTextField(private val intConfigEntry: IntConfigEntry, val radix: Int=10) : JTextField(),
+class IntegerTextField(private val intConfigEntry: IntConfigEntry, val radix: Int = 10) : JTextField(),
     DocumentListener {
     companion object {
         val NORMAL_BACKGROUND = Color(255, 255, 255)
