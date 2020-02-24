@@ -3,7 +3,7 @@ package it.achdjian.plugin.esp32.configurator
 import com.intellij.openapi.diagnostic.Logger
 import it.achdjian.plugin.esp32.actions.Settings
 import it.achdjian.plugin.esp32.entry_type.*
-import it.achdjian.plugin.esp32.entry_type.ConfigElements.configElements
+import it.achdjian.plugin.esp32.entry_type.ESP32ConfigElements.esp32configElements
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import it.achdjian.plugin.espparser.*
 import java.io.File
@@ -58,11 +58,11 @@ fun createMenuEntries(
     configList: List<EspressifConfig>
 ): List<ConfigurationEntry> {
 
-    configElements = createConfigElements(configList)
+    esp32configElements = createConfigElements(configList)
 
     configList.forEach { espressifConfig ->
         espressifConfig.select.forEach {
-            configElements[it] ?.let {configEntry->
+            esp32configElements[it] ?.let { configEntry->
                 if (configEntry is BoolConfigEntry){
                     configEntry.forceTrueBy.add(SimpleExpression(espressifConfig.internalName))
                 }
@@ -116,13 +116,13 @@ private fun createElement(
             return subMenu
         }
         is EspressifConfig -> {
-            configElements[espressifElement.name]?.let {
+            esp32configElements[espressifElement.name]?.let {
                 it.dependsOn = joinDependsOn(espressifElement.dependsOn)
                 return it
             } ?: throw RuntimeException("Unknow type: ${espressifElement::class}")
         }
         is EspressifChoice -> {
-            val choices = espressifElement.listConfig.map { configElements[it.name] as BoolConfigEntry }
+            val choices = espressifElement.listConfig.map { esp32configElements[it.name] as BoolConfigEntry }
 
             val choice = ChoiceConfigEntry(
                 espressifElement.prompt,
