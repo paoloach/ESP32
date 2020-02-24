@@ -2,5 +2,9 @@
 <project version="4">
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/openocd-esp32" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/openocd-esp32/jimtcl" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/openocd-esp32/src/jtag/drivers/libjaylink" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/openocd-esp32/tools/git2cl" vcs="Git" />
   </component>
 </project>

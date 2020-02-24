@@ -27,7 +27,7 @@ open class EspressifConfig(
 
     override val veriableDepending: List<String>
         get() {
-            return dependsOn.filterIsInstance<SimpleExpression>().map { it.value }.distinct()
+            return dependsOn.filterIsInstance<SimpleExpression>().map { it.text }.distinct()
         }
 
     override val valid: Boolean

@@ -27,10 +27,10 @@ fun getSerialPort(project: Project): ESP32SerialPortData? {
     val baud = config["CONFIG_ESPTOOLPY_MONITOR_BAUD"]?.toIntOrNull() ?: ESP32SettingState.serialPortBaud
 
 
-    val portNames = SerialPortList.getPortNames()
+    val portNames = ESP32SerialPortList.getPortNames()
     if (portNames.isEmpty())
         return ESP32SerialPortData(port, baud)
-    SerialPortList.getPortNames().firstOrNull { it == port }?.let {
+    ESP32SerialPortList.getPortNames().firstOrNull { it == port }?.let {
         return ESP32SerialPortData(
             port,
             baud
@@ -41,7 +41,7 @@ fun getSerialPort(project: Project): ESP32SerialPortData? {
 }
 
 
-object SerialPortList {
+object ESP32SerialPortList {
     private val serialInterface = SerialNativeInterface()
     private val PORTNAMES_REGEXP: Pattern?
     private val PORTNAMES_PATH: String?

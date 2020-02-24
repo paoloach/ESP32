@@ -2,7 +2,7 @@
 
 package it.achdjian.plugin.esp32.entry_type
 
-import it.achdjian.plugin.esp32.entry_type.ConfigElements.configElements
+import it.achdjian.plugin.esp32.entry_type.ESP32ConfigElements.esp32configElements
 import it.achdjian.plugin.espparser.*
 import kotlin.reflect.KClass
 
@@ -32,7 +32,7 @@ fun addListenerToDepending(
 ) {
     when (expression) {
         is SimpleExpression -> {
-            configElements[expression.value]?.let {
+            esp32configElements[expression.text]?.let {
                 when (it) {
                     is BoolConfigEntry -> it.addListener(listener)
                     is IntConfigEntry -> {
@@ -110,7 +110,7 @@ fun <T : Any> convertSimpleExpression(
     expression: SimpleExpression,
     configElements: Map<String, SdkConfigEntry>
 ): T {
-    configElements[expression.value]?.let {
+    configElements[expression.text]?.let {
         return when (it) {
             is BoolConfigEntry -> it.value as T
             is StringConfigEntry -> {
@@ -125,7 +125,7 @@ fun <T : Any> convertSimpleExpression(
             else -> throw RuntimeException("Uknown ConfigEntry type: ${it.javaClass.name}")
         }
 
-    } ?: return convertString(clazz, expression.value)
+    } ?: return convertString(clazz, expression.text)
 
 }
 
@@ -156,12 +156,12 @@ fun <T : Any> eval(clazz: KClass<T>, expression: Expression): T {
             }
         }
         is EnvironmentExpression -> {
-            configElements[expression.value]?.let {
+            esp32configElements[expression.text]?.let {
 
                 return it.text as T
             } ?: return "" as T
         }
-        is SimpleExpression -> return convertSimpleExpression(clazz, expression, configElements)
+        is SimpleExpression -> return convertSimpleExpression(clazz, expression, esp32configElements)
         is NotOper -> {
             return (!evalBool(expression.expression)) as T
         }
@@ -195,6 +195,6 @@ fun <T : Any> eval(clazz: KClass<T>, expression: Expression): T {
     }
 }
 
-object ConfigElements {
-    var configElements = mapOf<String, SdkConfigEntry>()
+object ESP32ConfigElements {
+    var esp32configElements = mapOf<String, SdkConfigEntry>()
 }

@@ -101,7 +101,10 @@ class EnvironmentTokenizer(val result: MutableList<Token>, val previousTokenizer
             Status.BEGIN -> {
                 when (c) {
                     '(' -> status == Status.END_BRACKET
-                    else -> status = Status.END_WORLD
+                    else -> {
+                        envName+=c
+                        status = Status.END_WORLD
+                    }
                 }
             }
             Status.END_BRACKET -> {

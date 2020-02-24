@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'it.achdjian.plugin'
-version '1.2.3'
+version '1.2.4'
 
 repositories {
     mavenCentral()
@@ -42,6 +42,7 @@ patchPluginXml {
     untilBuild "193.*"
     
     changeNotes """
+      <p>&#8226; 1.2.4 &#8594; Fix IDF_TARGET_ID </p>
       <p>&#8226; 1.2.3 &#8594; Fix parsing issue and resize setting </p>
       <p>&#8226; 1.2.2 &#8594; Fixes: start serial console when a new project is created and setting pannel </p>
       <p>&#8226; 1.2.1 &#8594; Fixes: Hex type, menu order and get the serial baud rate from the right property </p>
@@ -59,9 +60,10 @@ patchPluginXml {
 }
 
 
+
 task copyPlugin(type: Copy) {
     from file("${buildDir}/libs/esp32-${version}.jar")
-    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.3/config/plugins/ESP32/lib")
+    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.3/config/plugins/esp32/lib")
 }
 
 task execCLion(type: Exec) {

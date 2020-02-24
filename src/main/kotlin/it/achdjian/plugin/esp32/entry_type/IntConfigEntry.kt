@@ -46,14 +46,14 @@ open class IntConfigEntry(
 
 
     private fun convertoToLong(value: String): Long {
-        return ConfigElements.configElements[value]?.let {
+        return ESP32ConfigElements.esp32configElements[value]?.let {
             if (it is IntConfigEntry) {
                 0L
             } else {
                 return 0L
             }
         } ?: if (value.startsWith("0x"))
-            value.substring(2).toLong(16);
+            value.substring(2).toLong(16)
         else
             value.toLong()
 

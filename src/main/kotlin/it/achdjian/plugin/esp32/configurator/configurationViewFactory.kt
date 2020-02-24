@@ -6,7 +6,7 @@ import com.intellij.openapi.ui.TextComponentAccessor
 import com.intellij.ui.TextFieldWithHistoryWithBrowseButton
 import com.intellij.ui.components.installFileCompletionAndBrowseDialog
 import it.achdjian.plugin.esp32.entry_type.*
-import it.achdjian.plugin.esp32.entry_type.ConfigElements.configElements
+import it.achdjian.plugin.esp32.entry_type.ESP32ConfigElements.esp32configElements
 import it.achdjian.plugin.esp32.ui.ButtonTitledBorder
 import it.achdjian.plugin.espparser.AndOper
 import java.awt.BorderLayout
@@ -20,6 +20,22 @@ import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
+
+private fun createBoolPanel(jLabel: JLabel, configurationEntry: BoolConfigEntry): JPanel {
+    val panel = JPanel()
+    panel.layout = GridLayout(1, 2)
+    panel.add(jLabel)
+    val checkBox = JCheckBox()
+    checkBox.toolTipText = configurationEntry.description
+    checkBox.addItemListener(configurationEntry)
+    checkBox.isSelected = configurationEntry.value
+    panel.add(checkBox)
+    panel.isVisible = configurationEntry.enabled
+    configurationEntry.addListenerToDepending { panel.isVisible = it }
+    return panel
+}
+
+
 fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? {
     if (configurationEntry.text.isEmpty()) {
         return null
@@ -28,35 +44,17 @@ fun configuratorViewFactory(configurationEntry: ConfigurationEntry): Component? 
     jLabel.toolTipText = configurationEntry.description
     when (configurationEntry) {
         is BoolConfigEntry -> {
-            val panel = JPanel()
-            panel.layout = GridLayout(1, 2)
-            panel.add(jLabel)
-            val checkBox = JCheckBox()
-            checkBox.toolTipText = configurationEntry.description
-            checkBox.addItemListener(configurationEntry)
-            checkBox.isSelected = configurationEntry.value
-            panel.add(checkBox)
-            panel.isVisible = configurationEntry.enabled
-            configurationEntry.addListenerToDepending { panel.isVisible = it }
+            val panel = createBoolPanel(jLabel, configurationEntry)
             panel.name = "Boolconfig ${configurationEntry.text}"
             return panel
         }
         is SubMenuConfigEntry -> {
-            return configElements[configurationEntry.name]?.let {
+            return esp32configElements[configurationEntry.name]?.let {
                 if (it is BoolConfigEntry){
                     val panel=JPanel()
                     panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
 
-                    val boolPanel = JPanel()
-                    boolPanel.layout = GridLayout(1, 2)
-                    boolPanel.add(jLabel)
-                    val checkBox = JCheckBox()
-                    checkBox.toolTipText = it.description
-                    checkBox.addItemListener(it)
-                    checkBox.isSelected = it.value
-                    boolPanel.add(checkBox)
-                    boolPanel.isVisible = configurationEntry.enabled
-                    configurationEntry.addListenerToDepending { boolPanel.isVisible = it }
+                    val boolPanel= createBoolPanel(jLabel, it)
 
                     val menuPanel = menuPanel(configurationEntry, configurationEntry )
                     panel.add(boolPanel)

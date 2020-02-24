@@ -1,10 +1,10 @@
 package it.achdjian.plugin.espparser
 
-import org.hamcrest.CoreMatchers.`is` as Is
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.instanceOf
 import org.hamcrest.Matchers.isEmptyString
 import org.junit.jupiter.api.Test
+import org.hamcrest.CoreMatchers.`is` as Is
 
 internal class ExpressionParserTest {
     @Test
@@ -22,7 +22,7 @@ internal class ExpressionParserTest {
 
         val simpleExpression = parser.expresison as SimpleExpression
 
-        assertThat(simpleExpression.value, Is("A_CONFIG"))
+        assertThat(simpleExpression.text, Is("A_CONFIG"))
     }
 
     @Test
@@ -51,8 +51,8 @@ internal class ExpressionParserTest {
         val right = orOper.right as SimpleExpression
 
 
-        assertThat(left.value, Is("A_CONFIG"))
-        assertThat(right.value, Is("B_CONFIG"))
+        assertThat(left.text, Is("A_CONFIG"))
+        assertThat(right.text, Is("B_CONFIG"))
     }
 
     @Test
@@ -70,8 +70,8 @@ internal class ExpressionParserTest {
         val right = andOper.right as SimpleExpression
 
 
-        assertThat(left.value, Is("A_CONFIG"))
-        assertThat(right.value, Is("B_CONFIG"))
+        assertThat(left.text, Is("A_CONFIG"))
+        assertThat(right.text, Is("B_CONFIG"))
     }
 
     @Test
@@ -89,8 +89,8 @@ internal class ExpressionParserTest {
         val right = gteOper.right as SimpleExpression
 
 
-        assertThat(left.value, Is("A_CONFIG"))
-        assertThat(right.value, Is("B_CONFIG"))
+        assertThat(left.text, Is("A_CONFIG"))
+        assertThat(right.text, Is("B_CONFIG"))
     }
 
 
@@ -128,7 +128,7 @@ internal class ExpressionParserTest {
         val right = andOper.right as OrOper
 
 
-        assertThat(left.value, Is("A_CONFIG"))
+        assertThat(left.text, Is("A_CONFIG"))
         assertThat(right.left, instanceOf(NotOper::class.java) )
         assertThat(right.right, instanceOf(SimpleExpression::class.java) )
     }
@@ -148,8 +148,8 @@ internal class ExpressionParserTest {
         val right = andOper.right as SimpleExpression
 
 
-        assertThat(left.value, Is("IDF_TARGET_ENV"))
-        assertThat(right.value, isEmptyString())
+        assertThat(left.text, Is("IDF_TARGET_ENV"))
+        assertThat(right.text, isEmptyString())
     }
 
 
@@ -172,9 +172,9 @@ internal class ExpressionParserTest {
         val right = andOper.right as SimpleExpression
 
 
-        assertThat(right.value, Is("IDF_TARGET_ESP32"))
-        assertThat(orLeft.value, Is("FLASHMODE_QIO"))
-        assertThat(orRight.value, Is("FLASHMODE_QOUT"))
+        assertThat(right.text, Is("IDF_TARGET_ESP32"))
+        assertThat(orLeft.text, Is("FLASHMODE_QIO"))
+        assertThat(orRight.text, Is("FLASHMODE_QOUT"))
     }
 
     @Test

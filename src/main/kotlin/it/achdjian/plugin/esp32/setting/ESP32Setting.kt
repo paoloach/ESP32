@@ -9,9 +9,8 @@ import com.intellij.ui.components.installFileCompletionAndBrowseDialog
 import com.intellij.ui.layout.LCFlags
 import com.intellij.ui.layout.panel
 import com.jetbrains.cidr.ui.ActionItemsComboBox
-import it.achdjian.plugin.esp32.actions.Settings
 import it.achdjian.plugin.esp32.availableBaudRate
-import it.achdjian.plugin.esp32.serial.SerialPortList
+import it.achdjian.plugin.esp32.serial.ESP32SerialPortList
 import java.awt.Color
 import javax.swing.BorderFactory
 import javax.swing.JComponent
@@ -176,8 +175,9 @@ class ESP32Setting : Configurable {
             row("Default serial port: "){
                 espToolPy.isEditable = true
                 espToolPy.removeAll()
-                val portList = SerialPortList.getPortNames()
+                val portList = ESP32SerialPortList.getPortNames()
                 portList.forEach { espToolPy.addItem(it) }
+
                 espToolPy.addItem(ESP32SettingState.serialPortName)
                 espToolPy.selectedItem = ESP32SettingState.serialPortName
                 espToolPy()

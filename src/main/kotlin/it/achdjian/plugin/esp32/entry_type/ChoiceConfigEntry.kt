@@ -1,6 +1,6 @@
 package it.achdjian.plugin.esp32.entry_type
 
-import it.achdjian.plugin.esp32.entry_type.ConfigElements.configElements
+import it.achdjian.plugin.esp32.entry_type.ESP32ConfigElements.esp32configElements
 import it.achdjian.plugin.espparser.Expression
 import it.achdjian.plugin.espparser.SimpleExpression
 
@@ -40,7 +40,7 @@ class ChoiceConfigEntry(
                 if (eval(it.condition)) {
                     if (it.value is SimpleExpression) {
                         val configName = it.value.toString()
-                        val boolConfig = configElements[configName] ?: return null
+                        val boolConfig = esp32configElements[configName] ?: return null
                         if (boolConfig is BoolConfigEntry)
                             return boolConfig
                         else {

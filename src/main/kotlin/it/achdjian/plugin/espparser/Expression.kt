@@ -3,23 +3,23 @@ package it.achdjian.plugin.espparser
 
 open class Expression(value: String) : Token(value)
 
-open class SimpleExpression(val value: String) : Expression(value) {
-    override fun equals(other: Any?): Boolean = other is SimpleExpression && other.value == value
+open class SimpleExpression( value: String) : Expression(value) {
+    override fun equals(other: Any?): Boolean = other is SimpleExpression && other.text == text
     override fun hashCode(): Int {
-        return value.hashCode()
+        return text.hashCode()
     }
 
     override fun toString(): String {
-        return value
+        return text
     }
 }
 
 class EnvironmentExpression(value: String) : SimpleExpression(value) {
     override fun toString(): String {
-        if (value=="IDF_TARGET")
+        if (text=="IDF_TARGET")
             return "esp32"
         else {
-            return System.getenv(value) ?: ""
+            return System.getenv(text) ?: ""
         }
     }
 }
