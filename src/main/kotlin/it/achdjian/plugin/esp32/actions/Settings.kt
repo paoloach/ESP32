@@ -6,34 +6,19 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogBuilder
-import com.intellij.openapi.ui.DialogWrapper
 import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.ScrollPaneFactory
 import it.achdjian.plugin.esp32.configurator.CONFIG_FILE_NAME
 import it.achdjian.plugin.esp32.configurator.ESP32WizardPanel
 import it.achdjian.plugin.esp32.configurator.WizardData
-import it.achdjian.plugin.esp32.generator.createSdkConfigFile
 import java.awt.Dimension
-import java.awt.event.ActionEvent
 import java.awt.event.ComponentEvent
 import java.awt.event.ComponentListener
 import java.io.File
-import javax.swing.AbstractAction
 import javax.swing.BoxLayout
 import javax.swing.JPanel
 
-class SaveAction(
-    private val menuWizardData: WizardData,
-    private val projectPath: VirtualFile,
-    private val dialogWrapper: DialogWrapper
-) : AbstractAction("Save") {
-    override fun actionPerformed(p0: ActionEvent?) {
-        createSdkConfigFile(menuWizardData.entries, projectPath)
-        dialogWrapper.close(DialogWrapper.OK_EXIT_CODE)
-    }
-
-}
 
 fun getProjectPath(project: Project): VirtualFile? {
     val modules = ModuleManager.getInstance(project).modules

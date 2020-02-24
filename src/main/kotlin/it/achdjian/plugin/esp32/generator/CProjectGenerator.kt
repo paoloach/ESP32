@@ -17,8 +17,11 @@ import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 import com.jetbrains.cidr.cpp.execution.CMakeAppRunConfigurationType
 import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashConfigurationType
 import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashRunConfiguration
-import it.achdjian.plugin.esp32.configurator.*
-import it.achdjian.plugin.esp32.entry_type.ConfigurationEntry
+import it.achdjian.plugin.esp32.configurator.ESP32WizardPanel
+import it.achdjian.plugin.esp32.configurator.MAIN_DIR
+import it.achdjian.plugin.esp32.configurator.MissingConfig
+import it.achdjian.plugin.esp32.configurator.WizardData
+import it.achdjian.plugin.esp32.sdk_config.createSdkConfigFile
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import it.achdjian.plugin.esp32.ui.getResourceAsString
 import java.util.concurrent.TimeoutException
@@ -167,14 +170,3 @@ fun createMainFile(
 }
 
 
-fun createSdkConfigFile(entries: List<ConfigurationEntry>, path: VirtualFile) {
-    val configurations = mutableListOf<Pair<String, String>>()
-    entries.forEach { it.addConfiguration(configurations) }
-
-    val data = configurations.joinToString(separator = "\n") { "CONFIG_${it.first}=${it.second}" }
-
-    ApplicationManager.getApplication().runWriteAction {
-        val sdkConfig = path.findOrCreateChildData(null, CONFIG_FILE_NAME)
-        sdkConfig.setBinaryContent(data.toByteArray())
-    }
-}

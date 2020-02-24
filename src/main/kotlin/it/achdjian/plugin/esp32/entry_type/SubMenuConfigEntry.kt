@@ -30,7 +30,7 @@ class SubMenuConfigEntry(
 
     override fun addConfiguration(configurations: MutableList<Pair<String, String>>) {
         if (value)
-            configurations.add(Pair(name, "1"))
+            configurations.add(Pair(name, "y"))
         subMenu.forEach {
             it.addConfiguration(configurations)
         }
