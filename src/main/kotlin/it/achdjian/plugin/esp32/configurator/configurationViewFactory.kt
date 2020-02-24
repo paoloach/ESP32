@@ -212,7 +212,7 @@ class IntInputVerifier(private val min: Long, private val max: Long) : InputVeri
 }
 
 
-class IntegerTextField(private val intConfigEntry: IntConfigEntry, val radix: Int = 10) : JTextField(),
+class IntegerTextField(private val intConfigEntry: IntConfigEntry, private val radix: Int = 10) : JTextField(),
     DocumentListener {
     companion object {
         val NORMAL_BACKGROUND = Color(255, 255, 255)
@@ -230,17 +230,7 @@ class IntegerTextField(private val intConfigEntry: IntConfigEntry, val radix: In
         return super.processKeyBinding(ks, e, condition, pressed)
     }
 
-    override fun changedUpdate(documentEvent: DocumentEvent) {
-        val length = documentEvent.document.length
-        val str = documentEvent.document.getText(0, length)
-        try {
-            intConfigEntry.value = str.toInt(radix)
-            background = NORMAL_BACKGROUND
-        } catch (e: Exception) {
-            background = IntInputVerifier.ERROR_BACKGROUND
-        }
-
-    }
+    override fun changedUpdate(documentEvent: DocumentEvent)  = insertUpdate(documentEvent)
 
     override fun insertUpdate(documentEvent: DocumentEvent) {
         val length = documentEvent.document.length
@@ -253,16 +243,7 @@ class IntegerTextField(private val intConfigEntry: IntConfigEntry, val radix: In
         }
     }
 
-    override fun removeUpdate(documentEvent: DocumentEvent) {
-        val length = documentEvent.document.length
-        val str = documentEvent.document.getText(0, length)
-        try {
-            intConfigEntry.value = str.toInt(radix)
-            background = NORMAL_BACKGROUND
-        } catch (e: Exception) {
-            background = IntInputVerifier.ERROR_BACKGROUND
-        }
-    }
+    override fun removeUpdate(documentEvent: DocumentEvent) = insertUpdate(documentEvent)
 }
 
 
