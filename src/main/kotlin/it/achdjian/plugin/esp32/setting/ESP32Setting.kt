@@ -3,17 +3,20 @@ package it.achdjian.plugin.esp32.setting
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.TextComponentAccessor
 import com.intellij.ui.TextFieldWithHistoryWithBrowseButton
 import com.intellij.ui.components.installFileCompletionAndBrowseDialog
-import com.intellij.ui.layout.LCFlags
-import com.intellij.ui.layout.panel
 import com.jetbrains.cidr.ui.ActionItemsComboBox
 import it.achdjian.plugin.esp32.availableBaudRate
 import it.achdjian.plugin.esp32.serial.ESP32SerialPortList
+import it.achdjian.plugin.esp32.ui.GridLayout2
 import java.awt.Color
+import java.awt.Component
+import java.awt.Dimension
 import javax.swing.BorderFactory
 import javax.swing.JComponent
+import javax.swing.JLabel
 import javax.swing.border.Border
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -86,6 +89,8 @@ class ESP32Setting : Configurable {
 
     init {
         availableBaudRate.forEach { espToolBaudrate.addItem(it) }
+        espToolBaudrate.maximumSize=Dimension(10000,30)
+        espToolPy.maximumSize=Dimension(10000,30)
     }
 
     /**
@@ -133,58 +138,75 @@ class ESP32Setting : Configurable {
      *
      * @return new Swing form to show, or `null` if it cannot be created
      */
-    override fun createComponent(): JComponent =
-        panel(LCFlags.fillX, title = "Tools path") {
-            row("ESP32 espressif SDK path") {
-                val component = TextFieldWithHistoryWithBrowseButton()
-                val editor = component.childComponent.textEditor
-                editor.text = ESP32SettingState.sdkPath
-                editor.document.addDocumentListener(esp32Sdk)
-                esp32Sdk.component = component.childComponent
-                installFileCompletionAndBrowseDialog(
-                    null,
-                    component,
-                    editor,
-                    "ESP32 sdk path",
-                    FileChooserDescriptorFactory.createSingleFolderDescriptor(),
-                    TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
-                ) {
-                    esp32Sdk.path = it.path
-                    esp32Sdk.path
-                }
-                component()
-            }
-            row("crosscompile path: ") {
-                val component = TextFieldWithHistoryWithBrowseButton()
-                val editor = component.childComponent.textEditor
-                editor.text = ESP32SettingState.crosscompilerPath
-                editor.document.addDocumentListener(crosscompiler)
-                installFileCompletionAndBrowseDialog(
-                    null,
-                    component,
-                    editor,
-                    "ESP32 crosscompilerPath path",
-                    FileChooserDescriptorFactory.createSingleFileDescriptor(),
-                    TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
-                ) {
-                    crosscompiler.path = it.path
-                    crosscompiler.path
-                }
-                component()
-            }
-            row("Default serial port: "){
-                espToolPy.isEditable = true
-                espToolPy.removeAll()
-                val portList = ESP32SerialPortList.getPortNames()
-                portList.forEach { espToolPy.addItem(it) }
+    override fun createComponent(): JComponent  {
+        val panel = DialogPanel()
+        panel.layout = GridLayout2(4,2)
+        panel.name="Tools path"
 
-                espToolPy.addItem(ESP32SettingState.serialPortName)
-                espToolPy.selectedItem = ESP32SettingState.serialPortName
-                espToolPy()
-            }
-            row("Default serial flashing baud rate"){
-                espToolBaudrate.selectedItem = ESP32SettingState.serialPortBaud
-                espToolBaudrate()
-            }
+        val sdkPathLabel = JLabel("ESP32 espressif SDK path")
+        val crossCompilerLabel = JLabel("crosscompile path: ")
+        val serialPortLabel = JLabel("Default serial port: ")
+        val baudRateLabel = JLabel("Default serial flashing baud rate")
+
+        panel.add(sdkPathLabel)
+        panel.add(sdkPathComponent())
+        panel.add(crossCompilerLabel)
+        panel.add(sdkCrossCompilerPath())
+        panel.add(serialPortLabel)
+        panel.add(defaultSerialPort())
+        panel.add(baudRateLabel)
+        espToolBaudrate.selectedItem = ESP32SettingState.serialPortBaud
+        panel.add(espToolBaudrate)
+        return panel
+    }
+
+    fun defaultSerialPort(): Component {
+        espToolPy.isEditable = true
+        espToolPy.removeAll()
+        val portList = ESP32SerialPortList.getPortNames()
+        portList.forEach { espToolPy.addItem(it) }
+
+        espToolPy.addItem(ESP32SettingState.serialPortName)
+        espToolPy.selectedItem = ESP32SettingState.serialPortName
+        return espToolPy
+    }
+
+    fun sdkCrossCompilerPath() : Component {
+        val component = TextFieldWithHistoryWithBrowseButton()
+        val editor = component.childComponent.textEditor
+        editor.text = ESP32SettingState.crosscompilerPath
+        editor.document.addDocumentListener(crosscompiler)
+        installFileCompletionAndBrowseDialog(
+            null,
+            component,
+            editor,
+            "ESP32 crosscompilerPath path",
+            FileChooserDescriptorFactory.createSingleFileDescriptor(),
+            TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
+        ) {
+        crosscompiler.path = it.path
+        crosscompiler.path
         }
+        return component
+    }
+
+    fun sdkPathComponent() : Component {
+        val component = TextFieldWithHistoryWithBrowseButton()
+        val editor = component.childComponent.textEditor
+        editor.text = ESP32SettingState.sdkPath
+        editor.document.addDocumentListener(esp32Sdk)
+        esp32Sdk.component = component.childComponent
+        installFileCompletionAndBrowseDialog(
+            null,
+            component,
+            editor,
+            "ESP32 sdk path",
+            FileChooserDescriptorFactory.createSingleFolderDescriptor(),
+            TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
+        ) {
+            esp32Sdk.path = it.path
+            esp32Sdk.path
+        }
+        return component
+    }
 }

@@ -2,12 +2,15 @@ package it.achdjian.plugin.esp32.configurations.flash
 
 import com.intellij.openapi.options.SettingsEditor
 import com.intellij.openapi.project.Project
-import com.intellij.ui.layout.panel
+import com.intellij.openapi.ui.DialogPanel
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 import com.jetbrains.cidr.ui.ActionItemsComboBox
 import it.achdjian.plugin.esp32.actions.configParsing
 import it.achdjian.plugin.esp32.availableBaudRate
+import it.achdjian.plugin.esp32.ui.GridLayout2
 import java.io.File
+import javax.swing.JComponent
+import javax.swing.JLabel
 
 class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP32FlashRunConfiguration>() {
     private val configuration = ActionItemsComboBox<String>()
@@ -56,16 +59,14 @@ class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP
         espToolBaudrate.selectedItem?.let { state.baud = it as Int }
     }
 
-    override fun createEditor() = panel {
-        row("Configuration") {
-            configuration()
-        }
-        row("Serial port") {
-            espToolPy()
-        }
-        row("Serial port baud rate") {
-            espToolBaudrate()
-        }
+    override fun createEditor():JComponent {
+        val panel = DialogPanel()
+        panel.layout = GridLayout2(3,2)
+        panel.add(JLabel("Configuration"))
+        panel.add(configuration)
+        panel.add(JLabel("Serial port"))
+        panel.add(espToolPy)
+        return panel
     }
 
     private fun createPortList() =

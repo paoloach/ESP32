@@ -201,7 +201,7 @@ internal class EspressifMenuTest {
                 "    prompt \"After flashing\"",
                 "    default ESPTOOLPY_AFTER_HARD_RESET",
                 "    help",
-                "        Configure whether esptool.py should reset the ESP8266 after flashing.",
+                "        Configure whether esptool.py should reset the ESP32 after flashing.",
                 "",
                 "        Automatic resetting depends on the RTS & DTR signals being",
                 "        wired from the serial port to the ESP32. Most USB development",
