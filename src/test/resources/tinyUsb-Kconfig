@@ -1,0 +1,7 @@
+        config USB_DESC_MANUFACTURER_STRING
+            string "Manufacturer"
+            default "Espressif Systems"
+            depends on USB_ENABLED
+            help
+                Name of the manufacturer of the USB device
+
