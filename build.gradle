@@ -30,7 +30,7 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version 'CL-201.6073.20-EAP-SNAPSHOT'
+    version 'CL-201.6668.86-EAP-SNAPSHOT'
     //version 'CL-2019.3.4'
     type 'CL'
     pluginName 'esp32'
@@ -67,9 +67,14 @@ patchPluginXml {
 
 
 
+//task copyPlugin(type: Copy) {
+//    from file("${buildDir}/libs/esp32-${version}.jar")
+//    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.3/config/plugins/esp32/lib")
+//}
+
 task copyPlugin(type: Copy) {
     from file("${buildDir}/libs/esp32-${version}.jar")
-    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.3/config/plugins/esp32/lib")
+    into file("${project.gradle.gradleUserHomeDir}/../.local/share/JetBrains/CLion2020.1/esp32/lib")
 }
 
 task execCLion(type: Exec) {

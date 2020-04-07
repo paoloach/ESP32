@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test
 import java.io.File
 import org.hamcrest.CoreMatchers.`is` as Is
 
-class EspressifMenuTest {
+internal class EspressifMenuTest {
     @MockK
     lateinit var readFile: ReadFile
 
@@ -25,26 +25,6 @@ class EspressifMenuTest {
         MockKAnnotations.init(this, relaxUnitFun = true)
     }
 
-    @Test
-    fun defaultStringConfig() {
-        val config = "        config USB_DESC_MANUFACTURER_STRING\n" +
-                "            string \"Manufacturer\"\n" +
-                "            default \"Espressif Systems\"\n" +
-                "            depends on USB_ENABLED\n" +
-                "            help\n" +
-                "                Name of the manufacturer of the USB device\n"+
-                "        endmenu\n"
-
-        val lines = config.lines()
-
-
-        val menu = EspressifMenu(EspressifMenuNullElement(), "menu \"tinyUsb\"", sourcesList, readFile)
-        var parser: EspressifMenuParser = menu
-        lines.forEach {
-            parser = parser.addLine(it)
-        }
-        assertThat(menu.elements, hasSize(1))
-    }
 
     @Test
     fun esp8266SerialFlashConfig() {
