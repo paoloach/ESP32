@@ -9,5 +9,7 @@ class ESP32FlashConfigurationFactory(configurationTypeESP32: ESP32FlashConfigura
     override fun createTemplateConfiguration(project: Project): RunConfiguration =
         ESP32FlashRunConfiguration(project, this, configurationName)
     override fun getName() = configurationName
+
+    override fun getId(): String= name
 }
 

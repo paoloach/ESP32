@@ -15,7 +15,6 @@ import com.jetbrains.cidr.cpp.execution.CMakeBuildConfigurationHelper
 import com.jetbrains.cidr.cpp.execution.gdbserver.DownloadType
 import com.jetbrains.cidr.cpp.execution.gdbserver.RadioButtonPanel
 import it.achdjian.plugin.esp32.ui.BoardCfg
-import it.achdjian.plugin.esp32.ui.DebugerParameterPanel
 import it.achdjian.plugin.esp32.ui.FileChooseInput
 import it.achdjian.plugin.esp32.ui.selectBoardByPriority
 import java.awt.event.ActionEvent
@@ -35,8 +34,6 @@ class ESP32DebugSettingEditor( project: Project, configHelper: CMakeBuildConfigu
     private  lateinit var openOcdLocation: String
     private lateinit var downloadGroup: RadioButtonPanel<DownloadType>
     private lateinit var resetGroup: RadioButtonPanel<ResetType>
-
-    override fun createProgramParametersPanel(): CommonProgramParametersPanel = DebugerParameterPanel()
 
     @Throws(ConfigurationException::class)
     override fun applyEditorTo(cMakeAppRunConfiguration: CMakeAppRunConfiguration) {
