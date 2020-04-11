@@ -17,9 +17,8 @@ import com.jetbrains.cidr.execution.CidrCommandLineState
 import com.jetbrains.cidr.execution.CidrExecutableDataHolder
 import org.jdom.Element
 
-class ESP32DebugRunConfiguration(project: Project, factory: ConfigurationFactory, name: String) :
-    CMakeAppRunConfiguration(project, factory, name),
-    CidrExecutableDataHolder {
+class ESP32DebugConfiguration(project: Project, factory: ConfigurationFactory, name: String) :
+    CMakeAppRunConfiguration(project, factory, name), CidrExecutableDataHolder {
 
     companion object {
         const val DEFAULT_GDB_PORT = 3333
@@ -65,8 +64,9 @@ class ESP32DebugRunConfiguration(project: Project, factory: ConfigurationFactory
     @Throws(InvalidDataException::class)
     override fun readExternal(parentElement: Element) {
         super.readExternal(parentElement)
-        val element : Element?= parentElement.getChild(TAG_OPENOCD)
-        boardConfigFile = element?.getAttributeValue(ATTR_BOARD_CONFIG) ?:""
+        val element = parentElement.getChild(TAG_OPENOCD)
+        boardConfigFile = element?.let { element.getAttributeValue(ATTR_BOARD_CONFIG) } ?:""
+            boardConfigFile = ""
         gdbPort = Utils.readIntAttr(element, ATTR_GDB_PORT, DEFAULT_GDB_PORT)
         telnetPort = Utils.readIntAttr(element, ATTR_TELNET_PORT, DEFAULT_TELNET_PORT)
         resetType = Utils.readEnumAttr(element, ATTR_RESET_TYPE, DEFAULT_RESET)
@@ -87,7 +87,7 @@ class ESP32DebugRunConfiguration(project: Project, factory: ConfigurationFactory
 
 
     override fun clone(): RunConfiguration {
-        val cloned = super.clone() as ESP32DebugRunConfiguration
+        val cloned = super.clone() as ESP32DebugConfiguration
         cloned.flashConfigurationState.configurationName = flashConfigurationState.configurationName
         cloned.flashConfigurationState.port = flashConfigurationState.port
         cloned.flashConfigurationState.baud = flashConfigurationState.baud

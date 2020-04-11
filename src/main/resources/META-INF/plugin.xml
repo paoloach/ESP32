@@ -56,6 +56,9 @@
         <component>
             <implementation-class>it.achdjian.plugin.esp32.serial.SerialMonitorView</implementation-class>
         </component>
+        <component>
+            <implementation-class>it.achdjian.plugin.esp32.configurations.debuger.ESP32OpenOcdComponent</implementation-class>
+        </component>
     </project-components>
     <application-components>
         <component>

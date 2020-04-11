@@ -38,7 +38,7 @@ class ESP32DebugSettingEditor( project: Project, configHelper: CMakeBuildConfigu
     @Throws(ConfigurationException::class)
     override fun applyEditorTo(cMakeAppRunConfiguration: CMakeAppRunConfiguration) {
         super.applyEditorTo(cMakeAppRunConfiguration)
-        val esp32Conf: ESP32DebugRunConfiguration = cMakeAppRunConfiguration as ESP32DebugRunConfiguration
+        val esp32Conf: ESP32DebugConfiguration = cMakeAppRunConfiguration as ESP32DebugConfiguration
         val boardConfig = boardConfigFile.text.trim { it <= ' ' }
         esp32Conf.boardConfigFile = boardConfig
         gdbPort.validateContent()
@@ -51,7 +51,7 @@ class ESP32DebugSettingEditor( project: Project, configHelper: CMakeBuildConfigu
 
     override fun resetEditorFrom(cMakeAppRunConfiguration: CMakeAppRunConfiguration) {
         super.resetEditorFrom(cMakeAppRunConfiguration)
-        val esp32Conf = cMakeAppRunConfiguration as ESP32DebugRunConfiguration
+        val esp32Conf = cMakeAppRunConfiguration as ESP32DebugConfiguration
         openOcdLocation = ApplicationManager.getApplication().getComponent(ESP32DebugConfigurationState::class.java) .openOcdLocation
         boardConfigFile.text = esp32Conf.boardConfigFile
         gdbPort.text = esp32Conf.gdbPort.toString()
