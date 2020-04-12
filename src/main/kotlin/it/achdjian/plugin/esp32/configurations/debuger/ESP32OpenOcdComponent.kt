@@ -58,7 +58,7 @@ private fun require(fileToCheck: File?): File {
 }
 
 
-fun createOpenOcdCommandLine(config: ESP32DebugConfiguration, fileToLoad: File, additionalCommand: String, shutdown: Boolean): GeneralCommandLine {
+fun createOpenOcdCommandLine(config: ESP32DebugConfiguration, fileToLoad: File?, additionalCommand: String, shutdown: Boolean): GeneralCommandLine {
     val ocdSettings = ApplicationManager.getApplication().getComponent(ESP32DebugConfigurationState::class.java)
     val project: Project = config.project
     return if (StringUtil.isEmpty(config.boardConfigFile)) {
@@ -76,8 +76,8 @@ fun createOpenOcdCommandLine(config: ESP32DebugConfiguration, fileToLoad: File, 
         commandLine.addParameters("-c", "gdb_port " + config.gdbPort)
         commandLine.addParameters("-c", "telnet_port " + config.telnetPort)
         commandLine.addParameters("-f", config.boardConfigFile)
-        if (fileToLoad != null) {
-            val command = "program \"" + fileToLoad.absolutePath.replace(File.separatorChar, '/') + "\""
+        fileToLoad?.let {
+            val command = "program \"" + it.absolutePath.replace(File.separatorChar, '/') + "\""
             commandLine.addParameters("-c", command)
         }
         if (additionalCommand != null && additionalCommand.isNotEmpty()) {
@@ -131,7 +131,7 @@ class ESP32OpenOcdComponent {
         }
     }
 
-    fun startOpenOcd(esP32DebugConfiguration: ESP32DebugConfiguration?, fileToLoad: File, additionalCommand: String): Future<STATUS> {
+    fun startOpenOcd(esP32DebugConfiguration: ESP32DebugConfiguration?, fileToLoad: File?, additionalCommand: String): Future<STATUS> {
         return esP32DebugConfiguration?.let {config->
             val commandLine = createOpenOcdCommandLine(config, fileToLoad, additionalCommand, false)
 
