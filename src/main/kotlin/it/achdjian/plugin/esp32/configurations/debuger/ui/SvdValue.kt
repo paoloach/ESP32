@@ -4,7 +4,7 @@ abstract class SvdValue<T : SvdNode<*>> (id: String, name: String, description: 
     SvdNode<T>(id,name,description) {
 
     @Volatile
-    protected var isChanged = false
+    var isChanged = false
 
 
     abstract val defaultFormat: Format

@@ -8,7 +8,7 @@ interface BaseSvdNode {
     fun exportCsv(writer: PrintWriter, prefix: String, active: (BaseSvdNode)->Boolean) ;
 }
 
-open class SvdNode< T :BaseSvdNode>(val id:String,val name: String="", val description: String="", open val displayValue: String="", var children:MutableList<T> = mutableListOf() ) : BaseSvdNode{
+open class SvdNode< T :BaseSvdNode>(val id:String,val name: String="", val description: String="", open val displayValue: String="", var children:MutableList<SvdNode<*>> = mutableListOf() ) : BaseSvdNode{
 
     open fun setFormatFromSign(sign: Char) {}
     override fun exportCsv(writer: PrintWriter, prefix: String, active: (BaseSvdNode)->Boolean) {

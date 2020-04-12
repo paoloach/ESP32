@@ -10,22 +10,23 @@ import org.jdom.Text
 import org.jdom.input.SAXBuilder
 import java.io.InputStream
 import java.io.PrintWriter
+import java.nio.file.Path
 import java.text.MessageFormat
 import java.util.*
 
 class SvdRoot : SvdNode<SvdFile>(id = "", name = "") {
-    private val treeTableModel: SvdTreeTableModel = SvdTreeTableModel(this)
-    var activeNodes = setOf<SvdNode<*>>()
+    val treeTableModel = SvdTreeTableModel(this)
+    var activeNodes = mutableSetOf<SvdNode<*>>()
 
-    fun addFile(stream: InputStream?, shortName: String, fileName: String): SvdFile? {
+    fun addFile(stream: InputStream?, path: Path): SvdFile? {
         val document: Document
         try {
             document = SAXBuilder().build(stream)
         } catch (e: Exception) {
-            Messages.showErrorDialog("$fileName: ${e.message}", "Root load error")
+            Messages.showErrorDialog("${path.toString()}: ${e.message}", "Root load error")
             return null
         }
-        val svdFile = SvdFile(shortName, fileName)
+        val svdFile = SvdFile(path)
         val flatList = mutableListOf<SvdNode<*>>()
         val endian: List<Element> = selectDomSubNodes(document.rootElement, "cpu", "endian")
         val bigEndian: Boolean = endian.isNotEmpty() && ("big" == endian[0].getTextTrim())
@@ -37,6 +38,7 @@ class SvdRoot : SvdNode<SvdFile>(id = "", name = "") {
 
         val grouped = TreeMap<String, SvdNode<SvdPeripheral>>(java.lang.String.CASE_INSENSITIVE_ORDER)
 
+        val shortName = path.fileName.toString()
 
         elements.forEach { name, element ->
             try {
@@ -88,7 +90,7 @@ class SvdRoot : SvdNode<SvdFile>(id = "", name = "") {
 
     fun isActive(child: BaseSvdNode): Boolean = activeNodes.contains(child)
 
-    fun setActive(nodes: Set<SvdNode<*>>) {
+    fun setActive(nodes: MutableSet<SvdNode<*>>) {
         activeNodes = nodes
     }
 

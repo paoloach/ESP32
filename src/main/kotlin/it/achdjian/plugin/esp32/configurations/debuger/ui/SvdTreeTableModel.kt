@@ -99,7 +99,7 @@ class SvdTreeTableModel(val myRoot: SvdRoot) : TreeTableModel {
         myListeners.forEach { it.treeNodesRemoved(event) }
     }
 
-    private fun resetActiveCache() {
+    fun resetActiveCache() {
         myActiveCache.clear()
         myCoalescer = createAdressCoalescer(myRoot.activeNodes)
     }

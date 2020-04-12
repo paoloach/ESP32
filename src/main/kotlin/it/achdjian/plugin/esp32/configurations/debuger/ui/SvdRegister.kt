@@ -40,7 +40,7 @@ open class SvdRegister(peripheralName: String, name: String, description: String
                             field.updateFromValue(value)
                         }
                     } else {
-                        this.children.forEach { obj: SvdField -> obj.markStalled() }
+                        this.children.forEach { obj  -> (obj as SvdField).markStalled() }
                     }
                     failReason = "-"
                 } ?: markNoValue("-", true)

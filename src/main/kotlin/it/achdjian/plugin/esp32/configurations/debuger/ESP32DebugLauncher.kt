@@ -23,6 +23,7 @@ import com.jetbrains.cidr.execution.debugger.CidrDebugProcess
 import com.jetbrains.cidr.execution.debugger.backend.DebuggerDriverConfiguration
 import com.jetbrains.cidr.execution.debugger.remote.CidrRemoteDebugParameters
 import com.jetbrains.cidr.execution.debugger.remote.CidrRemoteGDBDebugProcess
+import it.achdjian.plugin.esp32.configurations.debuger.ui.SvdPanel
 import java.io.File
 
 
