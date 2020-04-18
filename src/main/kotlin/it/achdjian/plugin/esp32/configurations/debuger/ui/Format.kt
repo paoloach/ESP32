@@ -14,12 +14,12 @@ enum class Format(val readableName: String, val sign: Char) {
         override fun format(value: Long, bits: Int) = bitGroupFormat(value, bits, 1, "01", "0b")
     };
 
-    abstract fun format(var1: Long, var3: Int): String
+    abstract fun format(value: Long, bits: Int): String
 
     companion object {
-        private fun bitGroupFormat(value: Long, bits: Int, bitsPerSymbol: Int, alphabet: String, prefix: String): String {
-            var value = value
-            var bits = bits
+        private fun bitGroupFormat(v: Long, b: Int, bitsPerSymbol: Int, alphabet: String, prefix: String): String {
+            var value = v
+            var bits = b
             val result = StringBuilder()
             val symCount = alphabet.length
             while (bits > 0) {

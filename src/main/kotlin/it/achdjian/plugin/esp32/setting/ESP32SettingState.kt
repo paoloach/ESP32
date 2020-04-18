@@ -21,12 +21,11 @@ object ESP32SettingState {
     private const val COMPILER_PATH_KEY="ESP32_CROSSCOMPILER_PATH"
     private const val SERIAL_PORT_KEY="ESP32_SERIAL_PORT"
     private const val SERIAL_PORT_BAUD_KEY="ESP32_SERIAL_PORT_BAUD"
+    private const val ESP32_OPENOCD_LOCATION="ESP32_OPENOCD_LOCATION"
 
     var sdkPath: String
         get() = PropertiesComponent.getInstance().getValue(SDK_PATH_KEY, "")
         set(path) =  savePath(path)
-
-
 
     var crosscompilerPath: String
         get() = PropertiesComponent.getInstance().getValue(COMPILER_PATH_KEY, "")
@@ -40,10 +39,12 @@ object ESP32SettingState {
         get() = PropertiesComponent.getInstance().getInt(SERIAL_PORT_BAUD_KEY, 921600)
         set(baud) =  PropertiesComponent.getInstance().setValue(SERIAL_PORT_BAUD_KEY, baud,0)
 
+    var esp32OpenOcdLocation: String
+        get() = PropertiesComponent.getInstance().getValue(ESP32_OPENOCD_LOCATION, "")
+        set(path) =  PropertiesComponent.getInstance().setValue(ESP32_OPENOCD_LOCATION, path)
+
 
     fun validSDKPath():Boolean  = validSDKPath(sdkPath)
-
-
 
     private fun savePath(path:String){
         LOG.info("save path to $path")

@@ -252,8 +252,8 @@ class SvdTreeTable(model: SvdTreeTableModel, val myWindowProfileState: ProjectSt
     private fun reopenFiles() {
         myWindowProfileState.loadedFiles
             .filter { Files.exists(it) }
-            .first { Files.isReadable(it) }
-            .forEach {
+            .firstOrNull { Files.isReadable(it) }
+            ?.forEach {
                 var inputStream: InputStream? = null
                 try {
                     inputStream = BufferedInputStream(FileInputStream(it.toFile()))

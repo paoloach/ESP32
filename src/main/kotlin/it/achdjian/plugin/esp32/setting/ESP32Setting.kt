@@ -1,6 +1,5 @@
 package it.achdjian.plugin.esp32.setting
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
 import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.ui.DialogPanel
@@ -25,11 +24,12 @@ fun DocumentEvent.getText(): String = document.getText(0, document.length)
 
 class SDKPathDocumentListener(var path: String) : DocumentListener {
     var component: JComponent?
-    get() = _component
-    set(value) {_component=value
-    _border = value?.border
-    changeBorder()
-    }
+        get() = _component
+        set(value) {
+            _component = value
+            _border = value?.border
+            changeBorder()
+        }
 
     private var _component: JComponent? = null
     private var _border: Border? = null
@@ -56,7 +56,7 @@ class SDKPathDocumentListener(var path: String) : DocumentListener {
             if (!validSDKPath(path)) {
                 it.border = BorderFactory.createLineBorder(Color.RED)
             } else {
-                it.border =_border
+                it.border = _border
             }
         }
     }
@@ -79,18 +79,33 @@ class GccPathDocumentListener(var path: String) : DocumentListener {
 
 }
 
+class Esp32PathDocumentListener(var path: String) : DocumentListener {
+    override fun insertUpdate(p: DocumentEvent) {
+        path = p.getText()
+    }
+
+    override fun removeUpdate(p: DocumentEvent) {
+        path = p.getText()
+    }
+
+    override fun changedUpdate(p: DocumentEvent) {
+        path = p.getText()
+    }
+
+}
+
 
 class ESP32Setting : Configurable {
-    val LOG = Logger.getInstance(ESP32Setting::class.java)
-    private val espToolBaudrate = ActionItemsComboBox<Int>()
+    private val espToolBaudRate = ActionItemsComboBox<Int>()
     private val espToolPy = ActionItemsComboBox<String>()
-    private var esp32Sdk: SDKPathDocumentListener = SDKPathDocumentListener(ESP32SettingState.sdkPath)
-    private var crosscompiler: GccPathDocumentListener = GccPathDocumentListener(ESP32SettingState.crosscompilerPath)
+    private var esp32Sdk = SDKPathDocumentListener(ESP32SettingState.sdkPath)
+    private var crosscompiler = GccPathDocumentListener(ESP32SettingState.crosscompilerPath)
+    private var esp32OpenOcdListener = Esp32PathDocumentListener(ESP32SettingState.esp32OpenOcdLocation)
 
     init {
-        availableBaudRate.forEach { espToolBaudrate.addItem(it) }
-        espToolBaudrate.maximumSize=Dimension(10000,30)
-        espToolPy.maximumSize=Dimension(10000,30)
+        availableBaudRate.forEach { espToolBaudRate.addItem(it) }
+        espToolBaudRate.maximumSize = Dimension(10000, 30)
+        espToolPy.maximumSize = Dimension(10000, 30)
     }
 
     /**
@@ -103,7 +118,8 @@ class ESP32Setting : Configurable {
         return esp32Sdk.path != ESP32SettingState.sdkPath
                 || crosscompiler.path != ESP32SettingState.crosscompilerPath
                 || espToolPy.selectedItem != ESP32SettingState.serialPortName
-                || espToolBaudrate.selectedItem != ESP32SettingState.serialPortBaud
+                || espToolBaudRate.selectedItem != ESP32SettingState.serialPortBaud
+                || esp32OpenOcdListener.path != ESP32SettingState.esp32OpenOcdLocation
     }
 
     /**
@@ -124,8 +140,9 @@ class ESP32Setting : Configurable {
     override fun apply() {
         ESP32SettingState.sdkPath = esp32Sdk.path
         ESP32SettingState.crosscompilerPath = crosscompiler.path
+        ESP32SettingState.esp32OpenOcdLocation = esp32OpenOcdListener.path
         espToolPy.selectedItem?.let { ESP32SettingState.serialPortName = it as String }
-        espToolBaudrate.selectedItem?.let { ESP32SettingState.serialPortBaud = it as Int }
+        espToolBaudRate.selectedItem?.let { ESP32SettingState.serialPortBaud = it as Int }
     }
 
     /**
@@ -138,15 +155,16 @@ class ESP32Setting : Configurable {
      *
      * @return new Swing form to show, or `null` if it cannot be created
      */
-    override fun createComponent(): JComponent  {
+    override fun createComponent(): JComponent {
         val panel = DialogPanel()
-        panel.layout = GridLayout2(4,2)
-        panel.name="Tools path"
+        panel.layout = GridLayout2(5, 2)
+        panel.name = "Tools path"
 
         val sdkPathLabel = JLabel("ESP32 espressif SDK path")
-        val crossCompilerLabel = JLabel("crosscompile path: ")
+        val crossCompilerLabel = JLabel("crosscompiler path: ")
         val serialPortLabel = JLabel("Default serial port: ")
         val baudRateLabel = JLabel("Default serial flashing baud rate")
+        val esp32OpenOcdLabel = JLabel("ESP32 Openocd path")
 
         panel.add(sdkPathLabel)
         panel.add(sdkPathComponent())
@@ -155,12 +173,14 @@ class ESP32Setting : Configurable {
         panel.add(serialPortLabel)
         panel.add(defaultSerialPort())
         panel.add(baudRateLabel)
-        espToolBaudrate.selectedItem = ESP32SettingState.serialPortBaud
-        panel.add(espToolBaudrate)
+        espToolBaudRate.selectedItem = ESP32SettingState.serialPortBaud
+        panel.add(espToolBaudRate)
+        panel.add(esp32OpenOcdLabel)
+        panel.add(esp32OpenOcdPathComponent())
         return panel
     }
 
-    fun defaultSerialPort(): Component {
+    private fun defaultSerialPort(): Component {
         espToolPy.isEditable = true
         espToolPy.removeAll()
         val portList = ESP32SerialPortList.getPortNames()
@@ -171,7 +191,7 @@ class ESP32Setting : Configurable {
         return espToolPy
     }
 
-    fun sdkCrossCompilerPath() : Component {
+    private fun sdkCrossCompilerPath(): Component {
         val component = TextFieldWithHistoryWithBrowseButton()
         val editor = component.childComponent.textEditor
         editor.text = ESP32SettingState.crosscompilerPath
@@ -184,13 +204,13 @@ class ESP32Setting : Configurable {
             FileChooserDescriptorFactory.createSingleFileDescriptor(),
             TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
         ) {
-        crosscompiler.path = it.path
-        crosscompiler.path
+            crosscompiler.path = it.path
+            crosscompiler.path
         }
         return component
     }
 
-    fun sdkPathComponent() : Component {
+    private fun sdkPathComponent(): Component {
         val component = TextFieldWithHistoryWithBrowseButton()
         val editor = component.childComponent.textEditor
         editor.text = ESP32SettingState.sdkPath
@@ -206,6 +226,25 @@ class ESP32Setting : Configurable {
         ) {
             esp32Sdk.path = it.path
             esp32Sdk.path
+        }
+        return component
+    }
+
+    private fun esp32OpenOcdPathComponent(): Component {
+        val component = TextFieldWithHistoryWithBrowseButton()
+        val editor = component.childComponent.textEditor
+        editor.text = ESP32SettingState.esp32OpenOcdLocation
+        editor.document.addDocumentListener(esp32OpenOcdListener)
+        installFileCompletionAndBrowseDialog(
+            null,
+            component,
+            editor,
+            "ESP32 OpenOCD  path",
+            FileChooserDescriptorFactory.createSingleFileOrExecutableAppDescriptor(),
+            TextComponentAccessor.TEXT_FIELD_WITH_HISTORY_WHOLE_TEXT
+        ) {
+            esp32OpenOcdListener.path = it.path
+            esp32OpenOcdListener.path
         }
         return component
     }

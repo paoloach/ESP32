@@ -2,7 +2,6 @@ package it.achdjian.plugin.esp32.configurations.debuger
 
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.ConfigurationFactory
-import com.intellij.execution.configurations.RunConfiguration
 import com.intellij.execution.configurations.RuntimeConfigurationException
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.intellij.openapi.project.Project
@@ -12,17 +11,23 @@ import com.intellij.openapi.util.text.StringUtil
 import com.jetbrains.cidr.cpp.execution.CMakeAppRunConfiguration
 import com.jetbrains.cidr.cpp.execution.gdbserver.DownloadType
 import com.jetbrains.cidr.cpp.execution.gdbserver.Utils
+import com.jetbrains.cidr.cpp.toolchains.CPPDebugger
 import com.jetbrains.cidr.cpp.toolchains.CPPToolchains
 import com.jetbrains.cidr.execution.CidrCommandLineState
 import com.jetbrains.cidr.execution.CidrExecutableDataHolder
+import it.achdjian.plugin.esp32.ESP32_TOOLCHAIN
+import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import org.jdom.Element
+import java.io.File
 
 class ESP32DebugConfiguration(project: Project, factory: ConfigurationFactory, name: String) :
     CMakeAppRunConfiguration(project, factory, name), CidrExecutableDataHolder {
 
     companion object {
+        private val LOG = com.intellij.openapi.diagnostic.Logger.getInstance(ESP32DebugConfiguration::class.java)
         const val DEFAULT_GDB_PORT = 3333
         const val DEFAULT_TELNET_PORT = 4444
+
         private const val ATTR_GDB_PORT = "gdb-port"
         private const val ATTR_TELNET_PORT = "telnet-port"
         private const val ATTR_BOARD_CONFIG = "board-config"
@@ -32,7 +37,6 @@ class ESP32DebugConfiguration(project: Project, factory: ConfigurationFactory, n
         const val TAG_OPENOCD = "openocd"
     }
 
-    private val flashConfigurationState = ESP32DebugConfigurationState()
     var gdbPort = DEFAULT_GDB_PORT
     var telnetPort = DEFAULT_TELNET_PORT
     var boardConfigFile = ""
@@ -41,36 +45,62 @@ class ESP32DebugConfiguration(project: Project, factory: ConfigurationFactory, n
 
 
     override fun getState(executor: Executor, environment: ExecutionEnvironment): CidrCommandLineState {
-        val toolchain = CPPToolchains.getInstance().defaultToolchain
-        val launcher = ESP32DebugLauncher(project, toolchain!!, this)
+        val toolchain = CPPToolchains.getInstance().toolchains.firstOrNull{it.name==ESP32_TOOLCHAIN} ?: createToolchain()
+        val launcher = ESP32DebugLauncher(project, toolchain, this)
         return CidrCommandLineState(environment, launcher)
     }
 
+    private fun createToolchain(): CPPToolchains.Toolchain {
+        val defaultToolchain = CPPToolchains.getInstance().defaultToolchain
+
+        val path = File(ESP32SettingState.crosscompilerPath)
+        val compiler = File(path, "xtensa-esp32-elf-gcc")
+        val cxxCompiler = File(path, "xtensa-esp32-elf-g++")
+        val debugger = File(path, "xtensa-esp32-elf-gdb")
+
+        return defaultToolchain?.let { toolchain ->
+            val debugger = CPPDebugger.customGdb(debugger)
+            val esp32Toolchain = CPPToolchains.Toolchain(toolchain.osType, toolchain.toolSetKind,debugger)
+            esp32Toolchain.name=ESP32_TOOLCHAIN
+            esp32Toolchain.customCCompilerPath=compiler.absolutePath
+            esp32Toolchain.customCXXCompilerPath=cxxCompiler.absolutePath
+            esp32Toolchain
+        } ?: throw RuntimeConfigurationException("Debugger not configurable")
+    }
 
     @Throws(WriteExternalException::class)
     override fun writeExternal(parentElement: Element) {
-        super.writeExternal(parentElement)
-        val element = Element(TAG_OPENOCD)
-        parentElement.addContent(element)
-        element.setAttribute(ATTR_GDB_PORT, gdbPort.toString())
-        element.setAttribute(ATTR_TELNET_PORT, telnetPort.toString())
-        if (boardConfigFile.isBlank()) {
-            element.setAttribute(ATTR_BOARD_CONFIG, boardConfigFile)
+        try {
+            super.writeExternal(parentElement)
+            val element = Element(TAG_OPENOCD)
+            parentElement.addContent(element)
+            element.setAttribute(ATTR_GDB_PORT, gdbPort.toString())
+            element.setAttribute(ATTR_TELNET_PORT, telnetPort.toString())
+            if (boardConfigFile.isNotBlank()) {
+                element.setAttribute(ATTR_BOARD_CONFIG, boardConfigFile)
+            }
+            element.setAttribute(ATTR_RESET_TYPE, resetType.name)
+            element.setAttribute(ATTR_DOWNLOAD_TYPE, downloadType.name)
+        } catch (e: Exception){
+            LOG.error("Writing conf: ", e)
         }
-        element.setAttribute(ATTR_RESET_TYPE, resetType.name)
-        element.setAttribute(ATTR_DOWNLOAD_TYPE, downloadType.name)
+
     }
+
 
     @Throws(InvalidDataException::class)
     override fun readExternal(parentElement: Element) {
-        super.readExternal(parentElement)
-        val element = parentElement.getChild(TAG_OPENOCD)
-        boardConfigFile = element?.let { element.getAttributeValue(ATTR_BOARD_CONFIG) } ?:""
-            boardConfigFile = ""
-        gdbPort = Utils.readIntAttr(element, ATTR_GDB_PORT, DEFAULT_GDB_PORT)
-        telnetPort = Utils.readIntAttr(element, ATTR_TELNET_PORT, DEFAULT_TELNET_PORT)
-        resetType = Utils.readEnumAttr(element, ATTR_RESET_TYPE, DEFAULT_RESET)
-        downloadType = Utils.readEnumAttr(element, ATTR_DOWNLOAD_TYPE, DownloadType.ALWAYS)
+        try {
+            super.readExternal(parentElement)
+            val element = parentElement.getChild(TAG_OPENOCD)
+            boardConfigFile = element?.let { element.getAttributeValue(ATTR_BOARD_CONFIG) } ?: ""
+            gdbPort = Utils.readIntAttr(element, ATTR_GDB_PORT, DEFAULT_GDB_PORT)
+            telnetPort = Utils.readIntAttr(element, ATTR_TELNET_PORT, DEFAULT_TELNET_PORT)
+            resetType = Utils.readEnumAttr(element, ATTR_RESET_TYPE, DEFAULT_RESET)
+            downloadType = Utils.readEnumAttr(element, ATTR_DOWNLOAD_TYPE, DownloadType.ALWAYS)
+        } catch (e: Exception){
+            LOG.error("Error reading: ", e)
+        }
     }
 
     @Throws(RuntimeConfigurationException::class)
@@ -83,15 +113,6 @@ class ESP32DebugConfiguration(project: Project, factory: ConfigurationFactory, n
         } else if (StringUtil.isEmpty(boardConfigFile)) {
             throw RuntimeConfigurationException("Board config not defined")
         }
-    }
-
-
-    override fun clone(): RunConfiguration {
-        val cloned = super.clone() as ESP32DebugConfiguration
-        cloned.flashConfigurationState.configurationName = flashConfigurationState.configurationName
-        cloned.flashConfigurationState.port = flashConfigurationState.port
-        cloned.flashConfigurationState.baud = flashConfigurationState.baud
-        return cloned
     }
 }
 

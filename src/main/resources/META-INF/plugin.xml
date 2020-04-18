@@ -63,10 +63,5 @@
             <implementation-class>it.achdjian.plugin.esp32.configurations.debuger.ui.SvdWindowState</implementation-class>
         </component>
     </project-components>
-    <application-components>
-        <component>
-            <implementation-class>it.achdjian.plugin.esp32.configurations.debuger.ESP32DebugConfigurationState</implementation-class>
-        </component>
-    </application-components>
 
 </idea-plugin>

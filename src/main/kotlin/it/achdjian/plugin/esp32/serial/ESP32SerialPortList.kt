@@ -2,8 +2,8 @@ package it.achdjian.plugin.esp32.serial
 
 import com.intellij.execution.RunManagerEx
 import com.intellij.openapi.project.Project
+import it.achdjian.plugin.esp32.CONFIGURATION_NAME
 import it.achdjian.plugin.esp32.actions.configParsing
-import it.achdjian.plugin.esp32.configurationName
 import it.achdjian.plugin.esp32.configurations.flash.ESP32FlashRunConfiguration
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import jssc.SerialNativeInterface
@@ -16,7 +16,7 @@ import kotlin.math.min
 fun getSerialPort(project: Project): ESP32SerialPortData? {
     val flashConfPort = RunManagerEx.getInstanceEx(project)
         .allSettings
-        .firstOrNull { it.name == configurationName }
+        .firstOrNull { it.name == CONFIGURATION_NAME }
         ?.configuration
         ?.let {
             (it as ESP32FlashRunConfiguration).flashConfigurationState.port

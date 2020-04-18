@@ -12,16 +12,16 @@ import com.intellij.openapi.ui.Messages
 import com.intellij.openapi.util.Computable
 import com.intellij.openapi.util.Pair
 import com.intellij.openapi.util.io.FileUtil
-import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.ListSpeedSearch
 import com.intellij.ui.SimpleListCellRenderer
 import com.intellij.ui.components.JBList
 import com.intellij.ui.components.JBScrollPane
-import it.achdjian.plugin.esp32.configurations.debuger.ESP32DebugConfigurationState
+import it.achdjian.plugin.esp32.configurations.debuger.Board
 import it.achdjian.plugin.esp32.configurations.debuger.findScripts
 import it.achdjian.plugin.esp32.configurations.debuger.require
+import it.achdjian.plugin.esp32.setting.ESP32SettingState
 import sun.nio.cs.US_ASCII
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
@@ -32,11 +32,10 @@ import java.util.*
 import javax.swing.AbstractAction
 import javax.swing.Icon
 import javax.swing.JComponent
-import javax.swing.event.ListSelectionEvent
 
 @Throws(ConfigurationException::class)
-fun findBoardsConfigFiles(ESP32Settings: ESP32DebugConfigurationState): Array<File> ? {
-    val ocdScripts: File = require(findScripts(File(ESP32Settings.openOcdLocation)))
+fun findBoardsConfigFiles(): Array<File> ? {
+    val ocdScripts: File = require(findScripts(File(ESP32SettingState.esp32OpenOcdLocation)))
     return require(File(ocdScripts, "board")).listFiles()
 }
 
@@ -51,35 +50,26 @@ private fun calcConfigFileScore(keywordWeight: List<Pair<String, Int>>, ocdBoard
 }
 
 
-fun selectBoardByPriority(project: Project, boardName: String, mcuFamilyName: String): String ? {
+fun selectBoardByPriority(project: Project, board: Board): String ? {
     try {
         val keywordWeight = mutableListOf<Pair<String, Int>>()
-        val board = StringUtil.toUpperCase(Objects.toString(boardName, ""))
-        if (!board.isEmpty()) {
-            keywordWeight.add(Pair.pair(board, 1000))
+        if (board.name.isNotEmpty()) {
+            keywordWeight.add(Pair.pair(board.name, 1000))
         }
-        listOf("NUCLEO", "EVAL").filter { board.contains(it) }.firstOrNull()?.let { keywordWeight.add(Pair.pair(it,100)) }
-        if (board.contains("DISCOVERY")) {
-            keywordWeight.add(Pair.pair("DISCOVERY", 100))
-            keywordWeight.add(Pair.pair("DISC", 20))
-        } else if (board.contains("DISC")) {
-            keywordWeight.add(Pair.pair("DISC", 100))
-            keywordWeight.add(Pair.pair("DISCOVERY", 20))
+        listOf("ESP32", "WROVER").firstOrNull { board.name.contains(it) }?.let { keywordWeight.add(Pair.pair(it,100)) }
+        keywordWeight.add(Pair.pair("ESP32",1000))
+        for (i in board.mcuFamily.length - 1 downTo 6) {
+            keywordWeight.add(Pair.pair(board.mcuFamily.substring(0, i), i))
         }
-        val mcuFamily = StringUtil.toUpperCase(Objects.toString(mcuFamilyName, ""))
-        for (i in mcuFamily.length - 1 downTo 6) {
-            keywordWeight.add(Pair.pair(mcuFamily.substring(0, i), i))
-        }
-        val ESP32settings = ApplicationManager.getApplication().getComponent(ESP32DebugConfigurationState::class.java)
-        findBoardsConfigFiles(ESP32settings)?.let{
+        findBoardsConfigFiles()?.let{
             val boardByScores = it
                 .filter { !it.isDirectory }
-                .map { calcConfigFileScore(keywordWeight, it) }
+                .map {file-> calcConfigFileScore(keywordWeight, file) }
                 .sortedWith(kotlin.Comparator { a, b -> when {
                     a.second == b.second -> a.first.compareTo(b.first)
-                    else -> a.second.compareTo( b.second)
+                    else -> b.second -  a.second
                 }})
-                .map { it.first }.toTypedArray()
+                .map { it.first }
 
 
             val dialog = SelectBoardDialog(project, boardByScores)
@@ -95,14 +85,14 @@ fun selectBoardByPriority(project: Project, boardName: String, mcuFamilyName: St
 }
 
 
-class SelectBoardDialog(val myProject: Project,val myBoardFiles: Array<File>) : DialogWrapper(myProject, false, false) {
+class SelectBoardDialog(val myProject: Project, private val myBoardFiles: List<File>) : DialogWrapper(myProject, false, false) {
     companion object {
         const val CONFIG_FILE_SIZE_LIMIT = 100000
     }
 
     var myResult: String? = null
     var mySelectedFile: File? = null
-    private var myBoardList=JBList<File>(*myBoardFiles)
+    private var myBoardList=JBList(myBoardFiles)
     private var myCopyAndUseAction = CopyAndUseAction(this)
 
     init {
@@ -119,16 +109,16 @@ class SelectBoardDialog(val myProject: Project,val myBoardFiles: Array<File>) : 
     override fun createActions() = arrayOf(this.okAction, this.myCopyAndUseAction, this.cancelAction)
 
     override fun createCenterPanel(): JComponent {
-        myBoardList = JBList<File>(*myBoardFiles)
+        myBoardList = JBList(myBoardFiles)
         myBoardList.cellRenderer = SimpleListCellRenderer.create("") { obj: File -> obj.name }
         myBoardList.selectionMode = 0
-        myBoardList.addListSelectionListener{ e: ListSelectionEvent? ->
-            val index: Int = this.myBoardList.getSelectedIndex()
+        myBoardList.addListSelectionListener{
+            val index: Int = this.myBoardList.selectedIndex
             okAction.isEnabled = index >= 0
             myCopyAndUseAction.isEnabled = index >= 0
             if (index >= 0) {
-                val selectedFile = this.myBoardFiles.get(index)
-                myResult = "board/" + selectedFile.getName()
+                val selectedFile = this.myBoardFiles[index]
+                myResult = "board/" + selectedFile.name
                 mySelectedFile=selectedFile
             } else {
                 mySelectedFile = null
@@ -150,7 +140,7 @@ class SelectBoardDialog(val myProject: Project,val myBoardFiles: Array<File>) : 
 }
 
 
-class WriteSelected(val projectDir: VirtualFile, val selectedFile: File, val overwrite: Boolean) : Computable<File> {
+class WriteSelected(private val projectDir: VirtualFile, private val selectedFile: File, private val overwrite: Boolean) : Computable<File> {
     override fun compute(): File {
         val newConfigFile = projectDir.findOrCreateChildData(this, selectedFile.name)
         if (overwrite) {

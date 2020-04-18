@@ -15,8 +15,13 @@ import java.text.MessageFormat
 import java.util.*
 
 class SvdRoot : SvdNode<SvdFile>(id = "", name = "") {
-    val treeTableModel = SvdTreeTableModel(this)
     var activeNodes = mutableSetOf<SvdNode<*>>()
+    val treeTableModel: SvdTreeTableModel
+
+    init {
+        treeTableModel = SvdTreeTableModel(this)
+    }
+
 
     fun addFile(stream: InputStream?, path: Path): SvdFile? {
         val document: Document
