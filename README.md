@@ -7,7 +7,7 @@ In the setting menu, under *Build,Execution, Deployment*, you can find the *ESP3
 
 ![setup](/docs/images/setup.png)
 
-- [ESP32 espressif SDK path](#ESP32 espressif SDK path)
+- [ESP32 espressif SDK path](#esp32-espressif-sdk-path)
 - crosscompiler path
 - Default serial port
 - Default serial flashing baud rate
