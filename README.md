@@ -2,7 +2,7 @@
 
 Plugin for CLION allowing developing a ESP32 firmware, downloading it and debugging it using the integrated debugger by jtag.
 
-After installed this plugin, you will be able to create a new c project: [ESP32](/docs/images/ESP32-project.png)
+After installed this plugin, you will be able to create a new c project: ![ESP32](/docs/images/ESP32-project.png)
  
 It assumes that you have already installed the ESP32 environment as described into  [Get Started](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started)
 
