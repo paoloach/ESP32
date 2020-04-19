@@ -2,7 +2,10 @@
 
 Plugin for CLION allowing developing a ESP32 firmware, downloading it and debugging it using the integrated debugger by jtag.
 
-After installed this plugin, you will be able to create a new c project: ![ESP32](/docs/images/ESP32-project.png)
+After installed this plugin, you will be able to create a new c project: ![ESP32](/docs/images/ESP32-project.png).  
+ After create this type of project, you will see a set of predefined configurations to compile, flash and debug (by jtag) your ESP32 project and a new ESP32 serial console to see the ESP32 logs   
+
+
  
 It assumes that you have already installed the ESP32 environment as described into  [Get Started](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started)
 
@@ -35,6 +38,9 @@ Anyway, you can customize this value on every different configuration
 
 ### Default Serial Flashing Baud Rate 
 
-The default baud rate used to flash ESP32 chip.
+The default baud rate used to flash ESP32 chip. 
+Notice that the communication baud rate used is defined by *Serial flash config/Monitor Baud Rate* menu 
 
 ### ESP32 Openocd Path
+In order to communicate with jtag, you need to install a version of OpenOCD customized to work with ESP32: [openocd-esp32](https://github.com/espressif/openocd-esp32).  
+This path refers to the installation directory of this program.
