@@ -1,5 +1,5 @@
 <idea-plugin>
-    <id>it.achdjian.plugin.ESP322</id>
+    <id>it.achdjian.plugin.ESP32</id>
     <name>ESP32</name>
     <vendor email="pachdjian@gmail.com"></vendor>
 
@@ -28,6 +28,7 @@
     <depends>com.intellij.modules.clion</depends>
 
     <extensions defaultExtensionNs="com.intellij">
+        <webHelpProvider implementation="it.achdjian.plugin.esp32.help.ESP32HelpProvider" id="it.achdjian.plugin.ESP32"/>
         <toolWindow id="ESP32 Serial Monitor" anchor="bottom"
                     factoryClass="it.achdjian.plugin.esp32.serial.ESP32SerialMonitorToolWindowFactory"
                     canCloseContents="false" secondary="false"/>
@@ -35,7 +36,7 @@
         <configurationType implementation="it.achdjian.plugin.esp32.configurations.debuger.ESP32DebugConfigurationType"/>
         <configurationType implementation="it.achdjian.plugin.esp32.configurations.flash.ESP32FlashConfigurationType"/>
         <directoryProjectGenerator implementation="it.achdjian.plugin.esp32.generator.CProjectGenerator"/>
-        <applicationConfigurable order="last" id="ESP32.plugin.achdjian.it" displayName="ESP32 config" groupId="build" instance="it.achdjian.plugin.esp32.setting.ESP32Setting"/>
+        <applicationConfigurable order="last" id="it.achdjian.plugin.esp32" displayName="ESP32 config" groupId="build" instance="it.achdjian.plugin.esp32.setting.ESP32Setting"/>
         <projectService serviceInterface="it.achdjian.plugin.esp32.serial.ESP32SerialService" serviceImplementation="it.achdjian.plugin.esp32.serial.ESP32JsscESP32SerialService"/>
     </extensions>
 

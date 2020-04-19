@@ -1,7 +1,7 @@
 package it.achdjian.plugin.esp32.setting
 
 import com.intellij.openapi.fileChooser.FileChooserDescriptorFactory
-import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.SearchableConfigurable
 import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.TextComponentAccessor
 import com.intellij.ui.TextFieldWithHistoryWithBrowseButton
@@ -95,7 +95,7 @@ class Esp32PathDocumentListener(var path: String) : DocumentListener {
 }
 
 
-class ESP32Setting : Configurable {
+class ESP32Setting : SearchableConfigurable {
     private val espToolBaudRate = ActionItemsComboBox<Int>()
     private val espToolPy = ActionItemsComboBox<String>()
     private var esp32Sdk = SDKPathDocumentListener(ESP32SettingState.sdkPath)
@@ -144,6 +144,10 @@ class ESP32Setting : Configurable {
         espToolPy.selectedItem?.let { ESP32SettingState.serialPortName = it as String }
         espToolBaudRate.selectedItem?.let { ESP32SettingState.serialPortBaud = it as Int }
     }
+
+    override fun getId(): String =  "it.achdjian.plugin.esp32"
+
+    override fun getHelpTopic(): String = "it.achdjian.plugin.ESP32.setup"
 
     /**
      * Creates new Swing form that enables user to configure the settings.

@@ -12,6 +12,7 @@ import com.intellij.openapi.project.DumbAwareAction
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.project.ProjectManager
 import com.jetbrains.cidr.cpp.toolchains.CPPToolchainsConfigurable
+import it.achdjian.plugin.esp32.setting.ESP32Setting
 
 
 fun showErrorMessage(project: Project?, title: String, message: String) = showMessage(project, NotificationType.ERROR, title, message, false)
@@ -22,18 +23,18 @@ fun showErrorMessage(project: Project, title: String, message: String, enableRun
     showMessage(project, NotificationType.ERROR, title, message, enableRunConfiguration)
 
 fun showSuccessfulDownloadNotification(project: Project) =
-    showSuccessMessage(project, "OpenOCD", "firmware downloaded")
+    showSuccessMessage(project, "ESP32 OpenOCD", "firmware downloaded")
 
 fun showSuccessMessage(project: Project?, title: String, message: String)
         = showMessage(project, NotificationType.INFORMATION, title, message, false)
 
 fun openHelp() {
-    HelpManager.getInstance().invokeHelp("Embedded_Development")
+    HelpManager.getInstance().invokeHelp("it.achdjian.plugin.ESP32.main")
 }
 
 fun showFailedDownloadNotification(p: Project?) {
     val project = p ?: ProjectManager.getInstance().defaultProject
-    showErrorMessage(project, "OpenOCD", "MCU communication failure detailed", true)
+    showErrorMessage(project, "ESP32 OpenOCD", "MCU communication failure detailed", true)
 }
 
 
@@ -43,7 +44,7 @@ fun showMessage(project: Project?, notificationType: NotificationType, title: St
     if (notificationType != NotificationType.INFORMATION) {
         notification.addAction(
             DumbAwareAction.create("Show settings")
-             { ShowSettingsUtil.getInstance().showSettingsDialog(project, ESP32DebugSettingsConfigurable::class.java) }
+             { ShowSettingsUtil.getInstance().showSettingsDialog(project, ESP32Setting::class.java) }
         )
         notification.addAction(
             DumbAwareAction.create("Show toolchains")

@@ -66,15 +66,22 @@ fun createOpenOcdCommandLine(config: ESP32DebugConfiguration): GeneralCommandLin
     } else {
         val openOcdBinary = config.project.requireAndReport( File(ESP32SettingState.esp32OpenOcdLocation))
         val ocdScripts = config.project.requireAndReport( findOcdScripts(openOcdBinary))
-        PtyCommandLine().withWorkDirectory(openOcdBinary.parentFile)
-                .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
-                .withParameters("-c", "tcl_port disabled")
-                .withExePath(openOcdBinary.absolutePath)
-                .withParameters("-s", ocdScripts.absolutePath,
-                    "-f", config.boardConfigFile,
-                    "-c", "gdb_port " + config.gdbPort,
-                    "-c", "telnet_port " + config.telnetPort,
-                    "-c", "init;reset init;")
+        val commandLine = PtyCommandLine().withWorkDirectory(openOcdBinary.parentFile)
+            .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
+            .withParameters("-c", "tcl_port disabled")
+            .withExePath(openOcdBinary.absolutePath)
+            .withParameters(
+                "-s", ocdScripts.absolutePath,
+                "-f", config.boardConfigFile,
+                "-c", "gdb_port " + config.gdbPort,
+                "-c", "telnet_port " + config.telnetPort
+            )
+
+        if (config.resetType != ResetType.NONE){
+            commandLine.addParameters("-c", config.resetType.command)
+        }
+
+        commandLine
     }
 }
 

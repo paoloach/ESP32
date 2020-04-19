@@ -32,7 +32,6 @@ import com.jetbrains.cidr.execution.debugger.backend.DebuggerDriverConfiguration
 import com.jetbrains.cidr.execution.debugger.backend.gdb.GDBDriver
 import com.jetbrains.cidr.execution.debugger.remote.CidrRemoteDebugParameters
 import com.jetbrains.cidr.execution.debugger.remote.CidrRemoteGDBDebugProcess
-import it.achdjian.plugin.esp32.configurations.debuger.ui.registerPeripheralTab
 import java.io.File
 import java.util.concurrent.Future
 import java.util.concurrent.TimeUnit
@@ -55,7 +54,7 @@ class ESP32XDebugTabLayouter(
 
     override fun registerAdditionalContent(ui: RunnerLayoutUi) {
         innerLayouter.registerAdditionalContent(ui)
-        registerPeripheralTab(process, ui)
+        //registerPeripheralTab(process, ui)
     }
 }
 
@@ -161,7 +160,7 @@ class ESP32DebugLauncher(
                     ESP32OpenOcdComponent.stopOpenOcd()
                 }
             })
-            debugProcess.processHandler.putUserData(RESTART_KEY, McuResetAction({ debugProcess }, "monitor reset halt"))
+//            debugProcess.processHandler.putUserData(RESTART_KEY, McuResetAction({ debugProcess }, "monitor reset halt"))
             return debugProcess
         }
     }
@@ -196,16 +195,13 @@ class ESP32DebugLauncher(
             val runFile = findRunFile(commandLineState)
             ESP32OpenOcdComponent.stopOpenOcd()
             val downloadResult = ESP32OpenOcdComponent.loadFirmware(esP32DebugConfiguration, runFile)
-            LOG.info("Start ")
             val downloadStatus = ProgressManager.getInstance().runProcessWithProgressSynchronously(DownloadingFirmware(downloadResult), "Download firmware", true, project)
-            LOG.info("END")
             if (downloadStatus != DownloadingStatus.FLASH_DOWNLOAD_SUCCESS) {
                 downloadResult.cancel(true)
                 showErrorMessage(project, "OpenOCD", "MCU Communication Failure")
                 throw ProcessCanceledException()
             }
             ESP32OpenOcdComponent.stopOpenOcd()
-            LOG.info("OpenOCD stopped")
         }
 
         ESP32OpenOcdComponent.runOpenOcdServer(esP32DebugConfiguration)
