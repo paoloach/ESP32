@@ -7,3 +7,13 @@ In the setting menu, under *Build,Execution, Deployment*, you can find the *ESP3
 
 ![setup](/docs/images/setup.png)
 
+- [ESP32 espressif SDK path](#ESP32 espressif SDK path)
+- crosscompiler path
+- Default serial port
+- Default serial flashing baud rate
+- ESP32 Openocd path
+
+### ESP32 espressif SDK path
+
+This is the path where you installed the ESP32 esk, that is the path where you clone the repository
+https://github.com/espressif/esp-idf.git
