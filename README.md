@@ -2,18 +2,39 @@
 
 Plugin for CLION allowing developing a ESP32 firmware, downloading it and debugging it using the integrated debugger by jtag.
 
+After installed this plugin, you will be able to create a new c project: [ESP32](/docs/images/ESP32-project.png)
+ 
+It assumes that you have already installed the ESP32 environment as described into  [Get Started](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started/index.html#get-started)
+
 ## SETUP
 In the setting menu, under *Build,Execution, Deployment*, you can find the *ESP32* entry consisting in several voices
 
 ![setup](/docs/images/setup.png)
 
 - [ESP32 espressif SDK path](#esp32-espressif-sdk-path)
-- crosscompiler path
-- Default serial port
-- Default serial flashing baud rate
-- ESP32 Openocd path
+- [Crosscompiler path](#crosscompiler-path)
+- [Default Serial Port](#default-serial-port)
+- [Default Serial Flashing Baud Rate](#default-serial-flashing-baud-rate)
+- [ESP32 Openocd Path](#esp32-openocd-path)
 
 ### ESP32 espressif SDK path
 
-This is the path where you installed the ESP32 esk, that is the path where you clone the repository
+It is the path where you installed the ESP32 esk, that is the path where you clone the repository
 https://github.com/espressif/esp-idf.git
+It should contain the file ***Kconfig***, by which it builds the windows containing the different options.
+
+### Crosscompiler Path
+
+It is the path where you installed the crosscompiler executable. It should contain the xtensa-esp32-elf-gcc compiler and his friends.
+
+Please refer the espressif page [Standard Setup of Toolchain for Linux](https://docs.espressif.com/projects/esp-idf/en/latest/esp32/get-started-legacy/linux-setup.html#standard-setup-of-toolchain-for-linux-legacy-gnu-make)
+
+### Default Serial Port
+The default serial port used to flash and communicate with ESP32 chip.  
+Anyway, you can customize this value on every different configuration 
+
+### Default Serial Flashing Baud Rate 
+
+The default baud rate used to flash ESP32 chip.
+
+### ESP32 Openocd Path

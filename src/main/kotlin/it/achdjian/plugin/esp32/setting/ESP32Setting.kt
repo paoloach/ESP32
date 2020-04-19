@@ -160,11 +160,11 @@ class ESP32Setting : Configurable {
         panel.layout = GridLayout2(5, 2)
         panel.name = "Tools path"
 
-        val sdkPathLabel = JLabel("ESP32 espressif SDK path")
-        val crossCompilerLabel = JLabel("crosscompiler path: ")
-        val serialPortLabel = JLabel("Default serial port: ")
-        val baudRateLabel = JLabel("Default serial flashing baud rate")
-        val esp32OpenOcdLabel = JLabel("ESP32 Openocd path")
+        val sdkPathLabel = JLabel("ESP32 Espressif SDK Path")
+        val crossCompilerLabel = JLabel("Crosscompiler Path: ")
+        val serialPortLabel = JLabel("Default Serial Port: ")
+        val baudRateLabel = JLabel("Default Serial Flashing Baud Rate")
+        val esp32OpenOcdLabel = JLabel("ESP32 Openocd Path")
 
         panel.add(sdkPathLabel)
         panel.add(sdkPathComponent())
