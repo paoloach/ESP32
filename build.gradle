@@ -46,7 +46,6 @@ patchPluginXml {
     untilBuild "201.*"
     
     changeNotes """
-      <p>&#8226; 1.2.6 &#8594; Fix parser </p>
       <p>&#8226; 1.2.5 &#8594; Compatible with 2020.1 </p>
       <p>&#8226; 1.2.4 &#8594; Fix IDF_TARGET_ID </p>
       <p>&#8226; 1.2.3 &#8594; Fix parsing issue and resize setting </p>
