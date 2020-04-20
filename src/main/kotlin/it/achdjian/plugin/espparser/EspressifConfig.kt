@@ -129,7 +129,7 @@ open class EspressifConfig(
                 } else {
                     emptyExpression
                 }
-                multiDefault.add(Value(ExpressionParser(removeDoubleQuotes(default.trim())).expresison, ifCase))
+                multiDefault.add(Value(ExpressionParser(default.trim()).expresison, ifCase))
             }
             trimmedLine.startsWith("range ") -> {
                 val tokens = trimmedLine.split(Regex("\\s+"))

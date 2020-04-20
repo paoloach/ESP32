@@ -129,6 +129,23 @@ class EnvironmentTokenizer(val result: MutableList<Token>, val previousTokenizer
     }
 }
 
+class DoubleQuoteTokenizer(val parent: Tokenizer,val  result: MutableList<Token>) : Tokenizer {
+    var text=""
+    override fun newToken(c: Char): Tokenizer {
+        return when(c){
+            '\"' -> {
+                result.add(SimpleExpression(text))
+                parent
+            }
+            else -> {
+                text += c
+                this
+            }
+        }
+    }
+
+}
+
 class NormalTokenizer(val result: MutableList<Token>) : Tokenizer {
     private var prevOper = ' '
     private var tokenOper = false
@@ -144,6 +161,9 @@ class NormalTokenizer(val result: MutableList<Token>) : Tokenizer {
 
         if (!consumed)
             when (c) {
+                '\"' ->{
+                    return DoubleQuoteTokenizer(this, result)
+                }
                 ' ', '\t' -> {
                     if (varName.isNotEmpty()) {
                         result.add(ValueToken(varName))
