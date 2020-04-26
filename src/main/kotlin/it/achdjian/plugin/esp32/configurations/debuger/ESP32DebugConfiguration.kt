@@ -60,7 +60,9 @@ class ESP32DebugConfiguration(project: Project, factory: ConfigurationFactory, n
 
         return defaultToolchain?.let { toolchain ->
             val debugger = CPPDebugger.customGdb(debugger)
-            val esp32Toolchain = CPPToolchains.Toolchain(toolchain.osType, toolchain.toolSetKind,debugger)
+            val esp32Toolchain = CPPToolchains.Toolchain(toolchain.osType)
+            esp32Toolchain.debugger = debugger
+            esp32Toolchain.toolSetKind = toolchain.toolSetKind
             esp32Toolchain.name=ESP32_TOOLCHAIN
             esp32Toolchain.customCCompilerPath=compiler.absolutePath
             esp32Toolchain.customCXXCompilerPath=cxxCompiler.absolutePath

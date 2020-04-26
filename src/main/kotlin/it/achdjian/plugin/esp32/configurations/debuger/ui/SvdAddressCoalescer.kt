@@ -4,7 +4,6 @@ import com.intellij.execution.ExecutionException
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.util.Pair
 import com.intellij.util.SmartList
-import com.intellij.xdebugger.impl.ui.XDebuggerUIConstants
 import com.jetbrains.cidr.execution.debugger.CidrDebugProcess
 import com.jetbrains.cidr.execution.debugger.backend.DebuggerCommandException
 import com.jetbrains.cidr.execution.debugger.backend.DebuggerDriver
@@ -69,8 +68,6 @@ class SvdAddressCoalescer {
     }
 
     fun updateValues(process: CidrDebugProcess, cancelled: AtomicBoolean, updateListener: Runnable) {
-
-        ranges.forEach { it.second.forEach { register->register.markNoValue(XDebuggerUIConstants.getCollectingDataMessage(), false) } }
 
         updateListener.run()
 

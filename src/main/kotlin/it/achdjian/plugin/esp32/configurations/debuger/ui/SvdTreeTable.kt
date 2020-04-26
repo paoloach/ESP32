@@ -8,7 +8,6 @@ import com.intellij.openapi.actionSystem.ToggleAction
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.ide.CopyPasteManager
 import com.intellij.openapi.project.DumbAwareAction
-import com.intellij.openapi.util.text.TextWithMnemonic
 import com.intellij.ui.treeStructure.treetable.TreeTable
 import com.intellij.ui.treeStructure.treetable.TreeTableCellRenderer
 import com.intellij.ui.treeStructure.treetable.TreeTableTree
@@ -90,9 +89,6 @@ private class HideNodeAction(val table: SvdTreeTable) : DumbAwareAction("Hide no
         val selectedNode = table.tree.lastSelectedPathComponent as SvdNode<*>?
         selectedNode?.let {
             e.presentation.isVisible = true
-            e.presentation.setTextWithMnemonic {
-                TextWithMnemonic.fromPlainText("Hide Node ${selectedNode.name}")
-            }
             e.presentation.isEnabled = selectedNode !is SvdField
         } ?: run { e.presentation.isVisible = false }
 

@@ -35,6 +35,7 @@ class SerialMonitorView(val project: Project) : ProjectComponent {
 
         group.add(ESP32ConnectDisconnectAction())
         group.add(ESP32FlashAction(project))
+        group.add( ESP32SerialSetup())
 
         return ActionManager.getInstance().createActionToolbar(ActionPlaces.UNKNOWN, group, false)
     }
