@@ -51,6 +51,8 @@ internal class EspressifMenuTest {
         assertThat(btMenu.elements[2], instanceOf(EspressifChoice::class.java))
         assertThat(btMenu.elements[3], instanceOf(EspressifMenu::class.java))
         assertThat(btMenu.elements[4], instanceOf(EspressifMenu::class.java))
+        val nimbleMenu = btMenu.elements[4] as EspressifMenu
+        assertThat(nimbleMenu.elements, hasSize(35))
     }
 
     @Test

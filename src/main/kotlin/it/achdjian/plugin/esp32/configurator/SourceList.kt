@@ -22,8 +22,8 @@ class SourceList(val idfPath:String  = ESP32SettingState.sdkPath) {
 
 
     private fun addNewEnvVariable(envVariable: String): List<File> {
-        envVariable.replace("\$IDF_PATH",idfPath )
-        val file=File(envVariable)
+        val path = envVariable.replace("IDF_PATH",idfPath )
+        val file=File(path)
         return if (file.exists()){
             if (file.isDirectory){
                 componentDir.walk().toList()
