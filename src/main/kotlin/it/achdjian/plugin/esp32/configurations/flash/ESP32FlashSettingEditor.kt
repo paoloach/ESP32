@@ -5,17 +5,21 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.ui.DialogPanel
 import com.jetbrains.cidr.cpp.cmake.workspace.CMakeWorkspace
 import com.jetbrains.cidr.ui.ActionItemsComboBox
+import it.achdjian.plugin.esp32.DEFAULT_BAUD
 import it.achdjian.plugin.esp32.actions.configParsing
-import it.achdjian.plugin.esp32.availableBaudRate
+import it.achdjian.plugin.esp32.serial.ESP32SerialPortData
+import it.achdjian.plugin.esp32.ui.BaudRateComboBox
 import it.achdjian.plugin.esp32.ui.GridLayout2
 import java.io.File
 import javax.swing.JComponent
 import javax.swing.JLabel
 
 class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP32FlashRunConfiguration>() {
+    val serialPortData = ESP32SerialPortData("ttyUsb0", DEFAULT_BAUD)
+
     private val configuration = ActionItemsComboBox<String>()
     private val espToolPy = ActionItemsComboBox<String>()
-    private val espToolBaudrate = ActionItemsComboBox<Int>()
+    private val espToolBaudRate =  BaudRateComboBox{ serialPortData.baud = it }
 
     init {
         espToolPy.isEditable = true
@@ -45,9 +49,7 @@ class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP
         }
         espToolPy.selectedItem = port
 
-        availableBaudRate.forEach { espToolBaudrate.addItem(it) }
         val baud = state.baud
-        espToolBaudrate.selectedItem = baud
     }
 
 
@@ -56,7 +58,7 @@ class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP
         val state = runConfigurationESP32.flashConfigurationState
         configuration.selectedItem?.let { state.configurationName = it as String }
         espToolPy.selectedItem?.let { state.port = it as String }
-        espToolBaudrate.selectedItem?.let { state.baud = it as Int }
+        state.baud = serialPortData.baud
     }
 
     override fun createEditor():JComponent {
@@ -66,6 +68,8 @@ class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP
         panel.add(configuration)
         panel.add(JLabel("Serial port"))
         panel.add(espToolPy)
+        panel.add(JLabel("Serial Baud Rate"))
+        panel.add(espToolBaudRate)
         return panel
     }
 

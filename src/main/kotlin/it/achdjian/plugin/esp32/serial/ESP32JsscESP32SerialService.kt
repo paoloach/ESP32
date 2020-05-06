@@ -1,6 +1,5 @@
 package it.achdjian.plugin.esp32.serial
 
-import com.intellij.util.Consumer
 import jssc.SerialPort
 import jssc.SerialPortEvent
 import jssc.SerialPortException
@@ -9,8 +8,8 @@ import java.util.*
 class ESP32JsscESP32SerialService : ESP32SerialService {
     override var port: SerialPort? = null
     override var baudRate: Int = 115200
-    private val dataListeners = Collections.synchronizedSet(mutableSetOf<Consumer<ByteArray>>())
-    private val portStateListeners = Collections.synchronizedSet(mutableSetOf<Consumer<Boolean>>())
+    private val dataListeners = Collections.synchronizedSet(mutableSetOf<(data:ByteArray)->Unit>())
+    private val portStateListeners = Collections.synchronizedSet(mutableSetOf<(data:Boolean)->Unit>())
 
     override fun isConnected() = port != null
 
@@ -74,26 +73,26 @@ class ESP32JsscESP32SerialService : ESP32SerialService {
         }
     }
 
-    override fun addDataListener(listener: Consumer<ByteArray>) {
+    override fun addDataListener(listener: (data:ByteArray)->Unit) {
         require(!dataListeners.contains(listener))
         dataListeners.add(listener)
     }
 
-    override fun removeDataListener(listener: Consumer<ByteArray>) {
+    override fun removeDataListener(listener: (data:ByteArray)->Unit) {
         dataListeners.remove(listener)
     }
 
-    override fun addPortStateListener(listener: Consumer<Boolean>) {
+    override fun addPortStateListener(listener: (data:Boolean)->Unit) {
         portStateListeners.add(listener)
     }
 
-    override fun removePortStateListener(listener: Consumer<Boolean>) {
+    override fun removePortStateListener(listener: (data:Boolean)->Unit) {
         portStateListeners.remove(listener)
     }
 
     override fun notifyStateListeners(isConnected: Boolean) {
         for (listener in portStateListeners) {
-            listener.consume(isConnected)
+            listener(isConnected)
         }
     }
 
@@ -114,7 +113,7 @@ class ESP32JsscESP32SerialService : ESP32SerialService {
                     val buf = it.readBytes(serialEvent.eventValue)
                     if (buf.isNotEmpty()) {
                         for (dataListener in dataListeners) {
-                            dataListener.consume(buf)
+                            dataListener(buf)
                         }
                     }
                 }

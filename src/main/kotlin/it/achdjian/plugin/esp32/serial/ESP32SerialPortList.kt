@@ -26,7 +26,6 @@ fun getSerialPort(project: Project): ESP32SerialPortData? {
     val port = flashConfPort ?: ESP32SettingState.serialPortName
     val baud = config["CONFIG_ESPTOOLPY_MONITOR_BAUD"]?.toIntOrNull() ?: ESP32SettingState.serialPortBaud
 
-
     val portNames = ESP32SerialPortList.getPortNames()
     if (portNames.isEmpty())
         return ESP32SerialPortData(port, baud)
