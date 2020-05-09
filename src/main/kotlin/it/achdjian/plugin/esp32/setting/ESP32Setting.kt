@@ -6,10 +6,9 @@ import com.intellij.openapi.ui.DialogPanel
 import com.intellij.openapi.ui.TextComponentAccessor
 import com.intellij.ui.TextFieldWithHistoryWithBrowseButton
 import com.intellij.ui.components.installFileCompletionAndBrowseDialog
-import com.jetbrains.cidr.ui.ActionItemsComboBox
-import it.achdjian.plugin.esp32.availableBaudRate
-import it.achdjian.plugin.esp32.serial.ESP32SerialPortList
+import it.achdjian.plugin.esp32.ui.BaudRateComboBox
 import it.achdjian.plugin.esp32.ui.GridLayout2
+import it.achdjian.plugin.esp32.ui.SerialPortListComboBox
 import java.awt.Color
 import java.awt.Component
 import java.awt.Dimension
@@ -96,14 +95,13 @@ class Esp32PathDocumentListener(var path: String) : DocumentListener {
 
 
 class ESP32Setting : SearchableConfigurable {
-    private val espToolBaudRate = ActionItemsComboBox<Int>()
-    private val espToolPy = ActionItemsComboBox<String>()
+    private val espToolBaudRate = BaudRateComboBox{ESP32SettingState.serialPortBaud = it}
+    private val espToolPy = SerialPortListComboBox{ESP32SettingState.serialPortName = it}
     private var esp32Sdk = SDKPathDocumentListener(ESP32SettingState.sdkPath)
     private var crosscompiler = GccPathDocumentListener(ESP32SettingState.crosscompilerPath)
     private var esp32OpenOcdListener = Esp32PathDocumentListener(ESP32SettingState.esp32OpenOcdLocation)
 
     init {
-        availableBaudRate.forEach { espToolBaudRate.addItem(it) }
         espToolBaudRate.maximumSize = Dimension(10000, 30)
         espToolPy.maximumSize = Dimension(10000, 30)
     }
@@ -117,7 +115,7 @@ class ESP32Setting : SearchableConfigurable {
     override fun isModified(): Boolean {
         return esp32Sdk.path != ESP32SettingState.sdkPath
                 || crosscompiler.path != ESP32SettingState.crosscompilerPath
-                || espToolPy.selectedItem != ESP32SettingState.serialPortName
+                || espToolPy.isModified()
                 || espToolBaudRate.selectedItem != ESP32SettingState.serialPortBaud
                 || esp32OpenOcdListener.path != ESP32SettingState.esp32OpenOcdLocation
     }
@@ -141,8 +139,6 @@ class ESP32Setting : SearchableConfigurable {
         ESP32SettingState.sdkPath = esp32Sdk.path
         ESP32SettingState.crosscompilerPath = crosscompiler.path
         ESP32SettingState.esp32OpenOcdLocation = esp32OpenOcdListener.path
-        espToolPy.selectedItem?.let { ESP32SettingState.serialPortName = it as String }
-        espToolBaudRate.selectedItem?.let { ESP32SettingState.serialPortBaud = it as Int }
     }
 
     override fun getId(): String =  "it.achdjian.plugin.esp32"
@@ -175,24 +171,13 @@ class ESP32Setting : SearchableConfigurable {
         panel.add(crossCompilerLabel)
         panel.add(sdkCrossCompilerPath())
         panel.add(serialPortLabel)
-        panel.add(defaultSerialPort())
+        panel.add(espToolPy)
         panel.add(baudRateLabel)
         espToolBaudRate.selectedItem = ESP32SettingState.serialPortBaud
         panel.add(espToolBaudRate)
         panel.add(esp32OpenOcdLabel)
         panel.add(esp32OpenOcdPathComponent())
         return panel
-    }
-
-    private fun defaultSerialPort(): Component {
-        espToolPy.isEditable = true
-        espToolPy.removeAll()
-        val portList = ESP32SerialPortList.getPortNames()
-        portList.forEach { espToolPy.addItem(it) }
-
-        espToolPy.addItem(ESP32SettingState.serialPortName)
-        espToolPy.selectedItem = ESP32SettingState.serialPortName
-        return espToolPy
     }
 
     private fun sdkCrossCompilerPath(): Component {

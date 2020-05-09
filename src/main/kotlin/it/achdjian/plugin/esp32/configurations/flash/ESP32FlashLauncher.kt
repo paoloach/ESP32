@@ -29,7 +29,7 @@ class ESP32FlashLauncher(
             cmdLine.withEnvironment(it.additionalEnvironment)
         }
 
-        ESP32FlashConfigurationState.port.let { cmdLine.withEnvironment("ESPPORT",  "/dev/$it")}
+        ESP32FlashConfigurationState.port.let { cmdLine.withEnvironment("ESPPORT",  "$it")}
         ESP32FlashConfigurationState.baud.let { cmdLine.withEnvironment("ESPBAUD", it.toString())}
         return KillableColoredProcessHandler(cmdLine)
     }

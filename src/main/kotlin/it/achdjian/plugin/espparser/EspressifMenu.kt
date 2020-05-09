@@ -117,6 +117,11 @@ class EspressifMenu(
                                     throw RuntimeException(message, e)
                                 }
                             }
+                        } else {
+                            var parser: EspressifMenuParser = this
+                            lines.forEach {
+                                parser = parser.addLine(it)
+                            }
                         }
 
                     }

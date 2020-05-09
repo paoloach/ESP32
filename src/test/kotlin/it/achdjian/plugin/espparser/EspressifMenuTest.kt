@@ -13,6 +13,9 @@ import org.hamcrest.CoreMatchers.`is` as Is
 
 internal class EspressifMenuTest {
     @MockK
+    lateinit var file1: File
+
+    @MockK
     lateinit var readFile: ReadFile
 
     @MockK
@@ -24,7 +27,33 @@ internal class EspressifMenuTest {
     fun beforeEach() {
         MockKAnnotations.init(this, relaxUnitFun = true)
     }
+    @Test
+    fun ESP32BTConfig() {
+        val linesNimble = EspressifMenuTest::class.java.getResource("/kconfig/bt/nimble/Kconfig.in").readText().lines()
 
+        every {sourcesList.get("IDF_PATH/components/bt/host/bluedroid/Kconfig.in")} returns emptyList()
+        every {sourcesList.get("IDF_PATH/components/bt/host/nimble/Kconfig.in")} returns listOf(file1)
+        every {sourcesList.get("IDF_PATH/components/bt/esp_ble_mesh/Kconfig.in")} returns emptyList()
+        every { readFile.read(file1)} returns linesNimble
+        val lines = EspressifMenuTest::class.java.getResource("/kconfig/bt/Kconfig").readText().lines()
+        val menu = EspressifMenu(EspressifMenuNullElement(), "menu \"Bluetooth\"", sourcesList, readFile)
+        var parser: EspressifMenuParser = menu
+        lines.forEach {
+            parser = parser.addLine(it)
+        }
+        assertThat(menu.elements, hasSize(2))
+        assertThat(menu.elements[0], instanceOf(EspressifMenu::class.java))
+        assertThat(menu.elements[1], instanceOf(EspressifMenuConfig::class.java))
+        val btMenu = menu.elements[0] as EspressifMenu
+        assertThat(btMenu.elements, hasSize(5))
+        assertThat(btMenu.elements[0], instanceOf(EspressifConfig::class.java))
+        assertThat(btMenu.elements[1], instanceOf(EspressifMenu::class.java))
+        assertThat(btMenu.elements[2], instanceOf(EspressifChoice::class.java))
+        assertThat(btMenu.elements[3], instanceOf(EspressifMenu::class.java))
+        assertThat(btMenu.elements[4], instanceOf(EspressifMenu::class.java))
+        val nimbleMenu = btMenu.elements[4] as EspressifMenu
+        assertThat(nimbleMenu.elements, hasSize(35))
+    }
 
     @Test
     fun esp8266SerialFlashConfig() {

@@ -4,7 +4,7 @@ package it.achdjian.plugin.esp32
 
 const val DEFAULT_BAUD = 115200
 
-val availableBaudRate = listOf(
+val AVAILABLE_BAUD_RATE = listOf(
     300,
     600,
     1200,
