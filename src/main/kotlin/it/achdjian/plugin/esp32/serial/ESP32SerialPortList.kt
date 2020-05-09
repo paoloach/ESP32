@@ -14,6 +14,7 @@ import kotlin.math.min
 
 
 fun getSerialPort(project: Project): ESP32SerialPortData? {
+    val portList = ESP32SerialPortList();
     val flashConfPort = RunManagerEx.getInstanceEx(project)
         .allSettings
         .firstOrNull { it.name == CONFIGURATION_NAME }
@@ -26,10 +27,10 @@ fun getSerialPort(project: Project): ESP32SerialPortData? {
     val port = flashConfPort ?: ESP32SettingState.serialPortName
     val baud = config["CONFIG_ESPTOOLPY_MONITOR_BAUD"]?.toIntOrNull() ?: ESP32SettingState.serialPortBaud
 
-    val portNames = ESP32SerialPortList.getPortNames()
+    val portNames = portList.getPortNames()
     if (portNames.isEmpty())
         return ESP32SerialPortData(port, baud)
-    ESP32SerialPortList.getPortNames().firstOrNull { it == port }?.let {
+    portList.getPortNames().firstOrNull { it == port }?.let {
         return ESP32SerialPortData(
             port,
             baud
@@ -40,7 +41,7 @@ fun getSerialPort(project: Project): ESP32SerialPortData? {
 }
 
 
-object ESP32SerialPortList {
+class ESP32SerialPortList {
     private val serialInterface = SerialNativeInterface()
     private val PORTNAMES_REGEXP: Pattern?
     private val PORTNAMES_PATH: String?

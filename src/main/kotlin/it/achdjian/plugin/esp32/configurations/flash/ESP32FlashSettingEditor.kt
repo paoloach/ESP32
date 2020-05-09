@@ -8,9 +8,9 @@ import com.jetbrains.cidr.ui.ActionItemsComboBox
 import it.achdjian.plugin.esp32.DEFAULT_BAUD
 import it.achdjian.plugin.esp32.actions.configParsing
 import it.achdjian.plugin.esp32.serial.ESP32SerialPortData
+import it.achdjian.plugin.esp32.serial.ESP32SerialPortList
 import it.achdjian.plugin.esp32.ui.BaudRateComboBox
 import it.achdjian.plugin.esp32.ui.GridLayout2
-import java.io.File
 import javax.swing.JComponent
 import javax.swing.JLabel
 
@@ -36,16 +36,21 @@ class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP
         val state = runConfigurationESP32.flashConfigurationState
         state.configurationName?.let { configuration.selectedItem = state.configurationName }
 
-        val portList = createPortList()
-        portList.forEach { espToolPy.addItem(it) }
+
+        val portList = ESP32SerialPortList().getPortNames()
+        if (portList.isEmpty()){
+            espToolPy.addItem("No valid port");
+        } else {
+            portList.forEach { espToolPy.addItem(it) }
+        }
         val config = configParsing(runConfigurationESP32.project)
         val port = if (state.port.isBlank()) {
             config["ESPTOOLPY_PORT"]?.let { it }
         } else {
             state.port
         }
-        if (!port.isNullOrBlank() && !portList.contains(port)) {
-            espToolPy.addItem(port)
+        if (portList.contains(port)){
+            espToolPy.selectedItem = port
         }
         espToolPy.selectedItem = port
 
@@ -72,10 +77,4 @@ class ESP32FlashSettingEditor(private val project: Project) : SettingsEditor<ESP
         panel.add(espToolBaudRate)
         return panel
     }
-
-    private fun createPortList() =
-        File("/dev").walk().filter {
-            it.name.startsWith("ttyS") || it.name.startsWith("ttyUSB")
-        }.map { it.name }
-
 }
