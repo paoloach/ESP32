@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'it.achdjian.plugin'
-version '2019.3'
+version '2019.3.1'
 
 repositories {
     mavenCentral()
@@ -46,6 +46,7 @@ patchPluginXml {
     untilBuild "193.*"
     
     changeNotes """
+      <p>&#8226; 2019.3.1 &#8594; Code cleaning
       <p>&#8226; 2019.3 &#8594; Change version numeration in order to reflect clion target plus some minor improvoument and fixes </p>
       <p>&#8226; 1.3.1 &#8594; Add JTAG GDB </p>
       <p>&#8226; 1.2.6 &#8594; Fix parser </p>
