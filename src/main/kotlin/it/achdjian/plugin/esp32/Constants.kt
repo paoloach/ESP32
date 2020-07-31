@@ -20,7 +20,8 @@ val AVAILABLE_BAUD_RATE = listOf(
     576000,
     921600,
     1000000,
-    2000000
+    2000000,
+    3000000
 )
 
 const val CONFIGURATION_NAME = "ESP32 flash rom"
