@@ -59,6 +59,10 @@ fun addListenerToDepending(
             addListenerToDepending(expression.left, listener)
             addListenerToDepending(expression.right, listener)
         }
+        is NotEqualOper -> {
+            addListenerToDepending(expression.left, listener)
+            addListenerToDepending(expression.right, listener)
+        }
     }
 }
 
@@ -185,9 +189,15 @@ fun <T : Any> eval(clazz: KClass<T>, expression: Expression): T {
         }
         is EqualOper -> {
             if (expression.left::class != expression.right::class) {
-                throw RuntimeException("can't compare a type ${expression.left::class.simpleName} with ${expression.right::class.simpleName}")
+                return false as T
             }
             return (evalString(expression.left) == evalString(expression.right)) as T
+        }
+        is NotEqualOper -> {
+            if (expression.left::class != expression.right::class) {
+                return true as T
+            }
+            return (evalString(expression.left) != evalString(expression.right)) as T
         }
         else -> {
             throw RuntimeException("Undefined expression: ${expression.javaClass.name}")

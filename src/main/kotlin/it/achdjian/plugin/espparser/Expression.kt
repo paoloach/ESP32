@@ -84,6 +84,11 @@ class EqualOper(left: Expression, right: Expression) : BinaryOperation(left, rig
     override fun equals(other: Any?): Boolean = other is EqualOper && other.left == left && other.right == other.right
 }
 
+class NotEqualOper(left: Expression, right: Expression) : BinaryOperation(left, right) {
+    override fun equals(other: Any?): Boolean = other is NotEqualOper && other.left == left && other.right == other.right
+    override fun toString() = "NotEqual from $left and $right"
+}
+
 class NotAvailableOperation : RuntimeException()
 open class ParserError(message: String = "") : RuntimeException(message)
 class NotMatchingBracket : ParserError("Not matching bracket")
@@ -138,7 +143,7 @@ fun List<Token>.applyIntegerBinaryOperator(): List<Token> {
 
     while (iter.hasNext()) {
         when (val token = iter.next()) {
-            is GtOperator, is GteOperator, is LtOperator, is LteOperator, is EqualOperator -> {
+            is GtOperator, is GteOperator, is LtOperator, is LteOperator, is EqualOperator, is NotEqualOperator -> {
                 result.removeAt(result.lastIndex)
                 iter.previous()
                 val left = iter.previous()
@@ -151,6 +156,7 @@ fun List<Token>.applyIntegerBinaryOperator(): List<Token> {
                     throw InvalidRightArgument(right)
                 when (token) {
                     is EqualOperator -> result.add(EqualOper(left, right))
+                    is NotEqualOperator -> result.add(NotEqualOper(left, right))
                     is GtOperator -> result.add(GTOper(left, right))
                     is GteOperator -> result.add(GTEOper(left, right))
                     is LteOperator -> result.add(LTOper(left, right))

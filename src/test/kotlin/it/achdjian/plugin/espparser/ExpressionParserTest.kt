@@ -183,4 +183,11 @@ internal class ExpressionParserTest {
 
         assertThat(parser.expresison, Is( OrOper(SimpleExpression("BTDM_CONTROLLER_MODE_BR_EDR_ONLY"), SimpleExpression("BTDM_CONTROLLER_MODE_BTDM"))  as Expression))
     }
+
+    @Test
+    fun expressionWithNotEqual() {
+        val parser = ExpressionParser("A != 7  # backwards compatibility, can remove in IDF 5")
+
+        assertThat(parser.expresison, Is( NotEqualOper(SimpleExpression("A"), SimpleExpression("7"))  as Expression))
+    }
 }

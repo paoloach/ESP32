@@ -19,6 +19,7 @@ class AndOperator : BinaryOperator("&&")
 
 class OrOperator : BinaryOperator("||")
 class EqualOperator : BinaryOperator("==")
+class NotEqualOperator : BinaryOperator("!=")
 class GtOperator : BinaryOperator(">")
 class GteOperator : BinaryOperator(">=")
 class LtOperator : BinaryOperator("<")
@@ -41,6 +42,15 @@ fun operatorSecondChar(c: Char, prevOper: Char, result: MutableList<Token>): Boo
             }
             return true
         }
+        '!' -> {
+            return if (c == '='){
+                        result.add(NotEqualOperator())
+                        true
+                    } else {
+                        false;
+                    }
+        }
+
         '>' -> {
             if (c == '=') {
                 result.add(GteOperator())
@@ -170,13 +180,6 @@ class NormalTokenizer(val result: MutableList<Token>) : Tokenizer {
                         varName = ""
                     }
                 }
-                '!' -> {
-                    if (varName.isNotEmpty()) {
-                        result.add(ValueToken(varName))
-                        varName = ""
-                    }
-                    result.add(NotOperatorToken())
-                }
                 '(' -> {
                     if (varName.isNotEmpty()) {
                         result.add(ValueToken(varName))
@@ -191,7 +194,7 @@ class NormalTokenizer(val result: MutableList<Token>) : Tokenizer {
                     }
                     result.add(CloseBracket())
                 }
-                '=', '>', '<', '&', '|' -> {
+                '=', '>', '<', '&', '|', '!' -> {
                     prevOper = c
                     tokenOper = true
                     if (varName.isNotEmpty()) {
