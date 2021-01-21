@@ -83,7 +83,7 @@ class DebugerParameterPanel : CommonProgramParametersPanel() {
             null as Project?,
             FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor()
         )
-        myGdbRemoteField.emptyText.text = CPPBundle.message("gdbRemote.command.hint")
+        myGdbRemoteField.emptyText.text = "gdb remote"
         myDelayField.toolTipText = CPPBundle.message("gdbserver.startup.delay.text")
 
         super.initComponents()

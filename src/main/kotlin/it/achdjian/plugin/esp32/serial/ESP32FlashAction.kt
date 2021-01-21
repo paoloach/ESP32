@@ -29,7 +29,7 @@ class ESP32FlashAction(val project: Project) : ToggleAction("Flash", "Flash the 
                 serialService.close()
 
                 val executor = DefaultRunExecutor.getRunExecutorInstance()
-                val runner = ProgramRunnerUtil.getRunner(executor.id, it) as ProgramRunner
+                val runner = ProgramRunner.getRunner(executor.id, it.configuration) as ProgramRunner
 
                 val env = ExecutionEnvironment(executor, runner, it, project)
                 runner.execute(env)

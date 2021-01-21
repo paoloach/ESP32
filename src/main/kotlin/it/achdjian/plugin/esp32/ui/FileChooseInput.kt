@@ -30,7 +30,7 @@ abstract class FileChooseInput(valueName:String, defaultLocation: File,  fileCho
 
     init {
         this.installPathCompletion(fileDescriptor)
-        addActionListener { e: ActionEvent? ->
+        addActionListener { _: ActionEvent? ->
             var file: File? = null
             val text = this.textField.text
             if (text != null && !text.isEmpty()) {
@@ -65,7 +65,7 @@ abstract class FileChooseInput(valueName:String, defaultLocation: File,  fileCho
         }
     }
 
-    abstract fun validateFile(var1: File): Boolean
+    abstract fun validateFile(file: File): Boolean
 
 
 

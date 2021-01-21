@@ -13,7 +13,7 @@ import com.intellij.openapi.util.WriteExternalException
 import org.jdom.Element
 
 class ESP32FlashRunConfiguration(project: Project, factory: ConfigurationFactory, name:String) : RunConfigurationBase<ESP32FlashConfigurationState>(project, factory, name) {
-    val flashConfigurationState = ESP32FlashConfigurationState(project)
+    val flashConfigurationState = ESP32FlashConfigurationState()
 
     override fun getConfigurationEditor(): SettingsEditor<out RunConfiguration> =
         ESP32FlashSettingEditor(project)

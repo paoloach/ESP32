@@ -24,7 +24,7 @@
     <!-- uncomment to enable plugin in all products
     <depends>com.intellij.modules.lang</depends>
     -->
-
+    <depends>com.intellij.modules.java</depends>
     <depends>com.intellij.modules.clion</depends>
 
     <extensions defaultExtensionNs="com.intellij">
@@ -54,9 +54,6 @@
 
 
     <project-components>
-        <component>
-            <implementation-class>it.achdjian.plugin.esp32.serial.SerialMonitorView</implementation-class>
-        </component>
         <component>
             <implementation-class>it.achdjian.plugin.esp32.configurations.debuger.ESP32OpenOcdComponent</implementation-class>
         </component>

@@ -28,7 +28,7 @@ class ESP32ConnectDisconnectAction(val customPortData: ESP32SerialPortData) : To
             }
             val serialService = ServiceManager.getService(project, ESP32SerialService::class.java)
             //val serialPortData  = getSerialPort(project )
-            serialPortData?.let {
+            serialPortData.let {
                 try {
                     if (doConnect) {
                         serialService.connect(it.portName, it.baud)

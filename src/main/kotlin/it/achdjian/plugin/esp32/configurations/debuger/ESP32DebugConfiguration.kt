@@ -56,10 +56,10 @@ class ESP32DebugConfiguration(project: Project, factory: ConfigurationFactory, n
         val path = File(ESP32SettingState.crosscompilerPath)
         val compiler = File(path, "xtensa-esp32-elf-gcc")
         val cxxCompiler = File(path, "xtensa-esp32-elf-g++")
-        val debugger = File(path, "xtensa-esp32-elf-gdb")
+        val debuggerPath = File(path, "xtensa-esp32-elf-gdb")
 
         return defaultToolchain?.let { toolchain ->
-            val debugger = CPPDebugger.customGdb(debugger)
+            val debugger = CPPDebugger.customGdb(debuggerPath)
             val esp32Toolchain = CPPToolchains.Toolchain(toolchain.osType, toolchain.toolSetKind,debugger)
             esp32Toolchain.name=ESP32_TOOLCHAIN
             esp32Toolchain.customCCompilerPath=compiler.absolutePath
@@ -109,7 +109,7 @@ class ESP32DebugConfiguration(project: Project, factory: ConfigurationFactory, n
         Utils.checkPort(gdbPort)
         Utils.checkPort(telnetPort)
         if (gdbPort == telnetPort) {
-            throw RuntimeConfigurationException("gdb and telnet ports should be different")
+            throw RuntimeConfigurationException("Gdb and telnet ports should be different")
         } else if (StringUtil.isEmpty(boardConfigFile)) {
             throw RuntimeConfigurationException("Board config not defined")
         }

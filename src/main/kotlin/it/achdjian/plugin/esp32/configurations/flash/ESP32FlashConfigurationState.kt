@@ -7,7 +7,7 @@ import it.achdjian.plugin.esp32.DEFAULT_BAUD
 import org.jdom.Element
 
 
-class ESP32FlashConfigurationState(project: Project? = null) : RunConfigurationOptions() {
+class ESP32FlashConfigurationState : RunConfigurationOptions() {
     var configurationName:String?=null
     var port = "ttyUSB0"
     var baud = DEFAULT_BAUD

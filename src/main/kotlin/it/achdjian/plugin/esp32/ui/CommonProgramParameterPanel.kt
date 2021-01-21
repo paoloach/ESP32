@@ -41,7 +41,7 @@ open class CommonProgramParameterPanel : JPanel() {
     private var myHasModuleMacro = false
 
     protected val project : Project?
-        get() = myModuleContext ?.let {  it.project}
+        get() = myModuleContext ?.project
 
     init {
         layout = VerticalFlowLayout(VerticalFlowLayout.MIDDLE, 0, 5, true, false)
@@ -52,7 +52,6 @@ open class CommonProgramParameterPanel : JPanel() {
 
     protected fun initComponents() {
 
-        // for backward compatibility: com.microsoft.tooling.msservices.intellij.azure:3.0.11
         myWorkingDirectoryField.addBrowseFolderListener(
             ExecutionBundle.message("select.working.directory.message"), null,
             project,
@@ -116,11 +115,8 @@ open class CommonProgramParameterPanel : JPanel() {
         val commonMacroFilter = getCommonMacroFilter()
         doAddMacroSupport(
             textField,
-            Predicate { t: Macro ->
-                commonMacroFilter.test(
-                    t
-                ) && macroFilter.test(t)
-            }, userMacros
+            { t: Macro -> commonMacroFilter.test(t) && macroFilter.test(t) },
+            userMacros
         )
     }
 
@@ -150,7 +146,7 @@ open class CommonProgramParameterPanel : JPanel() {
         if (myModuleContext != null || myHasModuleMacro) {
             macros[PathMacroUtil.MODULE_DIR_MACRO_NAME] =
                 PathMacros.getInstance().getValue(PathMacroUtil.MODULE_DIR_MACRO_NAME)
-            macros[ProgramParametersConfigurator.MODULE_WORKING_DIR] =
+            macros[PathMacroUtil.MODULE_WORKING_DIR ] =
                 PathMacros.getInstance().getValue(PathMacroUtil.MODULE_WORKING_DIR_NAME)
         }
         return macros
@@ -158,7 +154,6 @@ open class CommonProgramParameterPanel : JPanel() {
 
     protected fun copyDialogCaption(component: LabeledComponent<RawCommandLineEditor>) {
         val rawCommandLineEditor = component.component
-        rawCommandLineEditor.dialogCaption = component.rawText
         component.label.labelFor = rawCommandLineEditor.textField
     }
 
@@ -171,7 +166,7 @@ open class CommonProgramParameterPanel : JPanel() {
         myProgramParametersComponent.component.text = params
     }
 
-    fun getWorkingDirectoryAccessor(): TextAccessor? {
+    fun getWorkingDirectoryAccessor(): TextAccessor {
         return myWorkingDirectoryField
     }
 
@@ -187,7 +182,7 @@ open class CommonProgramParameterPanel : JPanel() {
         myHasModuleMacro = true
     }
 
-    fun getProgramParametersComponent(): LabeledComponent<RawCommandLineEditor>? {
+    fun getProgramParametersComponent(): LabeledComponent<RawCommandLineEditor> {
         return myProgramParametersComponent
     }
 
@@ -203,15 +198,14 @@ open class CommonProgramParameterPanel : JPanel() {
 
 
     fun applyTo(configuration: CommonProgramRunConfigurationParameters) {
-        configuration.programParameters = fromTextField(myProgramParametersComponent.component, configuration)
-        configuration.workingDirectory = fromTextField(myWorkingDirectoryField, configuration)
+        configuration.programParameters = fromTextField(myProgramParametersComponent.component)
+        configuration.workingDirectory = fromTextField(myWorkingDirectoryField)
         configuration.envs = myEnvVariablesComponent.envs
         configuration.isPassParentEnvs = myEnvVariablesComponent.isPassParentEnvs
     }
 
     protected fun fromTextField(
-        textAccessor: TextAccessor,
-        configuration: CommonProgramRunConfigurationParameters
+        textAccessor: TextAccessor
     ): String? {
         return textAccessor.text
     }
@@ -219,7 +213,7 @@ open class CommonProgramParameterPanel : JPanel() {
     fun reset(configuration: CommonProgramRunConfigurationParameters) {
         setProgramParameters(configuration.programParameters)
         setWorkingDirectory(PathUtil.toSystemDependentName(configuration.workingDirectory))
-        myEnvVariablesComponent!!.envs = configuration.envs
-        myEnvVariablesComponent!!.isPassParentEnvs = configuration.isPassParentEnvs
+        myEnvVariablesComponent.envs = configuration.envs
+        myEnvVariablesComponent.isPassParentEnvs = configuration.isPassParentEnvs
     }
 }

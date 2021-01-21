@@ -5,10 +5,13 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.module.ModuleManager
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.project.ProjectManager
 import com.intellij.openapi.ui.DialogBuilder
 import com.intellij.openapi.ui.Messages
+import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.ui.ScrollPaneFactory
+import it.achdjian.plugin.esp32.configurations.debuger.ESP32DebugConfiguration
 import it.achdjian.plugin.esp32.configurator.CONFIG_FILE_NAME
 import it.achdjian.plugin.esp32.configurator.ESP32WizardPanel
 import it.achdjian.plugin.esp32.configurator.WizardData
@@ -21,11 +24,9 @@ import javax.swing.JPanel
 
 
 fun getProjectPath(project: Project): VirtualFile? {
-    val modules = ModuleManager.getInstance(project).modules
-    if (modules.isEmpty())
-        throw RuntimeException("Project has no modules")
-    val moduleFile = modules[0].moduleFile
-    return moduleFile?.parent?.parent
+    return project.basePath?.let {
+        StandardFileSystems.local().findFileByPath(it)
+    }
 }
 
 fun configParsing(project: Project, showDialog: Boolean=true): Map<String, String> {
@@ -52,12 +53,12 @@ fun configParsing(project: Project, showDialog: Boolean=true): Map<String, Strin
                     result[key] = value
                 }
             }
-    } ?: if (showDialog) Messages.showErrorDialog(project, "Unable to find $CONFIG_FILE_NAME file", "ESP32 plugin")
+    } ?: if (showDialog) Messages.showErrorDialog(project, "Unable to find $CONFIG_FILE_NAME file", "ESP32 Plugin")
 
     return result
 }
 
-class Settings : AnAction("ESP32 setting..."), ComponentListener {
+class Settings : AnAction("ESP32 Setting..."), ComponentListener {
     companion object {
         private val LOG = Logger.getInstance(Settings::class.java)
     }

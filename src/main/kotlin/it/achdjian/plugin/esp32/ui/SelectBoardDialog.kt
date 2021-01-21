@@ -22,7 +22,6 @@ import it.achdjian.plugin.esp32.configurations.debuger.Board
 import it.achdjian.plugin.esp32.configurations.debuger.findScripts
 import it.achdjian.plugin.esp32.configurations.debuger.require
 import it.achdjian.plugin.esp32.setting.ESP32SettingState
-import sun.nio.cs.US_ASCII
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -41,7 +40,7 @@ fun findBoardsConfigFiles(): Array<File> ? {
 
 private fun calcConfigFileScore(keywordWeight: List<Pair<String, Int>>, ocdBoard: File): Pair<File, Int> {
     return if (ocdBoard.length() <100000L ){
-        val text =  ocdBoard.readText(US_ASCII()).toUpperCase()
+        val text =  ocdBoard.readText(Charsets.ISO_8859_1).toUpperCase()
         val weight = keywordWeight.filter { text.contains(it.first) }.map { it.second }.sum()
         Pair.pair(ocdBoard, weight)
     } else {
@@ -65,10 +64,12 @@ fun selectBoardByPriority(project: Project, board: Board): String ? {
             val boardByScores = it
                 .filter { !it.isDirectory }
                 .map {file-> calcConfigFileScore(keywordWeight, file) }
-                .sortedWith(kotlin.Comparator { a, b -> when {
-                    a.second == b.second -> a.first.compareTo(b.first)
-                    else -> b.second -  a.second
-                }})
+                .sortedWith { a, b ->
+                    when (a.second) {
+                        b.second -> FileUtil.compareFiles(a.first, b.first)
+                        else -> b.second - a.second
+                    }
+                }
                 .map { it.first }
 
 
@@ -96,7 +97,7 @@ class SelectBoardDialog(val myProject: Project, private val myBoardFiles: List<F
     private var myCopyAndUseAction = CopyAndUseAction(this)
 
     init {
-        title = "Select board"
+        title = "Select Board"
         init()
         myBoardList.selectedIndex=0
     }
@@ -136,7 +137,7 @@ class SelectBoardDialog(val myProject: Project, private val myBoardFiles: List<F
         return JBScrollPane(myBoardList)
     }
 
-    override fun getPreferredFocusedComponent(): JComponent? =myBoardList
+    override fun getPreferredFocusedComponent(): JComponent =myBoardList
 }
 
 

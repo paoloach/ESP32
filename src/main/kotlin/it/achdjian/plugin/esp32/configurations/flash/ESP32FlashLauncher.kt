@@ -18,7 +18,7 @@ class ESP32FlashLauncher(
         cmdLine.addParameter("flash")
 
         val cMakeWorkspace = CMakeWorkspace.getInstance(environment.project)
-        cmdLine.withWorkDirectory(cMakeWorkspace.projectDir)
+        cmdLine.withWorkDirectory(cMakeWorkspace.projectPath.toFile())
 
         CMakeWorkspace.getInstance(environment.project).modelTargets.first{it.name=="flash"}?.buildConfigurations?.first()?.let {
             val profileInfo = cMakeWorkspace.getProfileInfoFor(it)
@@ -29,7 +29,7 @@ class ESP32FlashLauncher(
             cmdLine.withEnvironment(it.additionalEnvironment)
         }
 
-        ESP32FlashConfigurationState.port.let { cmdLine.withEnvironment("ESPPORT",  "$it")}
+        ESP32FlashConfigurationState.port.let { cmdLine.withEnvironment("ESPPORT", it)}
         ESP32FlashConfigurationState.baud.let { cmdLine.withEnvironment("ESPBAUD", it.toString())}
         return KillableColoredProcessHandler(cmdLine)
     }

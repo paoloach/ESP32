@@ -1,10 +1,10 @@
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.16'
-    id 'org.jetbrains.kotlin.jvm' version '1.4.0'
+    id 'org.jetbrains.intellij' version '0.6.5'
+    id 'org.jetbrains.kotlin.jvm' version '1.4.21-2'
 }
 
 group 'it.achdjian.plugin'
-version '2020.0.3'
+version '2021.1.0'
 
 repositories {
     mavenCentral()
@@ -14,13 +14,13 @@ repositories {
 }
 
 publishPlugin {
-    token intellijPublishToken
+    token = System.getenv("ORG_GRADLE_PROJECT_intellijPublishToken")
 }
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation files('lib/jssc-2.8.0.jar')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.4.10"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:1.4.21-2"
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
@@ -30,11 +30,14 @@ dependencies {
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
-    version 'CL-2020.2'
-  //  version 'CL-2020.1.1'
-    //version 'CL-2019.3.4'
+    plugins = ['com.intellij.java']
+    //version 'CL-2020.2'
+    //version 'CL-2020.3'
+
+    localPath = '/home/paolo/Downloads/clion-2020.2'
     type 'CL'
     pluginName 'esp32'
+    setPlugins("com.intellij.clion", "com.intellij.cidr.base")
 }
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
@@ -47,6 +50,8 @@ patchPluginXml {
     untilBuild "203.*"
 
     changeNotes """
+      <p>&#8226; 2021.1.0 &#8594; change clion packages for 2020.3 release    </p>
+      <p>&#8226; 2020.0.4 &#8594; Fix serial terminal creation </p>
       <p>&#8226; 2020.0.3 &#8594; Update parser </p>
       <p>&#8226; 2020.0.2 &#8594; Compatibility with 2020.2 </p>
       <p>&#8226; 2020.0.1 &#8594; clean code </p>
@@ -72,16 +77,9 @@ patchPluginXml {
       """
 }
 
-
-
-//task copyPlugin(type: Copy) {
-//    from file("${buildDir}/libs/esp32-${version}.jar")
-//    into file("${project.gradle.gradleUserHomeDir}/../.CLion2019.3/config/plugins/esp32/lib")
-//}
-
 task copyPlugin(type: Copy) {
     from file("${buildDir}/libs/esp32-${version}.jar")
-    into file("${project.gradle.gradleUserHomeDir}/../.local/share/JetBrains/CLion2020.2/esp32/lib")
+    into file("${project.gradle.gradleUserHomeDir}/../.local/share/JetBrains/CLion2020.3/esp32/lib")
 }
 
 task execCLion(type: Exec) {
