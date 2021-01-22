@@ -4,7 +4,7 @@ plugins {
 }
 
 group 'it.achdjian.plugin'
-version '2021.1.0'
+version '2021.1.1'
 
 repositories {
     mavenCentral()
@@ -31,10 +31,8 @@ dependencies {
 // See https://github.com/JetBrains/gradle-intellij-plugin/
 intellij {
     plugins = ['com.intellij.java']
-    //version 'CL-2020.2'
-    //version 'CL-2020.3'
+    version 'CL-2020.3'
 
-    localPath = '/home/paolo/Downloads/clion-2020.2'
     type 'CL'
     pluginName 'esp32'
     setPlugins("com.intellij.clion", "com.intellij.cidr.base")
@@ -46,11 +44,11 @@ compileTestKotlin {
     kotlinOptions.jvmTarget = "1.8"
 }
 patchPluginXml {
-    sinceBuild "201.6668.126"
+    sinceBuild "203.0"
     untilBuild "203.*"
 
     changeNotes """
-      <p>&#8226; 2021.1.0 &#8594; change clion packages for 2020.3 release    </p>
+      <p>&#8226; 2021.1.1 &#8594; change clion packages for 2020.3 release    </p>
       <p>&#8226; 2020.0.4 &#8594; Fix serial terminal creation </p>
       <p>&#8226; 2020.0.3 &#8594; Update parser </p>
       <p>&#8226; 2020.0.2 &#8594; Compatibility with 2020.2 </p>

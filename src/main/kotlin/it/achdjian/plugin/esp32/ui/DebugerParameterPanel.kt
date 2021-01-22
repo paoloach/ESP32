@@ -13,7 +13,6 @@ import com.intellij.ui.JBIntSpinner
 import com.intellij.ui.components.JBLabel
 import com.intellij.ui.components.JBTextField
 import com.intellij.ui.components.panels.HorizontalLayout
-import com.jetbrains.cidr.cpp.CPPBundle
 import com.jetbrains.cidr.cpp.execution.gdbserver.DownloadType
 import com.jetbrains.cidr.cpp.execution.gdbserver.GdbServerRunConfiguration
 import com.jetbrains.cidr.cpp.execution.gdbserver.RadioButtonPanel
@@ -23,7 +22,7 @@ import javax.swing.JPanel
 class TitleSeparator(val parent: DebugerParameterPanel) : AbstractTitledSeparatorWithIcon(
     AllIcons.General.ArrowRight,
     AllIcons.General.ArrowDown,
-    CPPBundle.message("gdbserver.options.advanced")
+    "Advanced GDB Server options"
 ) {
     override fun createPanel(): RefreshablePanel {
         return object : RefreshablePanel {
@@ -63,31 +62,31 @@ class DebugerParameterPanel : CommonProgramParametersPanel() {
     override fun initComponents() {
         myDownloadGroup = RadioButtonPanel<DownloadType>(DownloadType.values())
         myDownloadComponent =
-            LabeledComponent.create(myDownloadGroup, CPPBundle.message("gdbserver.executable.download"), "West")
+            LabeledComponent.create(myDownloadGroup,"Download executable", "West")
         myGdbServerFileField = TextFieldWithBrowseButton()
         myGdbRemoteField = JBTextField()
         myDelayField = JBIntSpinner(0, 0, 1000000, 500)
         myGdbServerComponent =
-            LabeledComponent.create(myGdbServerFileField, CPPBundle.message("gdbserver.title"), "West")
+            LabeledComponent.create(myGdbServerFileField, "GDB server", "West")
         val label = JPanel(HorizontalLayout(0))
         label.add(myDelayField, "LEFT")
-        label.add(JBLabel(CPPBundle.message("gdbserver.startup.delay.label.ms")), "LEFT")
-        myDelayComponent = LabeledComponent.create(label, CPPBundle.message("gdbserver.startup.delay.label"), "West")
+        label.add(JBLabel("ms"), "LEFT")
+        myDelayComponent = LabeledComponent.create(label, "Startup delay", "West")
         myOptionsSeparator = TitleSeparator(this)
-        myGdbRemoteComponent = LabeledComponent.create(myGdbRemoteField, CPPBundle.message("gdbRemote.command"), "West")
+        myGdbRemoteComponent = LabeledComponent.create(myGdbRemoteField, "'target remote' args:", "West")
 
         (myGdbServerFileField.textField as JBTextField).emptyText.setText("/usr/bin/gdbserver")
         myGdbServerFileField.addBrowseFolderListener(
-            CPPBundle.message("gdbserver.select.executable"),
+            "Select GDB Server Executable",
             null as String?,
             null as Project?,
             FileChooserDescriptorFactory.createSingleFileNoJarsDescriptor()
         )
         myGdbRemoteField.emptyText.text = "gdb remote"
-        myDelayField.toolTipText = CPPBundle.message("gdbserver.startup.delay.text")
+        myDelayField.toolTipText ="GDB Server Startup Delay"
 
         super.initComponents()
-        myProgramParametersComponent.label.text = CPPBundle.message("gdbserver.arguments")
+        myProgramParametersComponent.label.text = "GDB Server args:"
         myOptionsSeparator.off()
     }
 

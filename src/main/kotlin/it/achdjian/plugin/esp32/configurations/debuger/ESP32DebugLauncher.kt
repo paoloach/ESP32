@@ -169,7 +169,7 @@ class ESP32DebugLauncher(
 
         val targetProfileName = commandLineState.executionTarget.displayName
         esP32DebugConfiguration.getBuildAndRunConfigurations(targetProfileName)?.let { runConfigurations ->
-            runConfigurations.runFile?.let {
+            runConfigurations.runConfiguration?.productFile?.let {
                 if (it.exists() && it.isFile)
                     return it
                 else

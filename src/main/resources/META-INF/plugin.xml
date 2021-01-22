@@ -38,6 +38,7 @@
         <directoryProjectGenerator implementation="it.achdjian.plugin.esp32.generator.CProjectGenerator"/>
         <applicationConfigurable order="last" id="it.achdjian.plugin.esp32" displayName="ESP32 config" groupId="build" instance="it.achdjian.plugin.esp32.setting.ESP32Setting"/>
         <projectService serviceInterface="it.achdjian.plugin.esp32.serial.ESP32SerialService" serviceImplementation="it.achdjian.plugin.esp32.serial.ESP32JsscESP32SerialService"/>
+        <notificationGroup id="Serial Monitor Notification" displayType="BALLOON" key="serial.monitor.notification"/>
     </extensions>
 
     <actions>
@@ -58,5 +59,7 @@
             <implementation-class>it.achdjian.plugin.esp32.configurations.debuger.ESP32OpenOcdComponent</implementation-class>
         </component>
     </project-components>
+
+
 
 </idea-plugin>
